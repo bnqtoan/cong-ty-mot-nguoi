@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Slide Studio · skill làm slide chiều sâu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500;1,9..144,700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#141413;
+    --cream:#faf9f5;
+    --light-gray:#e8e6dc;
+    --mid:#6a6a6a;
+    --accent:#d97757;
+    --accent-soft:#f3e2d8;
+    --surface:#ffffff;
+    --sans:'Be Vietnam Pro',system-ui,sans-serif;
+    --serif:'Fraunces',Georgia,serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--cream);color:var(--ink);font-family:var(--sans);font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  /* sticky mini header */
+  header{position:sticky;top:0;background:rgba(250,249,245,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--light-gray);z-index:50}
+  header .inner{max-width:1100px;margin:0 auto;padding:1rem 6vw;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.78rem;color:var(--mid);letter-spacing:.1em;text-transform:uppercase}
+  header .brand{color:var(--accent);font-weight:700}
+  header nav{display:flex;gap:1.4rem}
+  header nav a{color:var(--mid);text-decoration:none;transition:color .2s}
+  header nav a:hover{color:var(--accent)}
+
+  section{padding:8vh 6vw;border-bottom:1px solid var(--light-gray)}
+  .wrap{max-width:980px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:1.2rem}
+
+  h1.hero-headline{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(2.6rem,6vw,4.8rem);line-height:1.06;letter-spacing:-.02em;color:var(--ink);max-width:22ch;margin-bottom:1.6rem}
+  h1.hero-headline .accent{color:var(--accent);font-style:italic}
+  .hero-subhead{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.15rem,1.8vw,1.5rem);color:var(--mid);max-width:48ch;line-height:1.45;margin-bottom:2.4rem}
+  .scroll-hint{font-family:var(--mono);font-size:.85rem;color:var(--mid);letter-spacing:.1em;display:inline-flex;align-items:center;gap:.6rem}
+  .scroll-hint::after{content:"↓";font-size:1.1rem;animation:bounce 1.6s ease-in-out infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+  h2{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.9rem,3.6vw,2.8rem);line-height:1.12;color:var(--ink);max-width:24ch;margin-bottom:1.6rem}
+  h2 .accent{color:var(--accent)}
+  h3{font-family:var(--sans);font-weight:800;font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.3;color:var(--ink);margin-bottom:.6rem;letter-spacing:-.01em}
+
+  .lead{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.15rem,1.7vw,1.4rem);color:var(--mid);max-width:50ch;margin-bottom:2rem;line-height:1.45}
+
+  p{max-width:62ch;margin-bottom:1.1rem;font-size:clamp(1rem,1.15vw,1.1rem);color:var(--ink)}
+  p.muted{color:var(--mid)}
+
+  .section-title-row{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap;margin-bottom:.4rem}
+  .section-title-row .num{font-family:var(--mono);font-size:.9rem;color:var(--accent);letter-spacing:.18em}
+
+  /* SOP tile */
+  .sop{background:var(--surface);border:1px solid var(--light-gray);border-radius:14px;padding:2rem 2.2rem;margin-top:1.6rem;transition:border-color .2s,transform .2s}
+  .sop:hover{border-color:var(--accent)}
+  .sop .tag{font-family:var(--mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.16em;color:var(--accent);margin-bottom:.7rem}
+  .sop h3{margin-bottom:1rem}
+  .sop .lead-line{font-family:var(--serif);font-style:italic;font-size:1.1rem;color:var(--ink);margin-bottom:1.4rem;line-height:1.45;max-width:none}
+  .sop .body p{max-width:none;margin-bottom:.9rem;font-size:1rem}
+  .sop .output-line{font-family:var(--mono);font-size:.88rem;color:var(--accent);margin-top:1.4rem;letter-spacing:.02em}
+  .sop .lock-line{font-family:var(--serif);font-style:italic;font-weight:700;font-size:1.15rem;color:var(--accent);margin-top:1.4rem;padding-left:1rem;border-left:3px solid var(--accent)}
+
+  /* example box (Action Title + subtitle) */
+  .example-box{background:var(--accent-soft);border:2px solid var(--accent);border-radius:12px;padding:1.4rem 1.6rem;margin:1.4rem 0;font-family:var(--serif)}
+  .example-box .ex-tag{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);margin-bottom:.6rem;font-style:normal}
+  .example-box .ex-title{font-style:italic;font-weight:700;font-size:1.25rem;color:var(--ink);margin-bottom:.4rem;line-height:1.3}
+  .example-box .ex-sub{font-style:italic;font-size:1rem;color:var(--mid);line-height:1.45}
+
+  /* loop diagram */
+  .loop-figure{margin:2.4rem 0;padding:2rem 0;text-align:center}
+  .loop-figure svg{width:100%;max-width:900px;height:auto;display:block;margin:0 auto}
+  .loop-caption{font-family:var(--mono);font-size:.82rem;color:var(--mid);margin-top:1.2rem;text-align:center;letter-spacing:.02em;max-width:60ch;margin-left:auto;margin-right:auto}
+
+  /* loop node labels list under the SVG */
+  .loop-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:2.4rem}
+  .loop-legend .leg-item{display:flex;align-items:baseline;gap:.6rem}
+  .loop-legend .leg-name{font-family:var(--sans);font-weight:700;color:var(--accent);font-size:1rem}
+  .loop-legend .leg-role{font-family:var(--serif);font-style:italic;color:var(--mid);font-size:.95rem;line-height:1.4}
+
+  /* code blocks */
+  pre{background:var(--ink);color:var(--cream);padding:1.4rem 1.6rem;border-radius:12px;overflow-x:auto;font-family:var(--mono);font-size:.92rem;line-height:1.6;margin:1.6rem 0}
+  pre .cm{color:var(--accent);font-weight:700}
+  code{font-family:var(--mono);font-size:.9em;background:var(--accent-soft);color:var(--ink);padding:.1em .35em;border-radius:3px}
+
+  /* path cards (way A / way B) */
+  .paths{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:1.8rem}
+  .path-card{background:var(--surface);border:1px solid var(--light-gray);border-top:3px solid var(--accent);border-radius:12px;padding:1.6rem 1.8rem}
+  .path-card .path-tag{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
+  .path-card h4{font-family:var(--sans);font-weight:700;font-size:1.15rem;margin-bottom:.7rem;color:var(--ink)}
+  .path-card p{font-size:.98rem;margin-bottom:0}
+
+  /* footer */
+  footer{background:var(--ink);color:var(--cream);padding:6vh 6vw}
+  footer .wrap{max-width:980px;margin:0 auto}
+  footer .tagline{font-family:var(--serif);font-style:italic;font-size:clamp(1.2rem,1.8vw,1.5rem);max-width:32ch;margin-bottom:2.4rem;line-height:1.4}
+  footer .tagline .accent{color:var(--accent)}
+  footer .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.4rem;margin-bottom:2.4rem;padding-bottom:2rem;border-bottom:1px solid rgba(255,255,255,.1)}
+  footer .links a{color:var(--cream);text-decoration:none;font-family:var(--mono);font-size:.88rem;letter-spacing:.04em;display:block;padding:.6rem 0;border-bottom:1px solid transparent;transition:border-color .2s,color .2s}
+  footer .links a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+  footer .closing{font-family:var(--serif);font-style:italic;color:var(--mid);font-size:1rem}
+
+  @media (max-width:760px){
+    .paths{grid-template-columns:1fr}
+    .loop-legend{grid-template-columns:1fr}
+    section{padding:6vh 5vw}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .scroll-hint::after{animation:none}
+    *{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <div class="brand">slide-studio</div>
+    <nav>
+      <a href="#problem">Vấn đề</a>
+      <a href="#loop">Vòng lặp</a>
+      <a href="#sops">SOPs</a>
+      <a href="#principles">Nguyên lý</a>
+      <a href="#start">Bắt đầu</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ========== SECTION 1: HERO ========== -->
+<section id="hero">
+  <div class="wrap">
+    <div class="eyebrow">Slide Studio · skill làm deck chiều sâu</div>
+    <h1 class="hero-headline">Mỗi deck chạy qua một <span class="accent">vòng lặp</span> khoẻ hơn.</h1>
+    <p class="hero-subhead">Bạn đưa nguyên liệu thô vô, skill ép nó qua nghiên cứu, kiến trúc, review, retro để deck sau khoẻ hơn deck trước.</p>
+    <div class="scroll-hint">Cuộn xuống xem nó chạy</div>
+  </div>
+</section>
+
+<!-- ========== SECTION 2: VẤN ĐỀ ========== -->
+<section id="problem">
+  <div class="wrap">
+    <div class="section-title-row">
+      <span class="num">01</span>
+      <h2>Vấn đề skill này giải</h2>
+    </div>
+    <p>Bạn nạp 5 PDF với 1 file ghi âm vô ChatGPT rồi nói "làm slide giùm". Nó trả ra 12 slide đầy chữ, tiêu đề kể chuyện lại, biểu đồ chen vô cho có.</p>
+    <p>Cái fail không nằm ở công cụ. Slide có chiều sâu cần tinh luyện với kiến trúc, cần biết bỏ gì, giữ gì, xếp ý nào trước, không phải gõ HTML nhanh.</p>
+    <p>Skill này đóng quy trình đó thành nếp chạy. Bạn đứng ở các cổng quyết định, chốt hướng, chốt outline, chốt chất lượng. AI lo phần cơ học đỡ tốn công.</p>
+  </div>
+</section>
+
+<!-- ========== SECTION 3: VÒNG LẶP ========== -->
+<section id="loop">
+  <div class="wrap">
+    <div class="section-title-row">
+      <span class="num">02</span>
+      <h2>Vòng lặp 6 bước</h2>
+    </div>
+    <p class="lead">Nó biến mỗi lần làm deck thành một luồng học, để deck sau khoẻ hơn deck trước.</p>
+
+    <figure class="loop-figure">
+      <svg viewBox="0 0 960 420" role="img" aria-label="6-node loop diagram">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97757"/>
+          </marker>
+          <marker id="arrow-dashed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#6a6a6a"/>
+          </marker>
+        </defs>
+        <!-- 6 nodes in horizontal flow with dashed return arc above -->
+        <g font-family="Be Vietnam Pro,sans-serif">
+          <!-- nodes -->
+          <g>
+            <circle cx="100" cy="220" r="58" fill="#fff" stroke="#d97757" stroke-width="2.5"/>
+            <text x="100" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#d97757">brainstorm</text>
+            <text x="100" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">01</text>
+          </g>
+          <g>
+            <circle cx="240" cy="220" r="58" fill="#fff" stroke="#6a6a6a" stroke-width="1.8"/>
+            <text x="240" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#141413">research</text>
+            <text x="240" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">02</text>
+          </g>
+          <g>
+            <circle cx="380" cy="220" r="58" fill="#fff" stroke="#6a6a6a" stroke-width="1.8"/>
+            <text x="380" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#141413">create</text>
+            <text x="380" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">03</text>
+          </g>
+          <g>
+            <circle cx="520" cy="220" r="58" fill="#fff" stroke="#6a6a6a" stroke-width="1.8"/>
+            <text x="520" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#141413">review</text>
+            <text x="520" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">04</text>
+          </g>
+          <g>
+            <circle cx="660" cy="220" r="58" fill="#fff" stroke="#6a6a6a" stroke-width="1.8"/>
+            <text x="660" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#141413">retro</text>
+            <text x="660" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">05</text>
+          </g>
+          <g>
+            <circle cx="800" cy="220" r="58" fill="#fff" stroke="#6a6a6a" stroke-width="1.8"/>
+            <text x="800" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#141413">deploy</text>
+            <text x="800" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">06</text>
+          </g>
+          <!-- forward arrows -->
+          <line x1="158" y1="220" x2="178" y2="220" stroke="#d97757" stroke-width="2" marker-end="url(#arrow)"/>
+          <line x1="298" y1="220" x2="318" y2="220" stroke="#d97757" stroke-width="2" marker-end="url(#arrow)"/>
+          <line x1="438" y1="220" x2="458" y2="220" stroke="#d97757" stroke-width="2" marker-end="url(#arrow)"/>
+          <line x1="578" y1="220" x2="598" y2="220" stroke="#d97757" stroke-width="2" marker-end="url(#arrow)"/>
+          <line x1="718" y1="220" x2="738" y2="220" stroke="#d97757" stroke-width="2" marker-end="url(#arrow)"/>
+          <!-- dashed return arc: retro → brainstorm via 40-assets/ -->
+          <path d="M 660 162 C 600 60, 200 60, 100 162" fill="none" stroke="#6a6a6a" stroke-width="1.6" stroke-dasharray="6 5" marker-end="url(#arrow-dashed)"/>
+          <text x="380" y="65" text-anchor="middle" font-size="13" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="italic">deck sau bắt đầu giàu hơn · qua 40-assets/</text>
+        </g>
+      </svg>
+      <div class="loop-caption">Mũi tên nét đứt quay về 40-assets/ vì mỗi retro để lại một đứa dùng lại được.</div>
+    </figure>
+
+    <div class="loop-legend">
+      <div class="leg-item"><span class="leg-name">brainstorm</span><span class="leg-role">Chốt câu hỏi đúng</span></div>
+      <div class="leg-item"><span class="leg-name">research</span><span class="leg-role">Gom bằng chứng sống</span></div>
+      <div class="leg-item"><span class="leg-name">create</span><span class="leg-role">Dựng outline duyệt được</span></div>
+      <div class="leg-item"><span class="leg-name">review</span><span class="leg-role">Bắt lỗi trước khi ship</span></div>
+      <div class="leg-item"><span class="leg-name">retro</span><span class="leg-role">Giữ lại tài sản xịn</span></div>
+      <div class="leg-item"><span class="leg-name">deploy</span><span class="leg-role">Đưa deck lên trang</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 4-9: SOPs ========== -->
+<section id="sops">
+  <div class="wrap">
+    <div class="section-title-row">
+      <span class="num">03</span>
+      <h2>7 SOPs · từ ý tưởng tới slide</h2>
+    </div>
+
+    <div class="sop">
+      <div class="tag">SOP 01 · brainstorm</div>
+      <h3>Brainstorm</h3>
+      <div class="lead-line">Đa số người sai từ đây. Sai câu hỏi đầu, mấy bước sau chỉ làm sai nhanh hơn.</div>
+      <div class="body"><p>Nó là một interview ngắn, không lan man. Trước hết skill gom bối cảnh và viết lại việc thật của deck bằng cách Jobs-to-be-Done của Christensen: người xem cần ra quyết định gì sau buổi này, chứ không phải bạn có bao nhiêu tài liệu.</p>
+        <p>Rồi nó dựng giả thuyết theo Hypothesis-Driven Thinking. Deck không bắt đầu bằng "có gì nói nấy", mà bắt đầu bằng một luận điểm đủ sắc để bị phản biện. Sau đó, 5 Whys kéo tới nguyên nhân gốc, tránh kiểu slide nào cũng chỉ kể triệu chứng.</p>
+        <p>Cuối cùng, SCQA hoặc Pixar ép câu chuyện thành nhịp dễ theo: bối cảnh, căng thẳng, câu hỏi, câu trả lời. Mình không cần deck màu mè ở đây. Mình cần một xương sống đủ chắc để research không chạy tán loạn.</p></div>
+      <div class="output-line">→ Output là <code>brainstorm.md</code>, file mà các SOP sau đọc.</div>
+    </div>
+
+    <div class="sop">
+      <div class="tag">SOP 02 · research</div>
+      <h3>Research</h3>
+      <div class="lead-line">Có brainstorm rồi, AI bắt đầu gom bằng chứng để từng claim có chân đứng.</div>
+      <div class="body"><p>Research SOP tách <code>claims.md</code> và <code>examples.md</code>. <code>claims.md</code> giữ luận điểm, độ chắc, nguồn, chỗ còn thiếu. <code>examples.md</code> giữ ca cụ thể, số liệu, quote ngắn, tình huống dùng được trên slide.</p>
+        <p>Nó soi nguyên liệu qua 5 ống kính đọc ý: What/So-What để khỏi dừng ở mô tả, Gap-Drag-Accelerator để thấy lực kéo và lực cản, Then-What để nối hệ quả, Anomaly để bắt điểm lệch, và Ladder of Inference của Argyris để kiểm tra bước nhảy từ dữ liệu sang kết luận.</p></div>
+      <div class="example-box">
+        <div class="ex-tag">Ví dụ · ống kính Ladder</div>
+        <div class="ex-title">"Doanh thu +18% lừa mắt."</div>
+        <div class="ex-sub">"Top 3 chi nhánh vẫn 14% margin. Vấn đề là 1 chi nhánh đang ramp."</div>
+      </div>
+    </div>
+
+    <div class="sop">
+      <div class="tag">SOP 03 · create</div>
+      <h3>Create · chỗ HTML xuất hiện</h3>
+      <div class="lead-line">Đây là chỗ HTML xuất hiện. Nhưng trước đó có một luật rất quan trọng.</div>
+      <div class="body"><p>Create SOP fork một <code>reference-deck</code> có sẵn, rồi đi theo lối trình bày của nó. Không ngồi tả gu bằng văn xuôi, vì tả kiểu đó thường ra mỗi slide một màu tính cách. Bạn duyệt outline trước, rồi skill mới dựng.</p>
+        <p>Mỗi slide đi qua schema 5 field: title tối đa 14 chữ, subtitle tối đa 18 chữ, slide-text tối đa 25 chữ, visual, stage-note. Kế hoạch ảnh có 4 nhánh: SVG, Stock, Codex, Placeholder. Cổng cứng là không build HTML trước khi outline được duyệt.</p>
+        <p>Step 2 thêm cổng chọn style theo style-decision-matrix. Skill đọc audience + brainstorm, đề xuất 2 đường: fork 1 seed có sẵn, hoặc bake gu mới từ ảnh/brand (xem SOP 03.5). Không có default ngầm. Mỗi deck có comment <code>&lt;!-- fork: ... · rationale: ... --&gt;</code> để truy vết.</p></div>
+      <div class="lock-line">Đừng tả gu. Fork 1 deck đã có gu.</div>
+    </div>
+
+    <div class="sop">
+      <div class="tag">SOP 03.5 · new-style</div>
+      <h3>New-style · gu mới không drift</h3>
+      <div class="lead-line">Gallery không phải menu đóng. Đưa 1 tấm ảnh tham khảo, skill bake ra gu mới.</div>
+      <div class="body"><p>Khi không có gu nào trong gallery hợp — hoặc bạn có sẵn ảnh đẹp, 1 câu mô tả, hay brand của mình — skill trích DNA: palette, cặp font, độ thoáng, và đúng 1 signature move (cái nhìn-là-nhận-ra). Tất cả đổ vào một <code>token contract</code> cố định.</p>
+        <p>Vì chrome và layout bị khoá, chỉ giá trị token đổi, nên gu mới <b>không bao giờ làm hỏng</b> presenter mechanics. Bake xong, verify bằng mắt, rồi gu đó vào gallery thành seed fork được như mọi gu khác. Đa dạng vô hạn, drift bằng không.</p></div>
+      <div class="output-line">→ Nguồn: ảnh tham khảo · prompt · brand. Output: 1 reference deck mới + token block.</div>
+    </div>
+
+    <div class="sop">
+      <div class="tag">SOP 04 · review</div>
+      <h3>Review · 3 lớp check</h3>
+      <div class="lead-line">Trước khi deploy, deck đi qua 3 lớp kiểm để lỗi rẻ được bắt sớm.</div>
+      <div class="body"><p>Lớp 0 là cấu trúc: <code>studio-check.sh</code> gác chống drift — research không lọt ra ngoài deck, mỗi deck đủ audience/brainstorm/outline, không có folder rác. Đây là tầng giữ cho cả studio không sập về mớ lộn xộn.</p>
+        <p>Lớp 1 là cơ học: <code>slide-check.sh</code> chạy 17 mục kiểm, gồm cấm gạch ngang dài, tỉ lệ kicker, số chữ cho người xem, chữ tràn khung, file thiếu, speaker-meta lọt vô audience layer, và audit trail của fork choice.</p>
+        <p>Lớp 2 là chất lượng theo <code>slide-method.md</code>, với 13 mục chấm. Nó không hỏi "đẹp chưa" chung chung, mà hỏi title có hành động không, visual có làm việc không, câu chuyện có kéo người xem đi không. Kết luận chỉ có SHIP, FIX-FIRST, hoặc REWORK.</p></div>
+    </div>
+
+    <div class="sop">
+      <div class="tag">SOP 05 · retro</div>
+      <h3>Retro · chỗ skill cộng dồn</h3>
+      <div class="lead-line">Đây là chỗ skill cộng dồn. KHÔNG retro = KHÔNG có vòng lặp.</div>
+      <div class="body"><p>Retro chỉ cần ba dòng nhìn lại: cái gì chạy, cái gì cần sửa, và một tài sản gửi vô <code>40-assets/</code>. Tài sản đó có thể là prompt, layout, kiểm tra, visual pattern, hoặc một ví dụ thiệt gọn. Nhờ vậy deck sau khoẻ hơn deck trước. Không retro, mỗi deck chỉ là một file PDF rời, xong rồi mất, không cộng dồn gì hết.</p></div>
+    </div>
+
+    <div class="sop">
+      <div class="tag">SOP 06 · deploy</div>
+      <h3>Deploy</h3>
+      <div class="lead-line">Deploy SOP push GitHub Pages, thường lên trang trong 30s.</div>
+      <div class="body"><p>Luồng nhẹ hều: build, check, commit, push, mở URL để kiểm. Chỗ dễ vấp cần nhớ: deck nhiều ảnh thì set <code>postBuffer 524288000</code>, còn repo có file bắt đầu bằng <code>_</code> thì thêm <code>.nojekyll</code> để GitHub Pages đừng nuốt mất.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 9.5: NGUYÊN LÝ + REFERENCE ========== -->
+<section id="principles">
+  <div class="wrap">
+    <div class="section-title-row">
+      <span class="num">3.5</span>
+      <h2>Nguyên lý chạy ngầm</h2>
+    </div>
+    <p class="lead">4 reference doc ngầm sau lưng các SOP. Bạn không cần đọc để dùng skill, nhưng đọc rồi sẽ thấy vì sao mỗi cổng quyết định nó như vậy.</p>
+
+    <div class="paths" style="grid-template-columns:1fr;gap:1rem">
+      <div class="path-card">
+        <div class="path-tag">references/style-decision-matrix.md</div>
+        <h4>Chọn fork theo audience × temperament</h4>
+        <p>Step 2 của create SOP không cho auto-default. Skill đọc audience.md với brainstorm.md, đối chiếu matrix 2 trục (data-heavy / pedagogical / creative... × peer / executive / student / creative / mass), đề xuất top 2 fork target có lý do và tradeoff, đợi bạn chốt. Mỗi deck mang theo comment <code>&lt;!-- fork: ... · rationale: ... --&gt;</code> để truy vết. Check #17 chặn deck nào ship thiếu comment này.</p>
+      </div>
+
+      <div class="path-card">
+        <div class="path-tag">references/content-to-container-principle.md</div>
+        <h4>Container phải khớp content's job</h4>
+        <p>Nguyên lý sâu nhất: đừng sửa slide, sửa quan hệ giữa content và container. Comparison cần fill-vs-outline hierarchy. Pedagogical content trên dark container sẽ fail vì opacity blend vô bg. 1 slide chỉ 1 anchor. Speaker-meta (timing, callback, fallback) không bao giờ vô audience layer · luôn ở stage-strip. Check #15 dùng 3 pattern structural (conditional+timing / deck-infra refs / deck-mgmt imperative) để bắt leak, không phải phrase list.</p>
+      </div>
+
+      <div class="path-card">
+        <div class="path-tag">references/scrollytelling-pattern.md</div>
+        <h4>4 gear animation, không stack</h4>
+        <p>Skill ship 4 cơ chế động: (1) IntersectionObserver reveal khi slide vô view, (2) SVG SMIL cho self-running loop, (3) Interactive SVG cho click-to-explore, (4) Scrollytelling sticky stage cho audience tự pace. Mỗi content chỉ nên dùng 1 gear. Stack nhiều gear ra slide rối. Khi brainstorm có signal "step by step / long read / construct" thì fork scrollytelling reference deck thay vì slide thường.</p>
+      </div>
+
+      <div class="path-card">
+        <div class="path-tag">reference-deck/_TOKENS.md</div>
+        <h4>Token contract · engine để gu nở vô hạn</h4>
+        <p>Một "gu" không phải file HTML mới — nó là một bộ giá trị cho danh sách <code>--token</code> cố định (màu 60-30-10, cặp font, độ thoáng) cộng đúng 1 signature move. Engine (chrome + layout) đọc token và bị khoá; gu chỉ đổi giá trị. Nhờ vậy attendee bake gu mới từ ảnh/brand mà presenter mechanics không bao giờ drift. Đây là cách phá trần "chỉ vài style" mà vẫn nhất quán.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 10: CÁCH BẮT ĐẦU ========== -->
+<section id="start">
+  <div class="wrap">
+    <div class="section-title-row">
+      <span class="num">04</span>
+      <h2>Cách bắt đầu</h2>
+    </div>
+    <p class="lead">Có 2 đường vô skill.</p>
+
+    <div class="paths">
+      <div class="path-card">
+        <div class="path-tag">Đường A</div>
+        <h4>Có inbox/ sẵn</h4>
+        <p>Nếu đã có <code>inbox/{event}/</code>, bạn nói "đọc inbox". Skill scan folder, list event, hỏi bạn xác nhận bối cảnh, rồi chạy đúng luồng từ brainstorm tới deploy. Cách này hợp khi nguyên liệu đã nằm sẵn, chỉ cần đứa làm deck gom lại cho ra hình.</p>
+      </div>
+      <div class="path-card">
+        <div class="path-tag">Đường B</div>
+        <h4>Drop direct</h4>
+        <p>Nếu chưa có inbox, bạn nói "mình cần làm deck về X cho [audience]". Skill sẽ hỏi mấy câu làm rõ trước khi chạy, như người xem là ai, quyết định cần chốt là gì, nguyên liệu đang có gì, hạn ra sao.</p>
+      </div>
+    </div>
+
+    <pre><span class="cm">$</span> cd slide-studio
+<span class="cm">$</span> claude
+<span class="cm">&gt;</span> đọc inbox và build deck Q3 review</pre>
+  </div>
+</section>
+
+<!-- ========== SECTION 11: FOOTER ========== -->
+<footer>
+  <div class="wrap">
+    <div class="tagline">Landing page này được dựng bằng chính <span class="accent">skill</span> này.</div>
+    <div class="links">
+      <a href="index.html">Xem deck mẫu — Buổi 1 →</a>
+      <a href="../skill/SKILL.md">SKILL.md →</a>
+      <a href="../skill/references/slide-method.md">slide-method.md →</a>
+      <a href="https://go.bnqtoan.workers.dev/insider-cong-ty-mot-nguoi" target="_blank" rel="noopener">Tham gia Insider →</a>
+    </div>
+    <div class="closing">Đi build cái deck của bạn — rồi vô <span class="accent">Insider</span> build cùng anh em.</div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,389 +1,1647 @@
 <!DOCTYPE html>
+<!-- fork: demo-deck/index.html picker UI · rationale: cream + Fraunces editorial for pedagogical × peer/student -->
 <html lang="vi">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Slide Studio · skill làm slide chiều sâu</title>
+<title>Làm slide sâu, nhanh, chuẩn, tương tác được — S1 · v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500;1,9..144,700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --ink:#141413;
-    --cream:#faf9f5;
-    --light-gray:#e8e6dc;
-    --mid:#6a6a6a;
-    --accent:#d97757;
-    --accent-soft:#f3e2d8;
-    --surface:#ffffff;
+    --ink:#141413;          /* near-black, primary type */
+    --cream:#faf9f5;        /* warm cream canvas */
+    --light-gray:#e8e6dc;   /* divider */
+    --mid:#6a6a6a;          /* muted body */
+    --accent:#d97757;       /* orange, used sparingly */
+    --accent-soft:#f3e2d8;  /* tinted accent bg */
+    --surface:#fff;         /* card / panel bg */
+    --thanks-grad-stop:#f5f1e6;
+    --overlay-rgb:250,249,245;
+    --dot-rgb:20,20,19;
     --sans:'Be Vietnam Pro',system-ui,sans-serif;
     --serif:'Fraunces',Georgia,serif;
     --mono:'JetBrains Mono',ui-monospace,monospace;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{background:var(--cream);color:var(--ink);font-family:var(--sans);font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased}
-
-  /* sticky mini header */
-  header{position:sticky;top:0;background:rgba(250,249,245,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--light-gray);z-index:50}
-  header .inner{max-width:1100px;margin:0 auto;padding:1rem 6vw;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.78rem;color:var(--mid);letter-spacing:.1em;text-transform:uppercase}
-  header .brand{color:var(--accent);font-weight:700}
-  header nav{display:flex;gap:1.4rem}
-  header nav a{color:var(--mid);text-decoration:none;transition:color .2s}
-  header nav a:hover{color:var(--accent)}
-
-  section{padding:8vh 6vw;border-bottom:1px solid var(--light-gray)}
-  .wrap{max-width:980px;margin:0 auto}
-
-  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:1.2rem}
-
-  h1.hero-headline{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(2.6rem,6vw,4.8rem);line-height:1.06;letter-spacing:-.02em;color:var(--ink);max-width:22ch;margin-bottom:1.6rem}
-  h1.hero-headline .accent{color:var(--accent);font-style:italic}
-  .hero-subhead{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.15rem,1.8vw,1.5rem);color:var(--mid);max-width:48ch;line-height:1.45;margin-bottom:2.4rem}
-  .scroll-hint{font-family:var(--mono);font-size:.85rem;color:var(--mid);letter-spacing:.1em;display:inline-flex;align-items:center;gap:.6rem}
-  .scroll-hint::after{content:"↓";font-size:1.1rem;animation:bounce 1.6s ease-in-out infinite}
-  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
-
-  h2{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.9rem,3.6vw,2.8rem);line-height:1.12;color:var(--ink);max-width:24ch;margin-bottom:1.6rem}
-  h2 .accent{color:var(--accent)}
-  h3{font-family:var(--sans);font-weight:800;font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.3;color:var(--ink);margin-bottom:.6rem;letter-spacing:-.01em}
-
-  .lead{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.15rem,1.7vw,1.4rem);color:var(--mid);max-width:50ch;margin-bottom:2rem;line-height:1.45}
-
-  p{max-width:62ch;margin-bottom:1.1rem;font-size:clamp(1rem,1.15vw,1.1rem);color:var(--ink)}
-  p.muted{color:var(--mid)}
-
-  .section-title-row{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap;margin-bottom:.4rem}
-  .section-title-row .num{font-family:var(--mono);font-size:.9rem;color:var(--accent);letter-spacing:.18em}
-
-  /* SOP tile */
-  .sop{background:var(--surface);border:1px solid var(--light-gray);border-radius:14px;padding:2rem 2.2rem;margin-top:1.6rem;transition:border-color .2s,transform .2s}
-  .sop:hover{border-color:var(--accent)}
-  .sop .tag{font-family:var(--mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.16em;color:var(--accent);margin-bottom:.7rem}
-  .sop h3{margin-bottom:1rem}
-  .sop .lead-line{font-family:var(--serif);font-style:italic;font-size:1.1rem;color:var(--ink);margin-bottom:1.4rem;line-height:1.45;max-width:none}
-  .sop .body p{max-width:none;margin-bottom:.9rem;font-size:1rem}
-  .sop .output-line{font-family:var(--mono);font-size:.88rem;color:var(--accent);margin-top:1.4rem;letter-spacing:.02em}
-  .sop .lock-line{font-family:var(--serif);font-style:italic;font-weight:700;font-size:1.15rem;color:var(--accent);margin-top:1.4rem;padding-left:1rem;border-left:3px solid var(--accent)}
-
-  /* example box (Action Title + subtitle) */
-  .example-box{background:var(--accent-soft);border:2px solid var(--accent);border-radius:12px;padding:1.4rem 1.6rem;margin:1.4rem 0;font-family:var(--serif)}
-  .example-box .ex-tag{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);margin-bottom:.6rem;font-style:normal}
-  .example-box .ex-title{font-style:italic;font-weight:700;font-size:1.25rem;color:var(--ink);margin-bottom:.4rem;line-height:1.3}
-  .example-box .ex-sub{font-style:italic;font-size:1rem;color:var(--mid);line-height:1.45}
-
-  /* loop diagram */
-  .loop-figure{margin:2.4rem 0;padding:2rem 0;text-align:center}
-  .loop-figure svg{width:100%;max-width:900px;height:auto;display:block;margin:0 auto}
-  .loop-caption{font-family:var(--mono);font-size:.82rem;color:var(--mid);margin-top:1.2rem;text-align:center;letter-spacing:.02em;max-width:60ch;margin-left:auto;margin-right:auto}
-
-  /* loop node labels list under the SVG */
-  .loop-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:2.4rem}
-  .loop-legend .leg-item{display:flex;align-items:baseline;gap:.6rem}
-  .loop-legend .leg-name{font-family:var(--sans);font-weight:700;color:var(--accent);font-size:1rem}
-  .loop-legend .leg-role{font-family:var(--serif);font-style:italic;color:var(--mid);font-size:.95rem;line-height:1.4}
-
-  /* code blocks */
-  pre{background:var(--ink);color:var(--cream);padding:1.4rem 1.6rem;border-radius:12px;overflow-x:auto;font-family:var(--mono);font-size:.92rem;line-height:1.6;margin:1.6rem 0}
-  pre .cm{color:var(--accent);font-weight:700}
-  code{font-family:var(--mono);font-size:.9em;background:var(--accent-soft);color:var(--ink);padding:.1em .35em;border-radius:3px}
-
-  /* path cards (way A / way B) */
-  .paths{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:1.8rem}
-  .path-card{background:var(--surface);border:1px solid var(--light-gray);border-top:3px solid var(--accent);border-radius:12px;padding:1.6rem 1.8rem}
-  .path-card .path-tag{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
-  .path-card h4{font-family:var(--sans);font-weight:700;font-size:1.15rem;margin-bottom:.7rem;color:var(--ink)}
-  .path-card p{font-size:.98rem;margin-bottom:0}
-
-  /* footer */
-  footer{background:var(--ink);color:var(--cream);padding:6vh 6vw}
-  footer .wrap{max-width:980px;margin:0 auto}
-  footer .tagline{font-family:var(--serif);font-style:italic;font-size:clamp(1.2rem,1.8vw,1.5rem);max-width:32ch;margin-bottom:2.4rem;line-height:1.4}
-  footer .tagline .accent{color:var(--accent)}
-  footer .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.4rem;margin-bottom:2.4rem;padding-bottom:2rem;border-bottom:1px solid rgba(255,255,255,.1)}
-  footer .links a{color:var(--cream);text-decoration:none;font-family:var(--mono);font-size:.88rem;letter-spacing:.04em;display:block;padding:.6rem 0;border-bottom:1px solid transparent;transition:border-color .2s,color .2s}
-  footer .links a:hover{color:var(--accent);border-bottom-color:var(--accent)}
-  footer .closing{font-family:var(--serif);font-style:italic;color:var(--mid);font-size:1rem}
-
-  @media (max-width:760px){
-    .paths{grid-template-columns:1fr}
-    .loop-legend{grid-template-columns:1fr}
-    section{padding:6vh 5vw}
+  /* Dark theme override — toggle with D key */
+  body.dark{
+    --ink:#ece9e0;
+    --cream:#1a1714;
+    --light-gray:#2f2924;
+    --mid:#9a958a;
+    --accent:#e88a6d;
+    --accent-soft:#3a2a22;
+    --surface:#26211c;
+    --thanks-grad-stop:#221d18;
+    --overlay-rgb:26,23,20;
+    --dot-rgb:236,233,224;
   }
-  @media (prefers-reduced-motion:reduce){
-    .scroll-hint::after{animation:none}
-    *{scroll-behavior:auto}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
+  body{background:var(--cream);color:var(--ink);font-family:var(--sans);font-weight:400;line-height:1.55;-webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease}
+
+  .slide{
+    min-height:100vh;scroll-snap-align:start;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:6vh 8vw 9vh;position:relative;overflow:hidden;
+  }
+  .wrap{max-width:1100px;margin:0 auto;width:100%}
+
+  .slide-num{position:absolute;top:3vh;right:4vw;font-family:var(--mono);font-size:.78rem;color:var(--mid);letter-spacing:.1em}
+  .slide-kicker{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);margin-bottom:1.4rem}
+
+  /* Headings — Fraunces italic for emotional weight, plain Be Vietnam Pro 800 for hard claims */
+  h1{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.9rem,4.1vw,3.4rem);line-height:1.1;letter-spacing:-.018em;color:var(--ink);max-width:22ch;text-wrap:balance}
+  /* text-wrap:balance distributes lines so no single-word orphan widows. Fallback: nowrap spans
+     glue critical 2-word phrases (e.g. "<span class=nowrap>thông điệp</span>"). */
+  h2,h3,.lead,.quietline,blockquote,.card .t{text-wrap:balance}
+  h1 .hl{color:var(--accent);font-style:italic}
+  h1 .dim{color:var(--mid);font-style:italic}
+  h1 .sans{font-family:var(--sans);font-style:normal;font-weight:800;letter-spacing:-.01em}
+  h1 u{text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:4px;text-underline-offset:6px;text-decoration-skip-ink:none}
+
+  .lead{font-family:var(--serif);font-style:italic;font-size:clamp(1rem,1.6vw,1.3rem);color:var(--mid);margin-top:1.2rem;max-width:48ch;line-height:1.45}
+  .lead.big{font-size:clamp(1.2rem,2.2vw,1.7rem);color:var(--ink);max-width:42ch}
+
+  .nowrap{white-space:nowrap}
+
+  /* Atmosphere wash — dual radial gradient for editorial warmth (borrowed from CXO deck) */
+  .atmosphere{
+    background:
+      radial-gradient(900px 600px at 82% 12%, rgba(217,119,87,.14), transparent 60%),
+      radial-gradient(700px 500px at 8% 92%, rgba(106,155,204,.08), transparent 60%),
+      var(--cream);
+  }
+  body.dark .atmosphere{
+    background:
+      radial-gradient(900px 600px at 82% 12%, rgba(232,138,109,.18), transparent 60%),
+      radial-gradient(700px 500px at 8% 92%, rgba(106,155,204,.10), transparent 60%),
+      var(--cream);
+  }
+  .atmosphere::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:
+      radial-gradient(circle at 50% 50%, rgba(var(--dot-rgb),.012) 1px, transparent 1px);
+    background-size:6px 6px;opacity:.5;
+  }
+
+  /* Background image (cover, quote, thanks, personal — atmospheric fill behind text) */
+  .cover-bg,.quote-bg,.thanks-bg,.s02-bg,.s08-bg,.s14-bg{
+    position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+  }
+  .cover-bg img,.quote-bg img,.thanks-bg img,.s02-bg img,.s08-bg img,.s14-bg img{
+    width:100%;height:100%;object-fit:cover;opacity:.65;
+    mix-blend-mode:multiply;
+  }
+  .cover-bg::after,.quote-bg::after,.thanks-bg::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(var(--overlay-rgb),.4) 0%,rgba(var(--overlay-rgb),.85) 100%);
+  }
+  .cover .wrap,.quote blockquote,.thanks .wrap,.personal .wrap{position:relative;z-index:2}
+
+  /* Cover */
+  .cover h1{font-size:clamp(2.6rem,6vw,5rem);line-height:1.02;max-width:18ch}
+  .cover h1 .grad{
+    background:linear-gradient(100deg,var(--accent) 0%,#e89172 55%,#f0b89e 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;font-style:italic;
+  }
+  .cover .meta{font-family:var(--mono);font-size:.92rem;color:var(--mid);margin-top:1.8rem;letter-spacing:.06em}
+  .cover .meta kbd{background:var(--ink);color:var(--cream);padding:2px 8px;border-radius:4px;font-family:var(--mono);font-size:.78rem;font-weight:600;margin:0 2px}
+
+  /* 2-col compare cards */
+  .cmp2{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:2rem}
+  .card{background:var(--surface);border:1px solid var(--light-gray);border-radius:14px;padding:1.4rem 1.5rem;transition:border-color .2s,background-color .25s}
+  .card.bad{opacity:.85}
+  .card.good{border-top:3px solid var(--accent)}
+  .card .tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mid)}
+  .card.good .tag{color:var(--accent)}
+  .card .t{font-family:var(--serif);font-style:italic;font-size:1.25rem;font-weight:500;margin-top:.6rem;line-height:1.3;color:var(--ink)}
+  .card .sub{font-family:var(--sans);font-style:normal;font-size:.95rem;color:var(--mid);margin-top:.8rem;line-height:1.55}
+
+  /* chip row */
+  .chip-row{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.6rem}
+  .chip{background:var(--surface);border:1px solid var(--light-gray);border-radius:999px;padding:.5rem 1rem;font-family:var(--mono);font-size:.82rem;color:var(--ink);letter-spacing:.02em}
+  .chip.hl{border-top:2px solid var(--accent);background:var(--surface);color:var(--ink);font-weight:600}
+
+  /* quote slide */
+  .quote{display:flex;align-items:center;justify-content:center;padding:8vh 10vw}
+  .quote blockquote{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.7rem,3.6vw,2.9rem);line-height:1.25;color:var(--ink);max-width:22ch;text-align:left;border-left:3px solid var(--accent);padding-left:2rem}
+  .quote blockquote .accent{color:var(--accent);font-style:italic}
+
+  /* personal moment */
+  .personal{justify-content:center;text-align:center}
+  .personal .quietline{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.3rem,2.4vw,1.9rem);color:var(--ink);max-width:34ch;margin:0 auto 1.8rem;line-height:1.4}
+  .personal .smallcap{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;color:var(--mid);text-transform:uppercase;margin-bottom:2rem}
+  .personal .image-placeholder{margin-top:0;margin-left:auto;margin-right:auto;max-width:760px}
+
+  /* figure / svg */
+  figure{margin-top:1.6rem}
+  svg{width:100%;height:auto;display:block}
+  .svg-cap{font-family:var(--mono);font-size:.7rem;color:var(--mid);margin-top:.7rem;text-align:center;letter-spacing:.02em}
+
+  /* image placeholder + stock */
+  .image-placeholder{margin-top:1.6rem;border:2px dashed var(--light-gray);border-radius:14px;
+    aspect-ratio:16/7;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:1.2rem;background:var(--surface);position:relative}
+  .image-placeholder:has(img){border:none;background:none;padding:0;aspect-ratio:auto}
+  .image-placeholder img{width:100%;border-radius:14px;display:block}
+  .image-placeholder:has(img) .placeholder-label,
+  .image-placeholder:has(img) .placeholder-prompt{display:none}
+  .placeholder-label{font-family:var(--mono);font-size:.82rem;color:var(--accent);letter-spacing:.06em}
+  .placeholder-prompt{font-size:.82rem;color:var(--mid);margin-top:.6rem;max-width:60ch;font-family:var(--serif);font-style:italic}
+  figure.stock{margin-top:1.6rem;border-radius:14px;overflow:hidden;position:relative}
+  figure.stock img{width:100%;height:clamp(220px,38vh,400px);object-fit:cover;display:block;filter:saturate(.9) contrast(1.02)}
+  figure.stock figcaption{font-family:var(--mono);font-size:.66rem;color:var(--mid);margin-top:.5rem}
+
+  /* logo strip (S20c) */
+  .logo-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:1.8rem}
+  .logo-cell{background:var(--surface);border:1px solid var(--light-gray);border-radius:14px;padding:1.4rem 1.3rem;text-align:center;transition:border-color .2s,background-color .25s}
+  .logo-cell:hover{border-color:var(--accent)}
+  .logo-cell .logo{height:64px;display:flex;align-items:center;justify-content:center;margin-bottom:.9rem}
+  .logo-cell .logo img{max-height:56px;max-width:90%;object-fit:contain}
+  .logo-cell .logo-name{font-family:var(--serif);font-style:italic;font-weight:500;font-size:1.1rem;color:var(--ink)}
+  .logo-cell .logo-role{font-family:var(--mono);font-size:.74rem;color:var(--mid);margin-top:.4rem;letter-spacing:.04em}
+
+  /* stage strip — HIDDEN by default (opt-in with N) */
+  .stage-strip{position:absolute;left:0;right:0;bottom:0;background:var(--surface);
+    border-top:1px solid var(--light-gray);color:var(--mid);font-family:var(--mono);font-size:.76rem;
+    padding:.7rem 8vw;letter-spacing:.02em;line-height:1.55;display:none}
+  .stage-strip b{color:var(--accent)}
+  body.show-stage .stage-strip{display:block}
+
+  /* presenter chrome bar */
+  .bar{position:fixed;bottom:0;left:0;right:0;height:3px;background:var(--light-gray);z-index:50}
+  .bar>i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+
+  /* sidebar TOC — toggled with S */
+  .sidebar{position:fixed;top:0;left:-320px;width:300px;height:100vh;
+    background:var(--surface);border-right:1px solid var(--light-gray);
+    overflow-y:auto;z-index:60;transition:left .25s ease;
+    padding:1.6rem 1rem 1.4rem 1.6rem;font-family:var(--sans)}
+  body.show-sidebar .sidebar{left:0}
+  body.show-sidebar{padding-left:300px}
+  .sidebar h3{font-family:var(--mono);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:.9rem;padding-bottom:.7rem;border-bottom:1px solid var(--light-gray)}
+  .sidebar ol{list-style:none;padding:0;margin:0;counter-reset:s}
+  .sidebar li{counter-increment:s;display:flex;gap:.6rem;padding:.42rem .55rem;
+    border-radius:6px;cursor:pointer;font-size:.84rem;line-height:1.35;color:var(--mid);
+    transition:background .15s,color .15s}
+  .sidebar li::before{content:counter(s,decimal-leading-zero);
+    font-family:var(--mono);font-size:.7rem;color:var(--accent);flex-shrink:0;padding-top:.1rem;font-weight:600}
+  .sidebar li:hover{background:var(--cream);color:var(--ink)}
+  .sidebar li.active{background:var(--accent-soft);color:var(--ink);font-weight:500}
+
+  /* grid overview — Esc / G — show ONLY kicker + title at thumbnail scale */
+  body.grid-mode{scroll-snap-type:none;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px;background:var(--cream)}
+  body.grid-mode .slide{
+    min-height:0;aspect-ratio:16/9;transform:scale(1);cursor:pointer;
+    border:1px solid var(--light-gray);border-radius:6px;
+    padding:10px 12px;justify-content:flex-start;background:var(--surface);
+    overflow:hidden;position:relative;
+  }
+  body.grid-mode .slide:hover{border-color:var(--accent);box-shadow:0 4px 12px rgba(217,119,87,.12)}
+  body.grid-mode .stage-strip,body.grid-mode .bar,body.grid-mode .sidebar,body.grid-mode .slide-num,
+  body.grid-mode figure,body.grid-mode .lead,body.grid-mode .image-placeholder,
+  body.grid-mode .chip-row,body.grid-mode .logo-strip,body.grid-mode .cmp2,
+  body.grid-mode .cover .meta,body.grid-mode .qr,body.grid-mode .qr-cap,body.grid-mode .contact,
+  body.grid-mode .sub:not(.thanks .sub),body.grid-mode .smallcap,
+  body.grid-mode .quote blockquote br{display:none}
+  body.grid-mode .quote{padding:10px 12px;align-items:flex-start;justify-content:flex-start}
+  body.grid-mode .quote blockquote{font-size:.78rem;line-height:1.3;padding-left:.6rem;border-left-width:2px;max-width:none}
+  body.grid-mode .wrap{max-width:none;padding:0}
+  body.grid-mode .slide-kicker{font-size:.5rem;letter-spacing:.12em;margin-bottom:.35rem;
+    color:var(--accent);font-weight:600;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body.grid-mode h1{font-size:.78rem;line-height:1.18;max-width:none;font-weight:600;font-style:italic;
+    display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  body.grid-mode h1 br{display:none}
+  body.grid-mode h1 .hl,body.grid-mode h1 .dim,body.grid-mode h1 u{color:inherit;text-decoration:none}
+  body.grid-mode h1 .hl{color:var(--accent)}
+  body.grid-mode .personal .quietline{font-size:.78rem;line-height:1.3;
+    display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  body.grid-mode .thanks h1{font-size:1.4rem;text-align:center;margin-top:18%}
+  body.grid-mode .thanks .sub{font-size:.55rem;text-align:center;margin-top:.4rem}
+  /* tiny slide number badge top-right */
+  body.grid-mode .slide::after{
+    content:attr(id);
+    position:absolute;top:6px;right:8px;
+    font-family:var(--mono);font-size:.5rem;color:var(--mid);
+    background:var(--cream);padding:1px 5px;border-radius:3px;letter-spacing:0;
+  }
+  @media (max-width:900px){body.grid-mode{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:560px){body.grid-mode{grid-template-columns:repeat(2,1fr)}}
+
+  /* thank-you */
+  .thanks{justify-content:center;text-align:center;background:linear-gradient(180deg,var(--cream) 0%,var(--thanks-grad-stop) 100%)}
+  .thanks h1{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(3.5rem,8vw,6.5rem);line-height:1;letter-spacing:-.02em;max-width:none}
+  .thanks h1 .accent{color:var(--accent);font-style:italic}
+  .thanks .sub{font-family:var(--mono);font-size:.9rem;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);margin-top:1.4rem}
+  .thanks .contact{display:flex;gap:2.4rem;justify-content:center;margin-top:3rem;flex-wrap:wrap;
+    font-family:var(--sans);font-size:.95rem;color:var(--mid)}
+  .thanks .contact b{display:block;color:var(--ink);font-size:1.05rem;margin-bottom:.2rem;font-family:var(--serif);font-style:italic;font-weight:500}
+  .thanks .qr{margin-top:2rem;display:inline-block;background:#fff;padding:.8rem;border-radius:12px;border:1px solid var(--light-gray);transition:transform .2s,border-color .2s;cursor:pointer}
+  .thanks .qr:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .thanks .qr svg,.thanks .qr img{width:140px;height:140px;display:block}
+  .thanks .qr.qr-fallback{padding:1.2rem 1.6rem}
+  .thanks .qr.qr-fallback::after{content:"go.bnqtoan.workers.dev/insider-cong-ty-mot-nguoi";font-family:var(--mono);font-size:.7rem;color:var(--ink)}
+  .thanks .qr-cap{font-family:var(--mono);font-size:.7rem;color:var(--mid);margin-top:.6rem;letter-spacing:.08em}
+
+  /* SVG remap for dark mode — inline fills/strokes still use light literals */
+  body.dark svg [fill="#141413"]{fill:#ece9e0}
+  body.dark svg [fill="#6a6a6a"]{fill:#9a958a}
+  body.dark svg [fill="#fff"]{fill:#26211c}
+  body.dark svg [fill="#faf9f5"]{fill:#1a1714}
+  body.dark svg [fill="#e8e6dc"]{fill:#3a342d}
+  body.dark svg [fill="#f3e2d8"]{fill:#3a2a22}
+  body.dark svg [stroke="#141413"]{stroke:#ece9e0}
+  body.dark svg [stroke="#6a6a6a"]{stroke:#9a958a}
+  body.dark svg [stroke="#e8e6dc"]{stroke:#3a342d}
+  body.dark svg g[fill="#141413"] text{fill:#ece9e0}
+
+  @media (max-width:760px){.cmp2,.logo-strip{grid-template-columns:1fr}}
+
+  /* scroll-reveal: real drawing/construction effect (not page fade) */
+  @media (prefers-reduced-motion: no-preference){
+    /* Stroked paths + lines: stroke-draw effect */
+    .slide figure svg line,
+    .slide figure svg path[stroke]:not([fill]),
+    .slide figure svg path[stroke][fill="none"] {
+      stroke-dasharray: 1200;
+      stroke-dashoffset: 1200;
+      transition: stroke-dashoffset .8s cubic-bezier(.4,.2,.2,1);
+    }
+    .slide.revealed figure svg line,
+    .slide.revealed figure svg path[stroke]:not([fill]),
+    .slide.revealed figure svg path[stroke][fill="none"] {
+      stroke-dashoffset: 0;
+    }
+    /* Filled shapes: scale + fade */
+    .slide figure svg rect,
+    .slide figure svg circle,
+    .slide figure svg polygon,
+    .slide figure svg ellipse {
+      opacity: 0;
+      transform-origin: center;
+      transform: scale(.92);
+      transition: opacity .45s cubic-bezier(.2,.7,.2,1), transform .45s cubic-bezier(.2,.7,.2,1);
+    }
+    .slide.revealed figure svg rect,
+    .slide.revealed figure svg circle,
+    .slide.revealed figure svg polygon,
+    .slide.revealed figure svg ellipse {
+      opacity: 1;
+      transform: scale(1);
+    }
+    /* Text: fade in after shapes */
+    .slide figure svg text {
+      opacity: 0;
+      transition: opacity .35s ease-out;
+      transition-delay: .35s;
+    }
+    .slide.revealed figure svg text { opacity: 1; }
+    /* Stagger child order in figure svg */
+    .slide.revealed figure svg > *:nth-child(1){ transition-delay: 0ms }
+    .slide.revealed figure svg > *:nth-child(2){ transition-delay: 70ms }
+    .slide.revealed figure svg > *:nth-child(3){ transition-delay: 140ms }
+    .slide.revealed figure svg > *:nth-child(4){ transition-delay: 210ms }
+    .slide.revealed figure svg > *:nth-child(5){ transition-delay: 280ms }
+    .slide.revealed figure svg > *:nth-child(6){ transition-delay: 350ms }
+    .slide.revealed figure svg > *:nth-child(7){ transition-delay: 420ms }
+    .slide.revealed figure svg > *:nth-child(8){ transition-delay: 490ms }
+    .slide.revealed figure svg > *:nth-child(9){ transition-delay: 560ms }
+    .slide.revealed figure svg > *:nth-child(10){ transition-delay: 630ms }
+    .slide.revealed figure svg > *:nth-child(n+11){ transition-delay: 700ms }
+    /* Text fades slightly later than its sibling shape */
+    .slide.revealed figure svg text { transition-delay: calc(var(--t-delay, 0ms) + 350ms); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .slide figure svg *{
+      opacity:1 !important; transform:none !important;
+      stroke-dashoffset:0 !important; stroke-dasharray:none !important;
+    }
+  }
+  /* grid-mode: force all SVGs visible (IO can be flaky when all slides on screen) */
+  body.grid-mode .slide figure svg *{
+    opacity:1 !important; transform:none !important;
+    stroke-dashoffset:0 !important; stroke-dasharray:none !important;
+  }
+  @media print{
+    .slide figure svg *{
+      opacity:1 !important; transform:none !important;
+      stroke-dashoffset:0 !important; stroke-dasharray:none !important;
+    }
+  }
+
+  @media print{
+    html{scroll-snap-type:none}
+    .slide{min-height:auto;page-break-after:always;border:none}
+    .stage-strip,.bar,.sidebar{display:none}
+    /* force light theme for print */
+    body.dark{
+      --ink:#141413;--cream:#faf9f5;--light-gray:#e8e6dc;--mid:#6a6a6a;
+      --accent:#d97757;--accent-soft:#f3e2d8;--surface:#fff;
+      --thanks-grad-stop:#f5f1e6;--overlay-rgb:250,249,245;--dot-rgb:20,20,19;
+    }
+    body.dark svg [fill="#141413"]{fill:#141413}
+    body.dark svg [fill="#6a6a6a"]{fill:#6a6a6a}
+    body.dark svg [fill="#fff"]{fill:#fff}
+    body.dark svg [fill="#faf9f5"]{fill:#faf9f5}
+    body.dark svg [fill="#e8e6dc"]{fill:#e8e6dc}
+    body.dark svg [fill="#f3e2d8"]{fill:#f3e2d8}
+    body.dark svg [stroke="#141413"]{stroke:#141413}
+    body.dark svg [stroke="#6a6a6a"]{stroke:#6a6a6a}
+    body.dark svg [stroke="#e8e6dc"]{stroke:#e8e6dc}
+  }
+  @media (prefers-reduced-motion: reduce){
+    svg animate,svg animateTransform,svg animateMotion{display:none !important}
+    svg *{animation:none !important}
   }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="inner">
-    <div class="brand">slide-studio</div>
-    <nav>
-      <a href="#problem">Vấn đề</a>
-      <a href="#loop">Vòng lặp</a>
-      <a href="#sops">SOPs</a>
-      <a href="#principles">Nguyên lý</a>
-      <a href="#start">Bắt đầu</a>
-    </nav>
-  </div>
-</header>
+<!-- ============ BLOCK 1 — Mở (S01–S04) ============ -->
 
-<!-- ========== SECTION 1: HERO ========== -->
-<section id="hero">
-  <div class="wrap">
-    <div class="eyebrow">Slide Studio · skill làm deck chiều sâu</div>
-    <h1 class="hero-headline">Mỗi deck chạy qua một <span class="accent">vòng lặp</span> khoẻ hơn.</h1>
-    <p class="hero-subhead">Bạn đưa nguyên liệu thô vô, skill ép nó qua nghiên cứu, kiến trúc, review, retro để deck sau khoẻ hơn deck trước.</p>
-    <div class="scroll-hint">Cuộn xuống xem nó chạy</div>
+<section class="slide cover atmosphere has-bg" id="s01-cover" data-title="Cover">
+  <span class="slide-num"></span>
+  <div class="cover-bg">
+    <img src="images/s01-cover-atmosphere.png" alt="" onerror="this.style.display='none'"/>
   </div>
+  <div class="wrap">
+    <div class="slide-kicker">Buổi 1 / 3 · Công ty một người · 29.05.2026</div>
+    <h1>Làm slide <span class="grad">sâu</span>,<br/>nhanh, chuẩn,<br/>tương tác được.</h1>
+    <div class="meta">Tony Bùi · Slide Studio · 20:00–22:30 ICT · nhấn <kbd>S</kbd> sidebar · <kbd>Esc</kbd> grid · <kbd>N</kbd> notes</div>
+  </div>
+  <div class="stage-strip">▸ Beat 1 · ~30s. <b>Word order: "sâu" đứng trước "nhanh"</b>. Đó là cả deck. Đừng vội đọc cả title; để họ nhìn 2-3 giây.</div>
 </section>
+<!-- audience-word-count: 22 -->
 
-<!-- ========== SECTION 2: VẤN ĐỀ ========== -->
-<section id="problem">
+<section class="slide" id="s02-phong-hoi" data-title="Câu mình hay được hỏi">
+  <span class="slide-num"></span>
   <div class="wrap">
-    <div class="section-title-row">
-      <span class="num">01</span>
-      <h2>Vấn đề skill này giải</h2>
+    <h1>Mình hay được hỏi "làm slide nhanh kiểu gì"<br/><span class="dim">câu hay, nhưng đang đo cái dễ.</span></h1>
+    <div class="image-placeholder" data-img="s02-question-bubble">
+      <img src="images/s02-question-bubble.png" alt="" onerror="this.style.display='none'"/>
+      <div class="placeholder-label">[ image: s02-question-bubble · drop into images/ ]</div>
+      <div class="placeholder-prompt">brand-flat-editorial · silhouette giơ tay hỏi, chat bubble · cream + orange accent</div>
     </div>
-    <p>Bạn nạp 5 PDF với 1 file ghi âm vô ChatGPT rồi nói "làm slide giùm". Nó trả ra 12 slide đầy chữ, tiêu đề kể chuyện lại, biểu đồ chen vô cho có.</p>
-    <p>Cái fail không nằm ở công cụ. Slide có chiều sâu cần tinh luyện với kiến trúc, cần biết bỏ gì, giữ gì, xếp ý nào trước, không phải gõ HTML nhanh.</p>
-    <p>Skill này đóng quy trình đó thành nếp chạy. Bạn đứng ở các cổng quyết định, chốt hướng, chốt outline, chốt chất lượng. AI lo phần cơ học đỡ tốn công.</p>
+    <figure style="display:none">
+      <svg viewBox="0 0 900 200" role="img" aria-label="chat bubble">
+        <rect x="40" y="40" width="640" height="120" rx="22" fill="#fff" stroke="#e8e6dc" stroke-width="1.5"/>
+        <polygon points="120,160 100,200 160,160" fill="#fff" stroke="#e8e6dc" stroke-width="1.5"/>
+        <polygon points="118,160 102,198 158,160" fill="#fff" stroke="none"/>
+        <text x="360" y="92" text-anchor="middle" fill="#141413" font-family="Fraunces,serif" font-style="italic" font-weight="500" font-size="26">"Anh làm slide kiểu gì</text>
+        <text x="360" y="128" text-anchor="middle" fill="#141413" font-family="Fraunces,serif" font-style="italic" font-weight="500" font-size="26">đẹp vậy, nhanh vậy?"</text>
+        <text x="820" y="100" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-size="12">— audience</text>
+        <text x="820" y="118" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-size="12">FB / DM</text>
+      </svg>
+    </figure>
   </div>
+  <div class="stage-strip">▸ Beat 2 · ~1 phút. <b>Câu hỏi nghe hợp lý, đang đo sai cái.</b> Để mình kể câu trả lời thật.</div>
 </section>
+<!-- audience-word-count: 19 -->
 
-<!-- ========== SECTION 3: VÒNG LẶP ========== -->
-<section id="loop">
+<section class="slide" id="s03-cau-hoi-dung" data-title="Câu hỏi đúng">
+  <span class="slide-num"></span>
   <div class="wrap">
-    <div class="section-title-row">
-      <span class="num">02</span>
-      <h2>Vòng lặp 6 bước</h2>
+    <h1>Câu hỏi đúng không phải "nhanh kiểu gì"<br/>là <span class="hl">"slide đó có đáng nghe không."</span></h1>
+    <div class="image-placeholder" data-img="s03-cau-hoi-dung">
+      <img src="images/s03-cau-hoi-dung.png" alt="" onerror="this.style.display='none'"/>
+      <div class="placeholder-label">[ image: s03-cau-hoi-dung ]</div>
+      <div class="placeholder-prompt">brand-flat-editorial · 2 vòng tròn chồng (nhanh mờ vs đáng nghe rõ) · cream + orange</div>
     </div>
-    <p class="lead">Nó biến mỗi lần làm deck thành một luồng học, để deck sau khoẻ hơn deck trước.</p>
+    <div class="cmp2">
+      <div class="card bad">
+        <div class="tag">câu hỏi sai</div>
+        <div class="t">Nhanh kiểu gì?</div>
+        <div class="sub">AI ai cũng dựng vài phút. Đo speed là đo cái dễ.</div>
+      </div>
+      <div class="card good">
+        <div class="tag">câu hỏi đúng</div>
+        <div class="t">Đáng nghe không?</div>
+        <div class="sub">Audience · beat · distill 20% · Action Title. <b style="color:var(--accent)">BẠN</b> quyết.</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">▸ Beat 3 · ~2 phút. <b>4 thứ đó là phần BẠN làm.</b> AI lo cơ học SAU. Skill mình show Block 5, tới đó audience đã hiểu skill chỉ là cơ học cuối chuỗi.</div>
+</section>
+<!-- audience-word-count: 33 -->
 
-    <figure class="loop-figure">
-      <svg viewBox="0 0 960 420" role="img" aria-label="6-node loop diagram">
-        <defs>
-          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97757"/>
-          </marker>
-          <marker id="arrow-dashed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="#6a6a6a"/>
-          </marker>
-        </defs>
-        <!-- 6 nodes in horizontal flow with dashed return arc above -->
-        <g font-family="Be Vietnam Pro,sans-serif">
-          <!-- nodes -->
-          <g>
-            <circle cx="100" cy="220" r="58" fill="#fff" stroke="#d97757" stroke-width="2.5"/>
-            <text x="100" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#d97757">brainstorm</text>
-            <text x="100" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">01</text>
-          </g>
-          <g>
-            <circle cx="240" cy="220" r="58" fill="#fff" stroke="#6a6a6a" stroke-width="1.8"/>
-            <text x="240" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#141413">research</text>
-            <text x="240" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">02</text>
-          </g>
-          <g>
-            <circle cx="380" cy="220" r="58" fill="#fff" stroke="#6a6a6a" stroke-width="1.8"/>
-            <text x="380" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#141413">create</text>
-            <text x="380" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">03</text>
-          </g>
-          <g>
-            <circle cx="520" cy="220" r="58" fill="#fff" stroke="#6a6a6a" stroke-width="1.8"/>
-            <text x="520" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#141413">review</text>
-            <text x="520" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">04</text>
-          </g>
-          <g>
-            <circle cx="660" cy="220" r="58" fill="#fff" stroke="#6a6a6a" stroke-width="1.8"/>
-            <text x="660" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#141413">retro</text>
-            <text x="660" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">05</text>
-          </g>
-          <g>
-            <circle cx="800" cy="220" r="58" fill="#fff" stroke="#6a6a6a" stroke-width="1.8"/>
-            <text x="800" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#141413">deploy</text>
-            <text x="800" y="240" text-anchor="middle" font-size="11" fill="#6a6a6a" font-family="JetBrains Mono,monospace">06</text>
-          </g>
-          <!-- forward arrows -->
-          <line x1="158" y1="220" x2="178" y2="220" stroke="#d97757" stroke-width="2" marker-end="url(#arrow)"/>
-          <line x1="298" y1="220" x2="318" y2="220" stroke="#d97757" stroke-width="2" marker-end="url(#arrow)"/>
-          <line x1="438" y1="220" x2="458" y2="220" stroke="#d97757" stroke-width="2" marker-end="url(#arrow)"/>
-          <line x1="578" y1="220" x2="598" y2="220" stroke="#d97757" stroke-width="2" marker-end="url(#arrow)"/>
-          <line x1="718" y1="220" x2="738" y2="220" stroke="#d97757" stroke-width="2" marker-end="url(#arrow)"/>
-          <!-- dashed return arc: retro → brainstorm via 40-assets/ -->
-          <path d="M 660 162 C 600 60, 200 60, 100 162" fill="none" stroke="#6a6a6a" stroke-width="1.6" stroke-dasharray="6 5" marker-end="url(#arrow-dashed)"/>
-          <text x="380" y="65" text-anchor="middle" font-size="13" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="italic">deck sau bắt đầu giàu hơn · qua 40-assets/</text>
+<section class="slide" id="s04-mo-loop" data-title="Thiết lập luồng làm việc">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <div class="slide-kicker">Hôm nay mở cái gì</div>
+    <h1>Thiết lập một <span class="hl">luồng làm việc</span>.<br/><span class="dim">Slide sau khoẻ hơn slide trước.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 260" role="img" aria-label="slide-studio loop">
+        <g font-family="JetBrains Mono,monospace" font-size="14" fill="#141413">
+          <circle cx="120" cy="130" r="54" fill="#fff" stroke="#6a6a6a" stroke-width="1.5">
+            <animate attributeName="stroke" values="#6a6a6a;#d97757;#6a6a6a" dur="7.5s" begin="0s" repeatCount="indefinite"/>
+            <animate attributeName="stroke-width" values="1.5;3;1.5" dur="7.5s" begin="0s" repeatCount="indefinite"/>
+          </circle>
+          <text x="120" y="126" text-anchor="middle" font-size="14">00-decide</text>
+          <text x="120" y="146" text-anchor="middle" fill="#6a6a6a" font-size="12">BẠN</text>
+          <circle cx="290" cy="80" r="54" fill="#fff" stroke="#6a6a6a" stroke-width="1.5">
+            <animate attributeName="stroke" values="#6a6a6a;#d97757;#6a6a6a" dur="7.5s" begin="1.5s" repeatCount="indefinite"/>
+            <animate attributeName="stroke-width" values="1.5;3;1.5" dur="7.5s" begin="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <text x="290" y="76" text-anchor="middle" font-size="14">10-research</text>
+          <text x="290" y="96" text-anchor="middle" fill="#6a6a6a" font-size="12">AI</text>
+          <circle cx="460" cy="130" r="64" fill="#fff" stroke="#d97757" stroke-width="2.5">
+            <animate attributeName="stroke-width" values="2.5;5;2.5" dur="7.5s" begin="3s" repeatCount="indefinite"/>
+          </circle>
+          <text x="460" y="120" text-anchor="middle" fill="#d97757" font-size="14" font-weight="700">20-decks</text>
+          <text x="460" y="140" text-anchor="middle" fill="#6a6a6a" font-size="12">deck buổi 1</text>
+          <text x="460" y="156" text-anchor="middle" fill="#6a6a6a" font-size="12">ở đây ↑</text>
+          <circle cx="630" cy="80" r="54" fill="#fff" stroke="#6a6a6a" stroke-width="1.5">
+            <animate attributeName="stroke" values="#6a6a6a;#d97757;#6a6a6a" dur="7.5s" begin="4.5s" repeatCount="indefinite"/>
+            <animate attributeName="stroke-width" values="1.5;3;1.5" dur="7.5s" begin="4.5s" repeatCount="indefinite"/>
+          </circle>
+          <text x="630" y="76" text-anchor="middle" font-size="14">50-retro</text>
+          <text x="630" y="96" text-anchor="middle" fill="#6a6a6a" font-size="12">nhìn lại</text>
+          <circle cx="800" cy="130" r="54" fill="#fff" stroke="#6a6a6a" stroke-width="1.5">
+            <animate attributeName="stroke" values="#6a6a6a;#d97757;#6a6a6a" dur="7.5s" begin="6s" repeatCount="indefinite"/>
+            <animate attributeName="stroke-width" values="1.5;3;1.5" dur="7.5s" begin="6s" repeatCount="indefinite"/>
+          </circle>
+          <text x="800" y="126" text-anchor="middle" font-size="14">40-assets</text>
+          <text x="800" y="146" text-anchor="middle" fill="#6a6a6a" font-size="12">tài sản</text>
+          <path d="M168 110 Q210 80 245 70" fill="none" stroke="#6a6a6a" stroke-width="1.5"/>
+          <polygon points="245,70 235,68 240,78" fill="#6a6a6a"/>
+          <path d="M335 100 Q395 120 405 122" fill="none" stroke="#6a6a6a" stroke-width="1.5"/>
+          <polygon points="405,122 395,118 396,130" fill="#6a6a6a"/>
+          <path d="M515 110 Q570 80 585 75" fill="none" stroke="#6a6a6a" stroke-width="1.5"/>
+          <polygon points="585,75 575,73 580,83" fill="#6a6a6a"/>
+          <path d="M675 100 Q730 120 754 122" fill="none" stroke="#6a6a6a" stroke-width="1.5"/>
+          <polygon points="754,122 744,118 746,130" fill="#6a6a6a"/>
+          <path d="M800 180 Q700 230 460 215" fill="none" stroke="#d97757" stroke-width="2" stroke-dasharray="4 4">
+            <animate attributeName="stroke-dashoffset" from="0" to="-32" dur="1.5s" repeatCount="indefinite"/>
+          </path>
+          <polygon points="460,215 472,209 470,221" fill="#d97757"/>
+          <text x="640" y="240" text-anchor="middle" fill="#d97757" font-style="italic" font-family="Fraunces,serif" font-size="14">deck sau bắt đầu giàu hơn
+            <animate attributeName="opacity" values="0.4;1;0.4" dur="3s" repeatCount="indefinite"/>
+          </text>
         </g>
       </svg>
-      <div class="loop-caption">Mũi tên nét đứt quay về 40-assets/ vì mỗi retro để lại một đứa dùng lại được.</div>
+      <div class="svg-cap">slide-studio loop · 00 → 10 → 20 → 50 → 40 ↺</div>
     </figure>
-
-    <div class="loop-legend">
-      <div class="leg-item"><span class="leg-name">brainstorm</span><span class="leg-role">Chốt câu hỏi đúng</span></div>
-      <div class="leg-item"><span class="leg-name">research</span><span class="leg-role">Gom bằng chứng sống</span></div>
-      <div class="leg-item"><span class="leg-name">create</span><span class="leg-role">Dựng outline duyệt được</span></div>
-      <div class="leg-item"><span class="leg-name">review</span><span class="leg-role">Bắt lỗi trước khi ship</span></div>
-      <div class="leg-item"><span class="leg-name">retro</span><span class="leg-role">Giữ lại tài sản xịn</span></div>
-      <div class="leg-item"><span class="leg-name">deploy</span><span class="leg-role">Đưa deck lên trang</span></div>
-    </div>
   </div>
+  <div class="stage-strip">▸ Beat 4 · ~2 phút. <b>Self-referential tease:</b> deck dựng live ngay đây = deck mở buổi 2. Không phải skill demo. Là 1 cái loop.</div>
 </section>
+<!-- audience-word-count: 22 -->
 
-<!-- ========== SECTION 4-9: SOPs ========== -->
-<section id="sops">
+<!-- ============ BLOCK 2 — Slide tốt là gì (S05–S13) ============ -->
+
+<section class="slide" id="s05-tinh-luyen" data-title="Khác biệt = tinh luyện, không ở công cụ">
+  <span class="slide-num"></span>
   <div class="wrap">
-    <div class="section-title-row">
-      <span class="num">03</span>
-      <h2>7 SOPs · từ ý tưởng tới slide</h2>
-    </div>
-
-    <div class="sop">
-      <div class="tag">SOP 01 · brainstorm</div>
-      <h3>Brainstorm</h3>
-      <div class="lead-line">Đa số người sai từ đây. Sai câu hỏi đầu, mấy bước sau chỉ làm sai nhanh hơn.</div>
-      <div class="body"><p>Nó là một interview ngắn, không lan man. Trước hết skill gom bối cảnh và viết lại việc thật của deck bằng cách Jobs-to-be-Done của Christensen: người xem cần ra quyết định gì sau buổi này, chứ không phải bạn có bao nhiêu tài liệu.</p>
-        <p>Rồi nó dựng giả thuyết theo Hypothesis-Driven Thinking. Deck không bắt đầu bằng "có gì nói nấy", mà bắt đầu bằng một luận điểm đủ sắc để bị phản biện. Sau đó, 5 Whys kéo tới nguyên nhân gốc, tránh kiểu slide nào cũng chỉ kể triệu chứng.</p>
-        <p>Cuối cùng, SCQA hoặc Pixar ép câu chuyện thành nhịp dễ theo: bối cảnh, căng thẳng, câu hỏi, câu trả lời. Mình không cần deck màu mè ở đây. Mình cần một xương sống đủ chắc để research không chạy tán loạn.</p></div>
-      <div class="output-line">→ Output là <code>brainstorm.md</code>, file mà các SOP sau đọc.</div>
-    </div>
-
-    <div class="sop">
-      <div class="tag">SOP 02 · research</div>
-      <h3>Research</h3>
-      <div class="lead-line">Có brainstorm rồi, AI bắt đầu gom bằng chứng để từng claim có chân đứng.</div>
-      <div class="body"><p>Research SOP tách <code>claims.md</code> và <code>examples.md</code>. <code>claims.md</code> giữ luận điểm, độ chắc, nguồn, chỗ còn thiếu. <code>examples.md</code> giữ ca cụ thể, số liệu, quote ngắn, tình huống dùng được trên slide.</p>
-        <p>Nó soi nguyên liệu qua 5 ống kính đọc ý: What/So-What để khỏi dừng ở mô tả, Gap-Drag-Accelerator để thấy lực kéo và lực cản, Then-What để nối hệ quả, Anomaly để bắt điểm lệch, và Ladder of Inference của Argyris để kiểm tra bước nhảy từ dữ liệu sang kết luận.</p></div>
-      <div class="example-box">
-        <div class="ex-tag">Ví dụ · ống kính Ladder</div>
-        <div class="ex-title">"Doanh thu +18% lừa mắt."</div>
-        <div class="ex-sub">"Top 3 chi nhánh vẫn 14% margin. Vấn đề là 1 chi nhánh đang ramp."</div>
-      </div>
-    </div>
-
-    <div class="sop">
-      <div class="tag">SOP 03 · create</div>
-      <h3>Create · chỗ HTML xuất hiện</h3>
-      <div class="lead-line">Đây là chỗ HTML xuất hiện. Nhưng trước đó có một luật rất quan trọng.</div>
-      <div class="body"><p>Create SOP fork một <code>reference-deck</code> có sẵn, rồi đi theo lối trình bày của nó. Không ngồi tả gu bằng văn xuôi, vì tả kiểu đó thường ra mỗi slide một màu tính cách. Bạn duyệt outline trước, rồi skill mới dựng.</p>
-        <p>Mỗi slide đi qua schema 5 field: title tối đa 14 chữ, subtitle tối đa 18 chữ, slide-text tối đa 25 chữ, visual, stage-note. Kế hoạch ảnh có 4 nhánh: SVG, Stock, Codex, Placeholder. Cổng cứng là không build HTML trước khi outline được duyệt.</p>
-        <p>Step 2 thêm cổng chọn style theo style-decision-matrix. Skill đọc audience + brainstorm, đề xuất 2 đường: fork 1 seed có sẵn, hoặc bake gu mới từ ảnh/brand (xem SOP 03.5). Không có default ngầm. Mỗi deck có comment <code>&lt;!-- fork: ... · rationale: ... --&gt;</code> để truy vết.</p></div>
-      <div class="lock-line">Đừng tả gu. Fork 1 deck đã có gu.</div>
-    </div>
-
-    <div class="sop">
-      <div class="tag">SOP 03.5 · new-style</div>
-      <h3>New-style · gu mới không drift</h3>
-      <div class="lead-line">Gallery không phải menu đóng. Đưa 1 tấm ảnh tham khảo, skill bake ra gu mới.</div>
-      <div class="body"><p>Khi không có gu nào trong gallery hợp — hoặc bạn có sẵn ảnh đẹp, 1 câu mô tả, hay brand của mình — skill trích DNA: palette, cặp font, độ thoáng, và đúng 1 signature move (cái nhìn-là-nhận-ra). Tất cả đổ vào một <code>token contract</code> cố định.</p>
-        <p>Vì chrome và layout bị khoá, chỉ giá trị token đổi, nên gu mới <b>không bao giờ làm hỏng</b> presenter mechanics. Bake xong, verify bằng mắt, rồi gu đó vào gallery thành seed fork được như mọi gu khác. Đa dạng vô hạn, drift bằng không.</p></div>
-      <div class="output-line">→ Nguồn: ảnh tham khảo · prompt · brand. Output: 1 reference deck mới + token block.</div>
-    </div>
-
-    <div class="sop">
-      <div class="tag">SOP 04 · review</div>
-      <h3>Review · 3 lớp check</h3>
-      <div class="lead-line">Trước khi deploy, deck đi qua 3 lớp kiểm để lỗi rẻ được bắt sớm.</div>
-      <div class="body"><p>Lớp 0 là cấu trúc: <code>studio-check.sh</code> gác chống drift — research không lọt ra ngoài deck, mỗi deck đủ audience/brainstorm/outline, không có folder rác. Đây là tầng giữ cho cả studio không sập về mớ lộn xộn.</p>
-        <p>Lớp 1 là cơ học: <code>slide-check.sh</code> chạy 17 mục kiểm, gồm cấm gạch ngang dài, tỉ lệ kicker, số chữ cho người xem, chữ tràn khung, file thiếu, speaker-meta lọt vô audience layer, và audit trail của fork choice.</p>
-        <p>Lớp 2 là chất lượng theo <code>slide-method.md</code>, với 13 mục chấm. Nó không hỏi "đẹp chưa" chung chung, mà hỏi title có hành động không, visual có làm việc không, câu chuyện có kéo người xem đi không. Kết luận chỉ có SHIP, FIX-FIRST, hoặc REWORK.</p></div>
-    </div>
-
-    <div class="sop">
-      <div class="tag">SOP 05 · retro</div>
-      <h3>Retro · chỗ skill cộng dồn</h3>
-      <div class="lead-line">Đây là chỗ skill cộng dồn. KHÔNG retro = KHÔNG có vòng lặp.</div>
-      <div class="body"><p>Retro chỉ cần ba dòng nhìn lại: cái gì chạy, cái gì cần sửa, và một tài sản gửi vô <code>40-assets/</code>. Tài sản đó có thể là prompt, layout, kiểm tra, visual pattern, hoặc một ví dụ thiệt gọn. Nhờ vậy deck sau khoẻ hơn deck trước. Không retro, mỗi deck chỉ là một file PDF rời, xong rồi mất, không cộng dồn gì hết.</p></div>
-    </div>
-
-    <div class="sop">
-      <div class="tag">SOP 06 · deploy</div>
-      <h3>Deploy</h3>
-      <div class="lead-line">Deploy SOP push GitHub Pages, thường lên trang trong 30s.</div>
-      <div class="body"><p>Luồng nhẹ hều: build, check, commit, push, mở URL để kiểm. Chỗ dễ vấp cần nhớ: deck nhiều ảnh thì set <code>postBuffer 524288000</code>, còn repo có file bắt đầu bằng <code>_</code> thì thêm <code>.nojekyll</code> để GitHub Pages đừng nuốt mất.</p></div>
-    </div>
+    <div class="slide-kicker">Block 2 · Slide tốt là gì · lecture · 30 phút</div>
+    <h1>AI dựng slide 2 phút. Khác biệt =<br/><span class="hl">tinh luyện + tư duy kiến trúc</span>, không ở công cụ.</h1>
+    <p class="lead big">Công cụ ai cũng có. <b style="color:var(--accent)">Bộ lọc</b> thì không.</p>
+    <figure>
+      <svg viewBox="0 0 900 200" role="img" aria-label="trash slide vs deep slide">
+        <rect x="40" y="20" width="380" height="160" rx="10" fill="#fff" stroke="#e8e6dc" stroke-width="1.5"/>
+        <text x="230" y="46" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-size="12" letter-spacing="2">RÁC ĐẦY CHỮ</text>
+        <line x1="60" y1="70" x2="400" y2="70" stroke="#e8e6dc"/>
+        <line x1="60" y1="90" x2="400" y2="90" stroke="#e8e6dc"/>
+        <line x1="60" y1="110" x2="380" y2="110" stroke="#e8e6dc"/>
+        <line x1="60" y1="130" x2="400" y2="130" stroke="#e8e6dc"/>
+        <line x1="60" y1="150" x2="370" y2="150" stroke="#e8e6dc"/>
+        <line x1="60" y1="170" x2="390" y2="170" stroke="#e8e6dc"/>
+        <rect x="480" y="20" width="380" height="160" rx="10" fill="#fff" stroke="#d97757" stroke-width="2"/>
+        <text x="670" y="46" text-anchor="middle" fill="#d97757" font-family="JetBrains Mono,monospace" font-size="12" letter-spacing="2">CÓ CHIỀU SÂU</text>
+        <text x="670" y="114" text-anchor="middle" fill="#141413" font-family="Fraunces,serif" font-style="italic" font-weight="500" font-size="40">1 ý.</text>
+        <text x="670" y="138" text-anchor="middle" fill="#6a6a6a" font-size="14">1 visual anchor.</text>
+      </svg>
+    </figure>
   </div>
+  <div class="stage-strip">▸ Beat 5 · ~1.5 phút. <b>Bridge:</b> bạn sẽ hỏi 'tinh luyện + kiến trúc là gì cụ thể'. 8 slide tới là phương pháp luận BCG/McKinsey, condensed từ slide-research.md.</div>
 </section>
+<!-- audience-word-count: 24 -->
 
-<!-- ========== SECTION 9.5: NGUYÊN LÝ + REFERENCE ========== -->
-<section id="principles">
+<section class="slide" id="s06-4-driver" data-title="Chốt 4 thứ trước khi soạn slide">
+  <span class="slide-num"></span>
   <div class="wrap">
-    <div class="section-title-row">
-      <span class="num">3.5</span>
-      <h2>Nguyên lý chạy ngầm</h2>
-    </div>
-    <p class="lead">4 reference doc ngầm sau lưng các SOP. Bạn không cần đọc để dùng skill, nhưng đọc rồi sẽ thấy vì sao mỗi cổng quyết định nó như vậy.</p>
+    <div class="slide-kicker">Phần 1 · Design Drivers</div>
+    <h1>Chốt 4 thứ <span class="hl">TRƯỚC</span> khi soạn slide.<br/><span class="dim">Cái thứ 4 — nơi trình bày — hay bị bỏ qua nhất.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 200" role="img" aria-label="4 design drivers as chips, last one highlighted">
+        <g font-family="Fraunces,serif" font-style="italic" fill="#141413">
+          <!-- 4 chips, equal width, last one filled accent -->
+          <rect x="40" y="55" width="180" height="90" rx="12" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="130" y="95" text-anchor="middle" font-size="22">Audience</text>
+          <text x="130" y="118" text-anchor="middle" fill="#6a6a6a" font-size="13" font-family="JetBrains Mono,monospace" font-style="normal">ai ngồi nghe</text>
 
-    <div class="paths" style="grid-template-columns:1fr;gap:1rem">
-      <div class="path-card">
-        <div class="path-tag">references/style-decision-matrix.md</div>
-        <h4>Chọn fork theo audience × temperament</h4>
-        <p>Step 2 của create SOP không cho auto-default. Skill đọc audience.md với brainstorm.md, đối chiếu matrix 2 trục (data-heavy / pedagogical / creative... × peer / executive / student / creative / mass), đề xuất top 2 fork target có lý do và tradeoff, đợi bạn chốt. Mỗi deck mang theo comment <code>&lt;!-- fork: ... · rationale: ... --&gt;</code> để truy vết. Check #17 chặn deck nào ship thiếu comment này.</p>
-      </div>
+          <rect x="232" y="55" width="180" height="90" rx="12" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="322" y="95" text-anchor="middle" font-size="22">Goal</text>
+          <text x="322" y="118" text-anchor="middle" fill="#6a6a6a" font-size="13" font-family="JetBrains Mono,monospace" font-style="normal">họ làm gì sau đó</text>
 
-      <div class="path-card">
-        <div class="path-tag">references/content-to-container-principle.md</div>
-        <h4>Container phải khớp content's job</h4>
-        <p>Nguyên lý sâu nhất: đừng sửa slide, sửa quan hệ giữa content và container. Comparison cần fill-vs-outline hierarchy. Pedagogical content trên dark container sẽ fail vì opacity blend vô bg. 1 slide chỉ 1 anchor. Speaker-meta (timing, callback, fallback) không bao giờ vô audience layer · luôn ở stage-strip. Check #15 dùng 3 pattern structural (conditional+timing / deck-infra refs / deck-mgmt imperative) để bắt leak, không phải phrase list.</p>
-      </div>
+          <rect x="424" y="55" width="180" height="90" rx="12" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="514" y="95" text-anchor="middle" font-size="22">Brand</text>
+          <text x="514" y="118" text-anchor="middle" fill="#6a6a6a" font-size="13" font-family="JetBrains Mono,monospace" font-style="normal">giọng và màu</text>
 
-      <div class="path-card">
-        <div class="path-tag">references/scrollytelling-pattern.md</div>
-        <h4>4 gear animation, không stack</h4>
-        <p>Skill ship 4 cơ chế động: (1) IntersectionObserver reveal khi slide vô view, (2) SVG SMIL cho self-running loop, (3) Interactive SVG cho click-to-explore, (4) Scrollytelling sticky stage cho audience tự pace. Mỗi content chỉ nên dùng 1 gear. Stack nhiều gear ra slide rối. Khi brainstorm có signal "step by step / long read / construct" thì fork scrollytelling reference deck thay vì slide thường.</p>
-      </div>
-
-      <div class="path-card">
-        <div class="path-tag">reference-deck/_TOKENS.md</div>
-        <h4>Token contract · engine để gu nở vô hạn</h4>
-        <p>Một "gu" không phải file HTML mới — nó là một bộ giá trị cho danh sách <code>--token</code> cố định (màu 60-30-10, cặp font, độ thoáng) cộng đúng 1 signature move. Engine (chrome + layout) đọc token và bị khoá; gu chỉ đổi giá trị. Nhờ vậy attendee bake gu mới từ ảnh/brand mà presenter mechanics không bao giờ drift. Đây là cách phá trần "chỉ vài style" mà vẫn nhất quán.</p>
-      </div>
-    </div>
+          <!-- Last chip = filled orange accent, larger emphasis -->
+          <rect x="616" y="48" width="244" height="104" rx="12" fill="#d97757"/>
+          <text x="738" y="92" text-anchor="middle" fill="#fff" font-weight="700" font-size="22">Nơi trình bày</text>
+          <text x="738" y="116" text-anchor="middle" fill="#fff" font-size="13" font-family="JetBrains Mono,monospace" font-style="normal">hội trường · Zoom · PDF</text>
+          <text x="738" y="172" text-anchor="middle" fill="#d97757" font-family="JetBrains Mono,monospace" font-size="13" font-style="normal" letter-spacing="1">⤴ cái hay bị quên</text>
+        </g>
+      </svg>
+    </figure>
   </div>
+  <div class="stage-strip">▸ Beat 6 · ~3 phút. <b>Nơi trình bày khác nhau, đậm-nhạt khác nhau.</b> Hội trường = ít chữ ảnh to. PDF = chi tiết. Zoom = vừa phải. Cùng nội dung, 3 deck khác nhau. → refs/slide-method.html#drivers</div>
 </section>
+<!-- audience-word-count: 17 -->
 
-<!-- ========== SECTION 10: CÁCH BẮT ĐẦU ========== -->
-<section id="start">
+<section class="slide" id="s07-3-buoc" data-title="3 bước bắt buộc">
+  <span class="slide-num"></span>
   <div class="wrap">
-    <div class="section-title-row">
-      <span class="num">04</span>
-      <h2>Cách bắt đầu</h2>
-    </div>
-    <p class="lead">Có 2 đường vô skill.</p>
-
-    <div class="paths">
-      <div class="path-card">
-        <div class="path-tag">Đường A</div>
-        <h4>Có inbox/ sẵn</h4>
-        <p>Nếu đã có <code>inbox/{event}/</code>, bạn nói "đọc inbox". Skill scan folder, list event, hỏi bạn xác nhận bối cảnh, rồi chạy đúng luồng từ brainstorm tới deploy. Cách này hợp khi nguyên liệu đã nằm sẵn, chỉ cần đứa làm deck gom lại cho ra hình.</p>
-      </div>
-      <div class="path-card">
-        <div class="path-tag">Đường B</div>
-        <h4>Drop direct</h4>
-        <p>Nếu chưa có inbox, bạn nói "mình cần làm deck về X cho [audience]". Skill sẽ hỏi mấy câu làm rõ trước khi chạy, như người xem là ai, quyết định cần chốt là gì, nguyên liệu đang có gì, hạn ra sao.</p>
-      </div>
-    </div>
-
-    <pre><span class="cm">$</span> cd slide-studio
-<span class="cm">$</span> claude
-<span class="cm">&gt;</span> đọc inbox và build deck Q3 review</pre>
+    <div class="slide-kicker">Phần 2 · Quy trình</div>
+    <h1>3 bước: <span class="hl">Digest 20%</span> → Insight → Narrative.<br/><span class="dim">Bỏ bước nào cũng ra slide rác.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 220" role="img" aria-label="3-stage funnel">
+        <rect x="60" y="20" width="780" height="50" rx="6" fill="#fff" stroke="#e8e6dc" stroke-width="1.5"/>
+        <text x="450" y="50" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-size="14" letter-spacing="2">RAW DATA · báo cáo / nghiên cứu / interview</text>
+        <line x1="450" y1="74" x2="450" y2="96" stroke="#d97757" stroke-width="2"/>
+        <polygon points="450,96 444,86 456,86" fill="#d97757"/>
+        <rect x="200" y="100" width="500" height="44" rx="6" fill="#fff" stroke="#d97757" stroke-width="2"/>
+        <text x="450" y="128" text-anchor="middle" fill="#d97757" font-family="JetBrains Mono,monospace" font-size="14" letter-spacing="2">20% ATOM · 5–7 dữ liệu cốt lõi, ≤10 từ/ý</text>
+        <line x1="450" y1="148" x2="450" y2="170" stroke="#d97757" stroke-width="2"/>
+        <polygon points="450,170 444,160 456,160" fill="#d97757"/>
+        <rect x="290" y="170" width="320" height="46" rx="6" fill="#d97757"/>
+        <text x="450" y="203" text-anchor="middle" fill="#fff" font-family="Fraunces,serif" font-style="italic" font-weight="700" font-size="24">1 SLIDE · 1 BEAT</text>
+      </svg>
+    </figure>
   </div>
+  <div class="stage-strip">▸ Beat 7 · ~2 phút. <b>Nạp báo cáo thô vô AI rồi bảo "làm slide"</b> = text wall vô hồn. Quy trình này phân biệt slide BCG vs slide tự sinh.</div>
 </section>
+<!-- audience-word-count: 19 -->
 
-<!-- ========== SECTION 11: FOOTER ========== -->
-<footer>
+<section class="slide" id="s08-doc-gap-10" data-title="Đọc gấp 10 lần">
+  <span class="slide-num"></span>
   <div class="wrap">
-    <div class="tagline">Landing page này được dựng bằng chính <span class="accent">skill</span> này.</div>
-    <div class="links">
-      <a href="deck/slides.html">Xem deck mẫu — Buổi 1 →</a>
-      <a href="../skill/SKILL.md">SKILL.md →</a>
-      <a href="../skill/references/slide-method.md">slide-method.md →</a>
-      <a href="https://go.bnqtoan.workers.dev/insider-cong-ty-mot-nguoi" target="_blank" rel="noopener">Tham gia Insider →</a>
+    <h1>Đọc gấp <span class="hl">10 lần</span> để viết 1 dòng tinh túy.<br/><span class="dim">Độ sâu đo bằng bộ lọc, không bằng lượng chữ.</span></h1>
+    <div class="image-placeholder" data-img="s08-doc-10-lan">
+      <img src="images/s08-doc-10-lan.png" alt="" onerror="this.style.display='none'"/>
+      <div class="placeholder-label">[ image: s08-doc-10-lan ]</div>
+      <div class="placeholder-prompt">brand-flat-editorial · silhouette bent over đọc, stack 10 papers, 1 distilled card · cream + orange accent</div>
     </div>
-    <div class="closing">Đi build cái deck của bạn — rồi vô <span class="accent">Insider</span> build cùng anh em.</div>
+    <div class="chip-row">
+      <div class="chip">5–7 dữ liệu cốt lõi</div>
+      <div class="chip hl">mỗi ý ≤10 từ</div>
+      <div class="chip">loại từ thừa</div>
+      <div class="chip">câu dài → mảnh nguyên tử</div>
+    </div>
   </div>
-</footer>
+  <div class="stage-strip">▸ Beat 8 · ~2 phút. <b>Câu lock:</b> "độ sâu đo bằng bộ lọc, không bằng lượng chữ." Chính slide này phải tinh đến mức đó mới chứng minh được. Mình rewrite 6 lần.</div>
+</section>
+<!-- audience-word-count: 30 -->
 
+<section class="slide" id="s09-action-title" data-title="Tiêu đề = kết luận + đề xuất">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>Tiêu đề = <span class="hl">kết luận + đề xuất</span>.<br/><span class="dim">KHÔNG phải nhãn chủ đề.</span></h1>
+    <div class="cmp2">
+      <div class="card bad">
+        <div class="tag">✗ topic title</div>
+        <div class="t">Doanh thu Q3</div>
+      </div>
+      <div class="card good">
+        <div class="tag">✓ Action Title</div>
+        <div class="t">Doanh thu Q3 −15%:<br/>dồn ngân sách Loyalty.</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">▸ Beat 9 · ~3 phút. <b>HERO slide của Block 2.</b> Action Title = un-googleable. AI không sinh ra được nếu bạn không quyết. Slide kế = 4 cách tìm ra title đó.</div>
+</section>
+<!-- audience-word-count: 17 -->
+
+<section class="slide" id="s10-4-ong-kinh" data-title="5 ống kính tìm Action Title">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>5 ống kính tìm Action Title.<br/><span class="dim">Không có ống kính nào, title sẽ generic.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 340" role="img" aria-label="5 insight lenses converging">
+        <style>
+          #s10-4-ong-kinh .lens { outline: none; }
+          #s10-4-ong-kinh .lens rect { transition: fill .2s, stroke .2s, stroke-width .2s; }
+          #s10-4-ong-kinh .lens:hover rect { fill: #fdf3ec; }
+          #s10-4-ong-kinh .lens:focus rect { stroke: #d97757; stroke-width: 2.5; }
+          #s10-4-ong-kinh .lens.active rect { fill: #fdf3ec; stroke: #d97757; stroke-width: 2.5; }
+          #s10-4-ong-kinh .s10-out { transition: opacity .25s; }
+        </style>
+        <g font-family="Fraunces,serif" font-style="italic" font-size="14" fill="#141413">
+          <g class="lens" data-i="0" tabindex="0" role="button" aria-label="lens What So What Now What" style="cursor:pointer">
+            <rect x="20" y="18" width="240" height="46" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+            <text x="140" y="46" text-anchor="middle" font-size="14">What / So What / Now What</text>
+          </g>
+          <g class="lens" data-i="1" tabindex="0" role="button" aria-label="lens Gap Drag Accelerator" style="cursor:pointer">
+            <rect x="20" y="78" width="240" height="46" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+            <text x="140" y="106" text-anchor="middle" font-size="14">Gap · Drag · Accelerator</text>
+          </g>
+          <g class="lens" data-i="2" tabindex="0" role="button" aria-label="lens Then What" style="cursor:pointer">
+            <rect x="20" y="138" width="240" height="46" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+            <text x="140" y="166" text-anchor="middle" font-size="14">Then What? (bậc 2)</text>
+          </g>
+          <g class="lens" data-i="3" tabindex="0" role="button" aria-label="lens Anomaly" style="cursor:pointer">
+            <rect x="20" y="198" width="240" height="46" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+            <text x="140" y="226" text-anchor="middle" font-size="14">Anomaly</text>
+          </g>
+          <g class="lens" data-i="4" tabindex="0" role="button" aria-label="lens Ladder of Inference" style="cursor:pointer">
+            <rect x="20" y="258" width="240" height="46" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+            <text x="140" y="286" text-anchor="middle" font-size="14">Ladder (Quan sát → Diễn giải)</text>
+          </g>
+          <line x1="265" y1="41" x2="510" y2="171" stroke="#6a6a6a" stroke-width="1.2"/>
+          <line x1="265" y1="101" x2="510" y2="171" stroke="#6a6a6a" stroke-width="1.2"/>
+          <line x1="265" y1="161" x2="510" y2="171" stroke="#6a6a6a" stroke-width="1.2"/>
+          <line x1="265" y1="221" x2="510" y2="171" stroke="#6a6a6a" stroke-width="1.2"/>
+          <line x1="265" y1="281" x2="510" y2="171" stroke="#6a6a6a" stroke-width="1.2"/>
+          <!-- VIA label -->
+          <text class="s10-via" x="700" y="48" text-anchor="middle" fill="#d97757" font-family="JetBrains Mono,monospace" font-size="13" font-style="normal" letter-spacing="2">→ CLICK MỘT ỐNG KÍNH</text>
+          <!-- WRONG card (top) -->
+          <rect x="515" y="68" width="370" height="92" rx="10" fill="#fff" stroke="#bbb" stroke-width="1.2"/>
+          <text x="535" y="90" fill="#888" font-family="JetBrains Mono,monospace" font-size="11" font-style="normal" letter-spacing="2">✗ TITLE TỆ (chủ đề)</text>
+          <text class="s10-bad1" x="700" y="120" text-anchor="middle" fill="#888" font-style="italic" font-size="15"></text>
+          <text class="s10-bad2" x="700" y="142" text-anchor="middle" fill="#888" font-style="italic" font-size="15"></text>
+          <!-- RIGHT card (bottom, filled accent) -->
+          <rect x="515" y="172" width="370" height="132" rx="10" fill="#fdf3ec" stroke="#d97757" stroke-width="2"/>
+          <text x="535" y="194" fill="#d97757" font-family="JetBrains Mono,monospace" font-size="11" font-style="normal" letter-spacing="2">✓ ACTION TITLE</text>
+          <g class="s10-out" style="opacity:1">
+            <text class="s10-l1" x="700" y="232" text-anchor="middle" fill="#6a6a6a" font-style="italic" font-size="14">chưa chọn ống kính nào</text>
+            <text class="s10-l2" x="700" y="232" text-anchor="middle" fill="#141413" font-style="italic" font-size="15"></text>
+            <text class="s10-l3" x="700" y="260" text-anchor="middle" fill="#141413" font-style="italic" font-size="15"></text>
+            <text class="s10-l4" x="700" y="288" text-anchor="middle" fill="#141413" font-style="italic" font-size="15"></text>
+          </g>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 10 · ~4 phút. <b>Click từng ống kính trong demo</b> — cùng data ra title khác nhau. What/So-What ra title cứng; Gap-Drag ra title quantified; Then-What ra title sâu bậc 2; Anomaly ra title ngược logic; <b>Ladder</b> (mới) = move expert dùng để diễn giải fact thô. → refs/slide-method.html#insight</div>
+  <script>
+  (function(){
+    var root = document.getElementById('s10-4-ong-kinh');
+    if(!root) return;
+    var lensNames = ['What / So What / Now What','Gap · Drag · Accelerator','Then What?','Anomaly','Ladder'];
+    // each lens has: wrong (topic-title or shallow summary), right (Action Title via that lens)
+    // Every right answer = title (≤14 words, punch) + sub (≤18 words, why/how).
+    // Eats the dog food on the ≤14-word rule + the em-dash ban.
+    var pairs = [
+      {wrong: 'Retention Q3',
+       right: 'Retention Q3 −15%: dồn Loyalty Q4.',
+       sub: 'Dừng ads đại trà; ngân sách chuyển sang giữ tệp khách cũ.'},
+      {wrong: 'Doanh số quý này',
+       right: 'Thiếu 30% doanh số mục tiêu.',
+       sub: 'Cắt dòng SP phân khúc thấp, dồn lực bán phân khúc cao.'},
+      {wrong: 'Cắt giảm nhân sự 20%',
+       right: 'Cắt 20% nhân sự ẩn rủi ro bậc 2.',
+       sub: 'Dịch vụ sẽ tụt; bù bằng tự động hoá ngay tháng tới.'},
+      {wrong: 'Marketing và lượng khách',
+       right: 'Marketing −30% mà khách +10%.',
+       sub: 'Truyền miệng đang tự chạy. Tối ưu trải nghiệm để giữ đà.'},
+      {wrong: 'Doanh thu +18%, margin −4pp',
+       right: 'Doanh thu +18% lừa mắt.',
+       sub: 'Top 3 chi nhánh vẫn 14% margin. Vấn đề là 1 chi nhánh đang ramp.'}
+    ];
+    function wrap(s){
+      // 3-line wrap, max ~48 chars per line for fit
+      var words = s.split(' '); var lines=['','',''];
+      var i=0, line=0;
+      while(i<words.length && line<3){
+        var candidate = (lines[line]+' '+words[i]).trim();
+        if(candidate.length<=48){ lines[line]=candidate; i++; }
+        else { line++; }
+      }
+      if(i<words.length){ lines[2] = (lines[2]+' '+words.slice(i).join(' ')).trim(); }
+      return lines;
+    }
+    var lenses = root.querySelectorAll('.lens');
+    var out = root.querySelector('.s10-out');
+    var via = root.querySelector('.s10-via');
+    var l1 = root.querySelector('.s10-l1');
+    var l2 = root.querySelector('.s10-l2');
+    var l3 = root.querySelector('.s10-l3');
+    var l4 = root.querySelector('.s10-l4');
+    var bad1 = root.querySelector('.s10-bad1');
+    var bad2 = root.querySelector('.s10-bad2');
+    function activate(i){
+      out.style.opacity = '0';
+      bad1.style.opacity = '0';
+      bad2.style.opacity = '0';
+      setTimeout(function(){
+        lenses.forEach(function(el){ el.classList.remove('active'); });
+        lenses[i].classList.add('active');
+        via.textContent = '→ VIA ' + lensNames[i].toUpperCase();
+        // wrong (top card)
+        bad1.textContent = '"' + pairs[i].wrong + '"';
+        bad2.textContent = '';
+        bad1.style.opacity = '1';
+        bad2.style.opacity = '1';
+        // right (bottom filled card) — every pair has title + subtitle structure
+        // (5-field schema, ≤14 title + ≤18 subtitle — see sop/create.md Step 3)
+        l1.textContent = '';
+        l2.textContent = '"' + pairs[i].right + '"';
+        var subw = wrap(pairs[i].sub);
+        l3.textContent = subw[0];
+        l4.textContent = subw[1] || '';
+        // title row heavier; subtitle row dim + smaller
+        l2.setAttribute('fill', '#141413');
+        l2.setAttribute('font-size', '17');
+        l3.setAttribute('fill', '#6a6a6a');
+        l3.setAttribute('font-size', '14');
+        l4.setAttribute('fill', '#6a6a6a');
+        l4.setAttribute('font-size', '14');
+        out.style.opacity = '1';
+      }, 250);
+    }
+    lenses.forEach(function(el){
+      el.addEventListener('click', function(){ activate(parseInt(el.getAttribute('data-i'),10)); });
+      el.addEventListener('keydown', function(e){
+        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); activate(parseInt(el.getAttribute('data-i'),10)); }
+      });
+    });
+  })();
+  </script>
+</section>
+<!-- audience-word-count: 17 -->
+
+<section class="slide" id="s11-layout" data-title="Layout chọn từ bản chất thông điệp">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <div class="slide-kicker">Phần 3 · Concept-to-Visual</div>
+    <h1>Layout chọn từ <span class="hl">BẢN CHẤT</span> <span class="nowrap">thông điệp.</span><br/><span class="dim">Không vẽ <span class="nowrap">hoa mỹ.</span></span></h1>
+    <figure>
+      <svg viewBox="0 0 900 200" role="img" aria-label="4 layout types">
+        <g font-family="JetBrains Mono,monospace" font-size="14" fill="#141413">
+          <rect x="30" y="20" width="200" height="120" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <line x1="130" y1="40" x2="130" y2="120" stroke="#e8e6dc" stroke-width="2"/>
+          <text x="130" y="165" text-anchor="middle" font-size="14">So sánh → 2-cột</text>
+          <rect x="245" y="20" width="200" height="120" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <line x1="265" y1="80" x2="425" y2="80" stroke="#e8e6dc" stroke-width="2"/>
+          <circle cx="290" cy="80" r="6" fill="#6a6a6a"/>
+          <circle cx="345" cy="80" r="6" fill="#6a6a6a"/>
+          <circle cx="400" cy="80" r="6" fill="#6a6a6a"/>
+          <text x="345" y="165" text-anchor="middle" font-size="14">Tiến trình → Timeline</text>
+          <rect x="460" y="20" width="200" height="120" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <rect x="475" y="35" width="80" height="40" rx="4" fill="#e8e6dc"/>
+          <rect x="565" y="35" width="80" height="40" rx="4" fill="#e8e6dc"/>
+          <rect x="475" y="85" width="80" height="40" rx="4" fill="#e8e6dc"/>
+          <rect x="565" y="85" width="80" height="40" rx="4" fill="#e8e6dc"/>
+          <text x="560" y="165" text-anchor="middle" font-size="14">Cấu trúc → Tiled</text>
+          <rect x="675" y="20" width="200" height="120" rx="8" fill="#f3e2d8" stroke="#d97757" stroke-width="2"/>
+          <text x="775" y="165" text-anchor="middle" font-size="14" fill="#d97757" font-weight="700">Ý niệm → Bleed</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 11 · ~2 phút. <b>Quy tắc giết beige soup:</b> đừng hỏi "vẽ gì cho đẹp"; hỏi "thông điệp này thuộc loại gì". Layout tự ra. → refs/slide-method.html#layouts</div>
+</section>
+<!-- audience-word-count: 16 -->
+
+<section class="slide" id="s12-design-rules" data-title="4 rule polish">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>4 rule polish. Thiếu = <span class="hl">nhìn rẻ tiền</span>.</h1>
+    <figure>
+      <svg viewBox="0 0 900 300" role="img" aria-label="4 polish rules, click each to reveal illustration">
+        <style>
+          #s12-design-rules .r-btn { outline: none; cursor: pointer; }
+          #s12-design-rules .r-btn rect { transition: fill .2s, stroke .2s, stroke-width .2s; }
+          #s12-design-rules .r-btn:hover rect { fill: #fdf3ec; }
+          #s12-design-rules .r-btn.active rect { fill: #fdf3ec; stroke: #d97757; stroke-width: 2.5; }
+          #s12-design-rules .r-btn:focus rect { stroke: #d97757; stroke-width: 2.5; }
+          #s12-design-rules .s12-illus { transition: opacity .25s; opacity: 1; }
+          #s12-design-rules .illus-group { display: none; }
+          #s12-design-rules .illus-group.show { display: inline; }
+        </style>
+        <g font-family="Fraunces,serif" font-style="italic" fill="#141413">
+          <!-- 4 buttons in a 2x2 grid on the left -->
+          <g class="r-btn" data-i="0" tabindex="0" role="button" aria-label="1 visual anchor / slide">
+            <rect x="20" y="20" width="200" height="60" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+            <text x="120" y="46" text-anchor="middle" font-size="14" font-weight="700">1 visual anchor</text>
+            <text x="120" y="66" text-anchor="middle" font-size="12" font-style="normal" font-family="JetBrains Mono,monospace" fill="#6a6a6a">/ slide</text>
+          </g>
+          <g class="r-btn" data-i="1" tabindex="0" role="button" aria-label="60-30-10 màu">
+            <rect x="240" y="20" width="200" height="60" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+            <text x="340" y="46" text-anchor="middle" font-size="14" font-weight="700">60-30-10</text>
+            <text x="340" y="66" text-anchor="middle" font-size="12" font-style="normal" font-family="JetBrains Mono,monospace" fill="#6a6a6a">tỉ lệ màu</text>
+          </g>
+          <g class="r-btn" data-i="2" tabindex="0" role="button" aria-label="Whitespace có chủ ý">
+            <rect x="20" y="100" width="200" height="60" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+            <text x="120" y="126" text-anchor="middle" font-size="14" font-weight="700">Whitespace</text>
+            <text x="120" y="146" text-anchor="middle" font-size="12" font-style="normal" font-family="JetBrains Mono,monospace" fill="#6a6a6a">có chủ ý</text>
+          </g>
+          <g class="r-btn" data-i="3" tabindex="0" role="button" aria-label="Rhythm — nhịp slide-to-slide">
+            <rect x="240" y="100" width="200" height="60" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+            <text x="340" y="126" text-anchor="middle" font-size="14" font-weight="700">Rhythm</text>
+            <text x="340" y="146" text-anchor="middle" font-size="12" font-style="normal" font-family="JetBrains Mono,monospace" fill="#6a6a6a">nhịp deck</text>
+          </g>
+
+          <!-- Illustration box on the right -->
+          <rect x="475" y="20" width="405" height="260" rx="10" fill="#fdf3ec" stroke="#d97757" stroke-width="2"/>
+          <text x="495" y="48" fill="#d97757" font-family="JetBrains Mono,monospace" font-size="12" font-style="normal" letter-spacing="2">✓ MINH HOẠ</text>
+
+          <g class="s12-illus">
+            <!-- Placeholder for empty state -->
+            <text class="s12-empty" x="677" y="155" text-anchor="middle" fill="#6a6a6a" font-style="italic" font-size="14">click một rule trái để xem minh hoạ →</text>
+
+            <!-- Rule 1: 1 visual anchor — illustrates a slide w/ ONE dominant element vs scattered -->
+            <g class="illus-group" data-illus="0">
+              <text x="677" y="78" text-anchor="middle" fill="#141413" font-style="italic" font-size="15" font-weight="700">1 anchor: mắt biết nhìn đâu trước</text>
+              <!-- Good slide mock -->
+              <rect x="510" y="98" width="160" height="100" rx="6" fill="#fff" stroke="#d97757" stroke-width="1.5"/>
+              <circle cx="590" cy="148" r="32" fill="#d97757"/>
+              <text x="590" y="153" text-anchor="middle" fill="#fff" font-weight="700" font-size="18">87%</text>
+              <text x="590" y="218" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="11">✓ 1 anchor</text>
+              <!-- Bad slide mock -->
+              <rect x="690" y="98" width="160" height="100" rx="6" fill="#fff" stroke="#bbb" stroke-width="1.5" opacity=".7"/>
+              <circle cx="720" cy="130" r="18" fill="#d97757" opacity=".55"/>
+              <circle cx="820" cy="130" r="18" fill="#d97757" opacity=".55"/>
+              <circle cx="720" cy="175" r="18" fill="#d97757" opacity=".55"/>
+              <circle cx="820" cy="175" r="18" fill="#d97757" opacity=".55"/>
+              <text x="770" y="218" text-anchor="middle" fill="#bbb" font-family="JetBrains Mono,monospace" font-style="normal" font-size="11">✗ 4 anchor</text>
+              <text x="677" y="252" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="11">slide nào có 2 anchor = 2 slide</text>
+            </g>
+
+            <!-- Rule 2: 60-30-10 color ratio -->
+            <g class="illus-group" data-illus="1">
+              <text x="677" y="78" text-anchor="middle" fill="#141413" font-style="italic" font-size="15" font-weight="700">60% nền · 30% chính · 10% accent</text>
+              <!-- 60% block (cream/dominant) -->
+              <rect x="510" y="100" width="222" height="120" rx="6" fill="#faf9f5" stroke="#e8e6dc" stroke-width="1"/>
+              <text x="621" y="167" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="13" font-weight="700">60%</text>
+              <text x="621" y="184" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="10">nền</text>
+              <!-- 30% block (ink/secondary) -->
+              <rect x="735" y="100" width="111" height="120" rx="6" fill="#141413"/>
+              <text x="790" y="167" text-anchor="middle" fill="#faf9f5" font-family="JetBrains Mono,monospace" font-style="normal" font-size="13" font-weight="700">30%</text>
+              <text x="790" y="184" text-anchor="middle" fill="#faf9f5" font-family="JetBrains Mono,monospace" font-style="normal" font-size="10">chữ</text>
+              <!-- 10% accent strip -->
+              <rect x="849" y="100" width="32" height="120" rx="6" fill="#d97757"/>
+              <text x="865" y="167" text-anchor="middle" fill="#fff" font-family="JetBrains Mono,monospace" font-style="normal" font-size="11" font-weight="700">10%</text>
+              <text x="677" y="252" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="11">accent gắt = ít dùng để còn sức</text>
+            </g>
+
+            <!-- Rule 3: whitespace -->
+            <g class="illus-group" data-illus="2">
+              <text x="677" y="78" text-anchor="middle" fill="#141413" font-style="italic" font-size="15" font-weight="700">Whitespace = khoảng thở, không phải lười</text>
+              <!-- Good: with whitespace -->
+              <rect x="510" y="98" width="160" height="100" rx="6" fill="#fff" stroke="#d97757" stroke-width="1.5"/>
+              <rect x="540" y="135" width="100" height="6" rx="2" fill="#141413"/>
+              <rect x="540" y="148" width="60" height="6" rx="2" fill="#6a6a6a"/>
+              <text x="590" y="218" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="11">✓ thở được</text>
+              <!-- Bad: cramped -->
+              <rect x="690" y="98" width="160" height="100" rx="6" fill="#fff" stroke="#bbb" stroke-width="1.5" opacity=".7"/>
+              <rect x="700" y="108" width="140" height="6" rx="2" fill="#141413" opacity=".5"/>
+              <rect x="700" y="120" width="140" height="6" rx="2" fill="#141413" opacity=".5"/>
+              <rect x="700" y="132" width="135" height="6" rx="2" fill="#141413" opacity=".5"/>
+              <rect x="700" y="144" width="140" height="6" rx="2" fill="#141413" opacity=".5"/>
+              <rect x="700" y="156" width="138" height="6" rx="2" fill="#141413" opacity=".5"/>
+              <rect x="700" y="168" width="130" height="6" rx="2" fill="#141413" opacity=".5"/>
+              <rect x="700" y="180" width="140" height="6" rx="2" fill="#141413" opacity=".5"/>
+              <text x="770" y="218" text-anchor="middle" fill="#bbb" font-family="JetBrains Mono,monospace" font-style="normal" font-size="11">✗ chật chội</text>
+              <text x="677" y="252" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="11">khoảng trống = mắt nghỉ + ý nổi</text>
+            </g>
+
+            <!-- Rule 4: rhythm -->
+            <g class="illus-group" data-illus="3">
+              <text x="677" y="78" text-anchor="middle" fill="#141413" font-style="italic" font-size="15" font-weight="700">Rhythm: nhịp slide-to-slide</text>
+              <!-- 5 mini slide cards in a row, alternating sizes -->
+              <rect x="500" y="120" width="40" height="60" rx="4" fill="#fff" stroke="#6a6a6a"/>
+              <text x="520" y="156" text-anchor="middle" font-size="10" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal">cover</text>
+              <rect x="555" y="100" width="70" height="100" rx="4" fill="#fff" stroke="#d97757" stroke-width="1.5"/>
+              <text x="590" y="155" text-anchor="middle" font-size="10" fill="#d97757" font-family="JetBrains Mono,monospace" font-style="normal" font-weight="700">claim</text>
+              <rect x="640" y="120" width="40" height="60" rx="4" fill="#fff" stroke="#6a6a6a"/>
+              <text x="660" y="156" text-anchor="middle" font-size="10" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal">data</text>
+              <rect x="695" y="100" width="70" height="100" rx="4" fill="#fff" stroke="#d97757" stroke-width="1.5"/>
+              <text x="730" y="155" text-anchor="middle" font-size="10" fill="#d97757" font-family="JetBrains Mono,monospace" font-style="normal" font-weight="700">claim</text>
+              <rect x="780" y="120" width="40" height="60" rx="4" fill="#fff" stroke="#6a6a6a"/>
+              <text x="800" y="156" text-anchor="middle" font-size="10" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal">data</text>
+              <text x="677" y="232" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="11">nặng – nhẹ – nặng – nhẹ · audience thở</text>
+              <text x="677" y="252" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="11">5 slide nặng liên tiếp = audience kiệt</text>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 12 · ~2 phút. <b>1 anchor / slide</b>. Slide nào có 2 anchor là 2 slide. Click từng rule cho audience xem minh hoạ. <b>Nếu Block 2 overrun: demote slide này xuống refs/ chỉ làm take-home; giữ S13 vì là QC cuối.</b> → refs/slide-method.html#rules</div>
+  <script>
+  (function(){
+    var root = document.getElementById('s12-design-rules');
+    if(!root) return;
+    var btns = root.querySelectorAll('.r-btn');
+    var empty = root.querySelector('.s12-empty');
+    var groups = root.querySelectorAll('.illus-group');
+    function activate(i){
+      btns.forEach(function(b){ b.classList.remove('active'); });
+      btns[i].classList.add('active');
+      if(empty) empty.style.display = 'none';
+      groups.forEach(function(g){ g.classList.remove('show'); });
+      var target = root.querySelector('.illus-group[data-illus="' + i + '"]');
+      if(target) target.classList.add('show');
+    }
+    btns.forEach(function(el){
+      el.addEventListener('click', function(){ activate(parseInt(el.getAttribute('data-i'),10)); });
+      el.addEventListener('keydown', function(e){
+        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); activate(parseInt(el.getAttribute('data-i'),10)); }
+      });
+    });
+  })();
+  </script>
+</section>
+<!-- audience-word-count: 25 -->
+
+<section class="slide" id="s13-story-test" data-title="Story Test — QC cuối">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>SCR + Story Test: đọc riêng tiêu đề =<br/><span class="hl">ra cả mạch truyện</span>.</h1>
+    <figure>
+      <svg viewBox="0 0 900 180" role="img" aria-label="title-only filmstrip">
+        <g font-family="Fraunces,serif" font-style="italic" font-size="14" fill="#141413">
+          <rect x="20" y="20" width="200" height="60" rx="8" fill="#fff" stroke="#d97757" stroke-width="1.5"/>
+          <text x="120" y="46" text-anchor="middle" font-size="14">Câu hỏi đo cái dễ</text>
+          <text x="120" y="66" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="12">S02</text>
+          <line x1="225" y1="50" x2="245" y2="50" stroke="#d97757" stroke-width="2"/>
+          <polygon points="245,50 235,46 235,54" fill="#d97757"/>
+          <rect x="250" y="20" width="200" height="60" rx="8" fill="#fff" stroke="#d97757" stroke-width="1.5"/>
+          <text x="350" y="44" text-anchor="middle" font-size="14">Câu hỏi đúng:</text>
+          <text x="350" y="64" text-anchor="middle" font-size="14">đáng nghe không?</text>
+          <line x1="455" y1="50" x2="475" y2="50" stroke="#d97757" stroke-width="2"/>
+          <polygon points="475,50 465,46 465,54" fill="#d97757"/>
+          <rect x="480" y="20" width="200" height="60" rx="8" fill="#fff" stroke="#d97757" stroke-width="1.5"/>
+          <text x="580" y="44" text-anchor="middle" font-size="14">Mở cái LOOP,</text>
+          <text x="580" y="64" text-anchor="middle" font-size="14">không phải skill</text>
+          <line x1="685" y1="50" x2="705" y2="50" stroke="#d97757" stroke-width="2"/>
+          <polygon points="705,50 695,46 695,54" fill="#d97757"/>
+          <rect x="710" y="20" width="170" height="60" rx="8" fill="#fff" stroke="#d97757" stroke-width="1.5"/>
+          <text x="795" y="54" text-anchor="middle" font-size="19">…</text>
+          <text x="450" y="123" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="13" letter-spacing="1">↓ đọc riêng tiêu đề ra mạch:</text>
+          <text x="450" y="155" text-anchor="middle" fill="#d97757" font-weight="600" font-size="19">"câu hỏi đo cái dễ → đáng nghe không → mở cái loop →…"</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 13 · ~2 phút. <b>QC cuối. Chỉ chạy được nếu mọi title là Action Title (callback S09).</b> Lock line: "Slide tốt = distill 20% → Action Title từ insight → layout đúng bản chất → đọc tiêu đề ra cả câu chuyện. AI dựng được hết SAU khi BẠN đã quyết 4 cái đó."</div>
+</section>
+<!-- audience-word-count: 13 -->
+
+<!-- ============ BLOCK 3 — Research (S14–S18) ============ -->
+
+<section class="slide" id="s14-trang-trang" data-title="Outline chưa research = trang trắng">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <div class="slide-kicker">Block 3 · Research phase · 25 phút</div>
+    <h1>Mở outline.md chưa research =<br/><span class="hl">nhìn trang trắng</span>. Bài toán không nằm ở tool.</h1>
+    <div class="image-placeholder" data-img="s14-blank-outline">
+      <img src="images/s14-blank-outline.png" alt="" onerror="this.style.display='none'"/>
+      <div class="placeholder-label">[ image: s14-blank-outline ]</div>
+      <div class="placeholder-prompt">brand-flat-editorial · laptop screen open outline.md blank w/ cursor, hand hesitating · cream warmth</div>
+    </div>
+    <figure style="display:none">
+      <svg viewBox="0 0 900 200" role="img" aria-label="empty editor">
+        <rect x="80" y="20" width="740" height="160" rx="10" fill="#fff" stroke="#e8e6dc" stroke-width="1.5"/>
+        <text x="110" y="50" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-size="16">outline.md</text>
+        <line x1="110" y1="65" x2="820" y2="65" stroke="#e8e6dc"/>
+        <text x="110" y="105" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-size="16"># </text>
+        <rect x="135" y="92" width="12" height="22" fill="#d97757">
+          <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+        </rect>
+        <text x="450" y="155" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-size="16">outline rỗng = research rỗng</text>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 14 · ~1 phút. <b>Cái fail thật của "làm slide chậm" không phải tool. Là ngồi xuống mà chưa có nguyên liệu.</b> Block này lấy nguyên liệu.</div>
+</section>
+<!-- audience-word-count: 18 -->
+
+<section class="slide" id="s15-3-lop" data-title="3 lớp research nuôi outline">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>3 lớp research nuôi outline.<br/><span class="dim">Thiếu lớp nào, slide thiếu đó.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 232" role="img" aria-label="3 stacked research layers">
+        <g font-family="Fraunces,serif" font-style="italic" font-size="19" fill="#141413">
+          <rect x="100" y="20" width="700" height="42" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="450" y="48" text-anchor="middle" font-size="19">1 · audience.md — ai ngồi dưới</text>
+          <rect x="100" y="70" width="700" height="42" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="450" y="98" text-anchor="middle" font-size="19">2 · claims.md — claim + nguồn + counter</text>
+          <rect x="100" y="120" width="700" height="42" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="450" y="148" text-anchor="middle" font-size="19">3 · examples.md — ví dụ concrete</text>
+          <line x1="450" y1="166" x2="450" y2="184" stroke="#d97757" stroke-width="2"/>
+          <polygon points="450,184 444,174 456,174" fill="#d97757"/>
+          <rect x="300" y="180" width="300" height="44" rx="6" fill="#d97757"/>
+          <text x="450" y="211" text-anchor="middle" fill="#fff" font-family="Fraunces,serif" font-style="italic" font-weight="700" font-size="22">→ OUTLINE.md</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 15 · ~1 phút. <b>3 file đúng tên file mình dùng thật</b>. Sẽ thấy ngay trong demo. Mỗi lớp = 1 AI move khác nhau.</div>
+</section>
+<!-- audience-word-count: 19 -->
+
+<section class="slide" id="s16-audience-md" data-title="audience.md = Design Driver #1 viết tay">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>audience.md = <span class="hl">Design Driver #1 viết tay</span>.<br/><span class="dim">Vocab + 3 pain + ngôn ngữ họ dùng.</span></h1>
+    <div class="chip-row">
+      <div class="chip hl">vocab list</div>
+      <div class="chip hl">3 pain points</div>
+      <div class="chip hl">1 cách họ nói chuyện</div>
+    </div>
+    <p class="lead">AI move: <b style="color:var(--accent)">WebSearch + qmd</b> lục FB/LinkedIn 3-5 người đại diện. <b>Tái dùng được.</b> Buổi 2 dùng lại audience này, không research lại.</p>
+  </div>
+  <div class="stage-strip">▸ Beat 16 · ~2 phút. <b>Callback Driver #1 (S06). Giờ làm cụ thể bằng 1 file markdown.</b> audience.md sống trong 00-decide/.</div>
+</section>
+<!-- audience-word-count: 36 -->
+
+<section class="slide" id="s17-claims-md" data-title="claims.md = 4 ống kính gặp nguồn thật">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>claims.md = chỗ <span class="hl">4 ống kính</span> gặp nguồn thật.<br/><span class="dim">Action Title đẻ ra ở đây.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 160" role="img" aria-label="source → lens → action title pipeline">
+        <g font-family="Fraunces,serif" font-style="italic" font-size="19" fill="#141413">
+          <rect x="40" y="40" width="180" height="70" rx="10" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="130" y="72" text-anchor="middle" font-size="19">nguồn</text>
+          <text x="130" y="92" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="12">paper / interview / data</text>
+          <line x1="225" y1="75" x2="275" y2="75" stroke="#d97757" stroke-width="2"/>
+          <polygon points="275,75 265,71 265,79" fill="#d97757"/>
+          <rect x="280" y="40" width="220" height="70" rx="10" fill="#fff" stroke="#d97757" stroke-width="2"/>
+          <text x="390" y="72" text-anchor="middle" fill="#d97757" font-size="19">4 ống kính insight</text>
+          <text x="390" y="92" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="12">(callback S10)</text>
+          <line x1="505" y1="75" x2="555" y2="75" stroke="#d97757" stroke-width="2"/>
+          <polygon points="555,75 545,71 545,79" fill="#d97757"/>
+          <rect x="560" y="35" width="280" height="80" rx="10" fill="#fdf3ec" stroke="#d97757" stroke-width="2"/>
+          <text x="700" y="74" text-anchor="middle" fill="#d97757" font-weight="700" font-size="23">Action Title thô</text>
+          <text x="700" y="94" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="12">(chốt ở outline.md)</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 17 · ~2 phút. <b>Claim từ memory = hallucination = audience bắt được.</b> AI move: WebSearch + Codex deep research (delegate). Chỗ Block 2 (S09-S10) gặp đời thật.</div>
+</section>
+<!-- audience-word-count: 18 -->
+
+<section class="slide" id="s18-examples-md" data-title="examples.md vault-first">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>examples.md <span class="hl">vault-first</span> rồi mới web.<br/><span class="dim">qmd trước, hallucination sau.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 180" role="img" aria-label="vault search vs web search">
+        <g font-family="Fraunces,serif" font-style="italic" font-size="19" fill="#141413">
+          <rect x="60" y="25" width="320" height="65" rx="10" fill="#fff" stroke="#d97757" stroke-width="2"/>
+          <text x="220" y="55" text-anchor="middle" fill="#d97757" font-size="19">qmd vault search</text>
+          <text x="220" y="78" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="12">5-7 ví dụ concrete tái dùng</text>
+          <rect x="60" y="100" width="320" height="55" rx="10" fill="#fff" stroke="#e8e6dc" stroke-width="1.5" opacity=".7"/>
+          <text x="220" y="132" text-anchor="middle" fill="#6a6a6a" font-size="14">web search (chỉ khi vault không có)</text>
+          <line x1="395" y1="90" x2="475" y2="90" stroke="#d97757" stroke-width="2"/>
+          <polygon points="475,90 465,86 465,94" fill="#d97757"/>
+          <rect x="480" y="55" width="360" height="70" rx="10" fill="#d97757"/>
+          <text x="660" y="95" text-anchor="middle" fill="#fff" font-weight="700" font-size="19">examples.md (5-7 ví dụ)</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 18 · ~2 phút. <b>Research-first rule: vault có rồi đừng đi tìm lại.</b> ▶ LIVE DEMO: mở Claude Code, generate 3 file cho deck buổi 2 ngay. ~15 phút.</div>
+</section>
+<!-- audience-word-count: 18 -->
+
+<!-- ============ BLOCK 4 — Outline (S19-S20) ============ -->
+
+<section class="slide" id="s19-outline-format" data-title="outline.md = bảng lắp ráp">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <div class="slide-kicker">Block 4 · Outline đi trước · 15 phút</div>
+    <h1>outline.md = <span class="hl">bảng lắp ráp 4 cột</span>.<br/><span class="dim">Đủ 4 cột mới gọi outline.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 180" role="img" aria-label="4-column outline row">
+        <g font-family="JetBrains Mono,monospace" font-size="14" fill="#141413">
+          <rect x="40" y="20" width="200" height="80" rx="8" fill="#fff" stroke="#d97757" stroke-width="2"/>
+          <text x="140" y="48" text-anchor="middle" fill="#d97757" font-weight="700" font-size="19">title</text>
+          <text x="140" y="72" text-anchor="middle" fill="#6a6a6a" font-size="12">Action Title (kết luận)</text>
+          <text x="140" y="90" text-anchor="middle" fill="#6a6a6a" font-size="12">≤14 từ</text>
+          <rect x="252" y="20" width="200" height="80" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="352" y="48" text-anchor="middle" font-size="19" font-weight="700">slide-text</text>
+          <text x="352" y="72" text-anchor="middle" fill="#6a6a6a" font-size="12">audience-visible</text>
+          <text x="352" y="90" text-anchor="middle" fill="#6a6a6a" font-size="12">≤25 từ</text>
+          <rect x="464" y="20" width="200" height="80" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="564" y="48" text-anchor="middle" font-size="19" font-weight="700">visual</text>
+          <text x="564" y="72" text-anchor="middle" fill="#6a6a6a" font-size="12">SVG/Stock/</text>
+          <text x="564" y="90" text-anchor="middle" fill="#6a6a6a" font-size="12">Codex/Placeholder</text>
+          <rect x="676" y="20" width="200" height="80" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="776" y="48" text-anchor="middle" font-size="19" font-weight="700">stage-note</text>
+          <text x="776" y="72" text-anchor="middle" fill="#6a6a6a" font-size="12">speaker layer</text>
+          <text x="776" y="90" text-anchor="middle" fill="#6a6a6a" font-size="12">unbounded</text>
+          <line x1="450" y1="120" x2="450" y2="150" stroke="#d97757" stroke-width="2"/>
+          <polygon points="450,150 444,140 456,140" fill="#d97757"/>
+          <text x="450" y="172" text-anchor="middle" fill="#6a6a6a" font-size="12">← research files (claims.md, examples.md) cung phụ tùng</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 19 · ~5 phút. <b>Research files = thùng phụ tùng. Outline = bảng lắp ráp.</b> Mỗi heading PHẢI đã là Action Title (callback S09). Không phải đợi tới HTML mới đổi.</div>
+</section>
+<!-- audience-word-count: 33 -->
+
+<section class="slide" id="s20-anti-pattern" data-title="Bỏ outline = Story Test fail">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>Bỏ outline → nhảy thẳng design =<br/><span class="hl">không edit sạch + Story Test fail</span>.</h1>
+    <div class="cmp2">
+      <div class="card bad">
+        <div class="tag">✗ skip outline</div>
+        <div class="t">tangled edit</div>
+        <div class="sub">Slide đẹp rồi muốn sửa 1 ý = phải sửa cả file. Story Test fail vì title không phải Action Title.</div>
+      </div>
+      <div class="card good">
+        <div class="tag">✓ outline-first</div>
+        <div class="t">swap clean</div>
+        <div class="sub">Sửa outline → re-build HTML. 1-1 swap. Story Test chạy ngay ở outline time.</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">▸ Beat 20 · ~5 phút. <b>▶ LIVE DEMO:</b> dựng outline.md cho deck buổi 2 từ 3 file research vừa làm. ~10 phút. Đọc xuôi tiêu đề = Story Test pass.</div>
+</section>
+<!-- audience-word-count: 36 -->
+
+<!-- ============ BLOCK 4.5 — Slide ≠ PDF (S20a-S20c) ============ -->
+
+<section class="slide quote atmosphere" id="s20a-quote" data-title="Slide không cần là PDF">
+  <span class="slide-num"></span>
+  <div class="quote-bg">
+    <img src="images/s20a-quote-atmosphere.png" alt="" onerror="this.style.display='none'"/>
+  </div>
+  <blockquote>
+    Slide không cần là PDF.<br/>
+    Không cần là Canva.<br/>
+    Không cần là PowerPoint.<br/>
+    <span class="accent">Slide có thể là một website.</span><br/>
+    Và đây là chỗ phép màu xảy ra.
+  </blockquote>
+  <div class="stage-strip">▸ Beat 20a · ~30s. <b>Để chữ trong vài giây trước khi sang. Đừng đọc lên. Để họ đọc.</b></div>
+</section>
+<!-- audience-word-count: 25 -->
+
+<section class="slide" id="s20b-compound" data-title="Phép màu = mỗi deck nuôi deck kế">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>Phép màu = <span class="hl">mỗi deck nuôi deck kế</span> qua retro → assets.<br/><span class="dim">PDF cũng đọc được. Nhưng không sửa nguyên-tử, không git-diff, không fork lại.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 240" role="img" aria-label="canva files vs html decks">
+        <g font-family="Fraunces,serif" font-style="italic" font-size="19" fill="#141413">
+          <text x="40" y="28" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="12" letter-spacing="2">CANVA / GSLIDES / PPT · song song</text>
+          <rect x="40" y="40" width="160" height="60" rx="6" fill="#fff" stroke="#e8e6dc" stroke-width="1.5"/>
+          <text x="120" y="76" text-anchor="middle" font-size="19">deck #1.pdf</text>
+          <rect x="220" y="40" width="160" height="60" rx="6" fill="#fff" stroke="#e8e6dc" stroke-width="1.5"/>
+          <text x="300" y="76" text-anchor="middle" font-size="19">deck #2.pdf</text>
+          <rect x="400" y="40" width="160" height="60" rx="6" fill="#fff" stroke="#e8e6dc" stroke-width="1.5"/>
+          <text x="480" y="76" text-anchor="middle" font-size="19">deck #3.pdf</text>
+          <text x="690" y="76" text-anchor="middle" fill="#6a6a6a" font-family="JetBrains Mono,monospace" font-style="normal" font-size="14">không nối</text>
+          <text x="40" y="140" fill="#d97757" font-family="JetBrains Mono,monospace" font-style="normal" font-size="12" letter-spacing="2">HTML (slide-studio) · cộng dồn</text>
+          <rect x="40" y="152" width="160" height="60" rx="6" fill="#fff" stroke="#d97757" stroke-width="2"/>
+          <text x="120" y="188" text-anchor="middle" font-size="19">deck #1</text>
+          <line x1="205" y1="182" x2="295" y2="182" stroke="#d97757" stroke-width="2"/>
+          <polygon points="295,182 285,178 285,186" fill="#d97757"/>
+          <text x="250" y="172" text-anchor="middle" fill="#d97757" font-family="JetBrains Mono,monospace" font-style="normal" font-size="12">retro→assets</text>
+          <rect x="300" y="152" width="160" height="60" rx="6" fill="#fff" stroke="#d97757" stroke-width="2"/>
+          <text x="380" y="188" text-anchor="middle" font-size="19">deck #2</text>
+          <line x1="465" y1="182" x2="555" y2="182" stroke="#d97757" stroke-width="2"/>
+          <polygon points="555,182 545,178 545,186" fill="#d97757"/>
+          <text x="510" y="172" text-anchor="middle" fill="#d97757" font-family="JetBrains Mono,monospace" font-style="normal" font-size="12">retro→assets</text>
+          <rect x="560" y="152" width="160" height="60" rx="6" fill="#fff" stroke="#d97757" stroke-width="2"/>
+          <text x="640" y="188" text-anchor="middle" font-size="19">deck #3</text>
+          <text x="800" y="190" text-anchor="middle" fill="#d97757" font-family="Fraunces,serif" font-style="italic" font-size="22" font-weight="700">giàu lên</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 20b · ~2 phút. <b>Lock line: "Canva cho 1 deck rời. HTML cho 1 hệ thống deck biết học."</b> Chỗ phép màu xảy ra. Không phải hover effect.</div>
+</section>
+<!-- audience-word-count: 35 -->
+
+<section class="slide" id="s20c-stack" data-title="3 vai trong loop">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>3 vai: <span class="hl">Claude chạy loop</span> · Codex là nhánh ảnh · Obsidian là nhà offline.</h1>
+    <div class="logo-strip">
+      <div class="logo-cell">
+        <div class="logo"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Claude_AI_logo.svg/1280px-Claude_AI_logo.svg.png" alt="Claude" onerror="this.style.display='none'"/></div>
+        <div class="logo-name">Claude Code</div>
+        <div class="logo-role">chạy loop · 00→50</div>
+      </div>
+      <div class="logo-cell">
+        <div class="logo"><img src="assets/codex-logo-colored-light.svg" alt="Codex" onerror="this.style.display='none'"/></div>
+        <div class="logo-name">Codex CLI</div>
+        <div class="logo-role">nhánh ảnh · tùy chọn</div>
+      </div>
+      <div class="logo-cell">
+        <div class="logo"><img src="https://obsidian.md/images/2023-06-logo.png" alt="Obsidian" onerror="this.style.display='none'"/></div>
+        <div class="logo-name">Obsidian</div>
+        <div class="logo-role">nhà offline · vault</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">▸ Beat 20c · ~1 phút. <b>Codex KHÔNG bắt buộc.</b> Không có thì để placeholder, drop ảnh vô images/, place-images.py fuzzy-match. Hand-off: "Mở Claude Code trong slide-studio →"</div>
+</section>
+<!-- audience-word-count: 21 -->
+
+<!-- ============ S20d — Cho skill ăn cái gì? ============ -->
+<section class="slide" id="s20d-feed" data-title="Cho skill ăn gì để ra deck">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>Cho skill ăn 2 thứ: <span class="hl">style fork</span> + <span class="hl">content thô</span>.<br/><span class="dim">Bận thì gom rồi quăng, skill tự rút.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 360" role="img" aria-label="2 lanes feeding outline.md → slide skill → slides.html">
+        <g font-family="JetBrains Mono,monospace" font-size="14" fill="#141413">
+          <!-- LANE 1: STYLE -->
+          <text x="60" y="30" fill="#d97757" font-weight="700" letter-spacing="2" font-size="12">STYLE · fork (không tả)</text>
+          <rect x="60" y="46" width="300" height="44" rx="6" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="210" y="73" text-anchor="middle" font-size="14">link 1 deck mẫu (HTML)</text>
+          <rect x="60" y="96" width="300" height="44" rx="6" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="210" y="123" text-anchor="middle" font-size="14">— hoặc fork reference-deck/</text>
+          <rect x="60" y="146" width="300" height="44" rx="6" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="210" y="173" text-anchor="middle" font-size="14">— hoặc deck cũ bạn thích</text>
+          <text x="210" y="208" text-anchor="middle" fill="#6a6a6a" font-size="12" font-style="italic" font-family="Fraunces,serif">CSS tokens + chrome → tự lấy</text>
+
+          <!-- LANE 2: CONTENT -->
+          <text x="60" y="240" fill="#d97757" font-weight="700" letter-spacing="2" font-size="12">CONTENT · raw (gom thô)</text>
+          <rect x="60" y="256" width="190" height="40" rx="6" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="155" y="281" text-anchor="middle" font-size="14">brainstorm.md</text>
+          <rect x="258" y="256" width="220" height="40" rx="6" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="368" y="281" text-anchor="middle" font-size="14">recording → transcript</text>
+          <rect x="60" y="304" width="190" height="40" rx="6" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="155" y="329" text-anchor="middle" font-size="14">vault note · qmd</text>
+          <rect x="258" y="304" width="220" height="40" rx="6" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="368" y="329" text-anchor="middle" font-size="14">PDF / article / paste</text>
+
+          <!-- arrows merging to skill -->
+          <path d="M365 117 Q500 117 550 175" fill="none" stroke="#6a6a6a" stroke-width="1.5"/>
+          <path d="M485 295 Q520 295 550 215" fill="none" stroke="#6a6a6a" stroke-width="1.5"/>
+
+          <!-- SKILL middle -->
+          <rect x="555" y="155" width="180" height="80" rx="10" fill="#faf9f5" stroke="#d97757" stroke-width="2.5" stroke-dasharray="5 3"/>
+          <text x="645" y="184" text-anchor="middle" fill="#d97757" font-weight="700" font-size="19" font-family="Fraunces,serif" font-style="italic">skill `slide`</text>
+          <text x="645" y="206" text-anchor="middle" fill="#6a6a6a" font-size="12">research → distill → outline</text>
+          <text x="645" y="222" text-anchor="middle" fill="#6a6a6a" font-size="12">→ fork → fill → check</text>
+
+          <!-- gate -->
+          <line x1="735" y1="195" x2="765" y2="195" stroke="#d97757" stroke-width="2"/>
+          <polygon points="765,195 755,190 755,200" fill="#d97757"/>
+          <text x="750" y="180" text-anchor="middle" fill="#6a6a6a" font-size="12" font-style="italic" font-family="Fraunces,serif">duyệt outline</text>
+
+          <!-- OUTPUT -->
+          <rect x="770" y="155" width="120" height="80" rx="10" fill="#d97757"/>
+          <text x="830" y="200" text-anchor="middle" fill="#fff" font-weight="700" font-size="14">slides.html</text>
+
+          <!-- footer note -->
+          <text x="450" y="358" text-anchor="middle" fill="#6a6a6a" font-size="12" font-style="italic" font-family="Fraunces,serif">bạn chỉ phán đoán ở 1 chỗ: duyệt outline trước khi skill build HTML.</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 20d · ~3 phút. <b>Flow tự nhiên cho người bận:</b> 1 link deck mẫu + 1 thư mục đầy raw note (recording, PDF, paste) → skill chạy 6-bước SOP (research → distill → outline) → ASK bạn duyệt outline → fork + fill HTML. Bạn chỉ touch 1 gate. Skill làm 5 step cơ học còn lại.</div>
+</section>
+<!-- audience-word-count: 35 -->
+
+<!-- ============ BLOCK 5 — Skill chạy build (S21-S23) ============ -->
+
+<section class="slide" id="s21-invoke" data-title="1 lệnh chạy được vì 4 file đã viết">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <div class="slide-kicker">Block 5 · Skill chạy build · 22 phút</div>
+    <h1>1 lệnh chạy được. <span class="hl">KHÔNG</span> vì skill xịn,<br/>vì 4 file input <span class="hl">BẠN</span> đã viết trước.</h1>
+    <figure>
+      <svg viewBox="0 0 900 230" role="img" aria-label="4 inputs + reference deck → slides.html">
+        <g font-family="JetBrains Mono,monospace" font-size="14" fill="#141413">
+          <rect x="30" y="20" width="160" height="36" rx="6" fill="#fff" stroke="#d97757" stroke-width="2"/>
+          <text x="110" y="43" text-anchor="middle" fill="#d97757" font-size="14" font-weight="700">outline.md</text>
+          <rect x="30" y="62" width="160" height="36" rx="6" fill="#fff" stroke="#d97757" stroke-width="2"/>
+          <text x="110" y="85" text-anchor="middle" fill="#d97757" font-size="14" font-weight="700">audience.md</text>
+          <rect x="30" y="104" width="160" height="36" rx="6" fill="#fff" stroke="#d97757" stroke-width="2"/>
+          <text x="110" y="127" text-anchor="middle" fill="#d97757" font-size="14" font-weight="700">claims.md</text>
+          <rect x="30" y="146" width="160" height="36" rx="6" fill="#fff" stroke="#d97757" stroke-width="2"/>
+          <text x="110" y="169" text-anchor="middle" fill="#d97757" font-size="14" font-weight="700">examples.md</text>
+          <text x="110" y="205" text-anchor="middle" fill="#d97757" font-size="12">↑ BẠN viết</text>
+          <!-- input arrows stop just before reference-deck, converging to its left edge midpoint -->
+          <line x1="195" y1="38" x2="215" y2="135" stroke="#6a6a6a" stroke-width="1"/>
+          <line x1="195" y1="80" x2="215" y2="138" stroke="#6a6a6a" stroke-width="1"/>
+          <line x1="195" y1="122" x2="215" y2="142" stroke="#6a6a6a" stroke-width="1"/>
+          <line x1="195" y1="164" x2="215" y2="145" stroke="#6a6a6a" stroke-width="1"/>
+          <rect x="220" y="100" width="160" height="80" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="300" y="135" text-anchor="middle" font-size="14" font-weight="700">reference-deck/</text>
+          <text x="300" y="158" text-anchor="middle" fill="#6a6a6a" font-size="12">fork để giữ style</text>
+          <rect x="420" y="95" width="160" height="90" rx="8" fill="#faf9f5" stroke="#6a6a6a" stroke-width="1" stroke-dasharray="4 3"/>
+          <text x="500" y="128" text-anchor="middle" fill="#6a6a6a" font-size="14" font-weight="700">slide SOP</text>
+          <text x="500" y="150" text-anchor="middle" fill="#6a6a6a" font-size="12">router mỏng</text>
+          <text x="500" y="168" text-anchor="middle" fill="#6a6a6a" font-size="12">· AI cơ học</text>
+          <!-- ref-deck → skill SOP -->
+          <line x1="385" y1="140" x2="415" y2="140" stroke="#6a6a6a" stroke-width="1.5"/>
+          <polygon points="415,140 407,136 407,144" fill="#6a6a6a"/>
+          <!-- skill SOP → slides.html -->
+          <line x1="585" y1="140" x2="640" y2="140" stroke="#d97757" stroke-width="2"/>
+          <polygon points="640,140 630,135 630,145" fill="#d97757"/>
+          <rect x="645" y="110" width="220" height="60" rx="8" fill="#d97757"/>
+          <text x="755" y="146" text-anchor="middle" fill="#fff" font-weight="700" font-size="19">slides.html</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 21 · ~5 phút. <b>Terminal:</b> `claude` trong slide-studio, gõ "build deck từ outline này". Hết. Trí tuệ ở 4 file input. Skill là router mỏng.</div>
+</section>
+<!-- audience-word-count: 29 -->
+
+<section class="slide" id="s22-fork" data-title="Style là FORK, không tả">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>Style là <span class="hl">FORK</span>, không tả.<br/><span class="dim">Tả bằng chữ = AI drift mỗi deck một kiểu.</span></h1>
+    <div class="cmp2">
+      <div class="card bad">
+        <div class="tag">✗ tả prose</div>
+        <div class="t">"moleskine hand-drawn, navy + lime"</div>
+        <div class="sub">3 deck → 3 look khác. Drift mỗi lần build.</div>
+      </div>
+      <div class="card good">
+        <div class="tag">✓ fork reference-deck</div>
+        <div class="t">clone slides.html → swap content</div>
+        <div class="sub">3 deck cùng style. Cần look mới? Build 1 → promote thành reference.</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">▸ Beat 22 · ~5 phút. <b>Callback Driver #3 (Brand) + 60-30-10, đóng gói trong 1 file deck thật, không trong prose.</b> Reference-deck = visual system hoàn chỉnh.</div>
+</section>
+<!-- audience-word-count: 33 -->
+
+<section class="slide" id="s23-image-plan" data-title="SVG cho cấu trúc, ảnh cho cảm xúc">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>SVG cho <span class="hl">cấu trúc</span>, ảnh cho <span class="hl">cảm xúc</span>.<br/><span class="dim">Chọn nhầm nhánh = đốt thời gian.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 200" role="img" aria-label="4-branch image decision tree">
+        <g font-family="JetBrains Mono,monospace" font-size="14" fill="#141413">
+          <rect x="370" y="18" width="160" height="42" rx="8" fill="#d97757"/>
+          <text x="450" y="46" text-anchor="middle" fill="#fff" font-weight="700" font-size="19">image plan?</text>
+          <line x1="450" y1="60" x2="126" y2="100" stroke="#d97757" stroke-width="2"/>
+          <line x1="450" y1="60" x2="342" y2="100" stroke="#6a6a6a"/>
+          <line x1="450" y1="60" x2="558" y2="100" stroke="#6a6a6a"/>
+          <line x1="450" y1="60" x2="774" y2="100" stroke="#6a6a6a"/>
+          <rect x="26" y="100" width="200" height="64" rx="8" fill="#fdf3ec" stroke="#d97757" stroke-width="2"/>
+          <text x="126" y="124" text-anchor="middle" fill="#d97757" font-size="14" font-weight="700">SVG (default)</text>
+          <text x="126" y="146" text-anchor="middle" fill="#6a6a6a" font-size="11">cấu trúc · $0 · diff-able</text>
+          <rect x="242" y="100" width="200" height="64" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="342" y="124" text-anchor="middle" font-size="14" font-weight="700">Stock</text>
+          <text x="342" y="146" text-anchor="middle" fill="#6a6a6a" font-size="12">ảnh thật generic</text>
+          <rect x="458" y="100" width="200" height="64" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="558" y="124" text-anchor="middle" font-size="14" font-weight="700">Codex</text>
+          <text x="558" y="146" text-anchor="middle" fill="#6a6a6a" font-size="12">ẩn dụ độc bản</text>
+          <rect x="674" y="100" width="200" height="64" rx="8" fill="#fff" stroke="#6a6a6a" stroke-width="1.5"/>
+          <text x="774" y="124" text-anchor="middle" font-size="14" font-weight="700">Placeholder</text>
+          <text x="774" y="146" text-anchor="middle" fill="#6a6a6a" font-size="12">khi không có Codex</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 23 · ~5 phút. <b>Bài học đắt: đừng generate ảnh cho cái lẽ ra là sơ đồ.</b> ▶ LIVE DEMO: 1 SVG slide + 1 Codex slide trong cùng deck. → refs/imagegen-prompts.html</div>
+</section>
+<!-- audience-word-count: 22 -->
+
+<!-- ============ BLOCK 6 — Deploy (S24) ============ -->
+
+<section class="slide" id="s24-deploy" data-title="Push GitHub Pages = 30s">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <div class="slide-kicker">Block 6 · Deploy · 5 phút · ▶ LIVE DEMO</div>
+    <h1>Push GitHub Pages = <span class="hl">live URL trong 30 giây</span>.<br/><span class="dim"><code style="font-family:var(--mono);font-size:.78em">http.postBuffer 524288000</code> cho deck nhiều ảnh.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 180" role="img" aria-label="git push to live url with QR">
+        <g font-family="JetBrains Mono,monospace" font-size="15" fill="#141413">
+          <rect x="40" y="20" width="460" height="140" rx="10" fill="#fff" stroke="#e8e6dc" stroke-width="1.5"/>
+          <text x="70" y="58" fill="#d97757">$ git push
+            <animate attributeName="opacity" values="0;0;1;1;1;1;1;0" dur="5s" keyTimes="0;0.05;0.1;0.85;0.9;0.95;0.97;1" repeatCount="indefinite"/>
+          </text>
+          <text x="70" y="85" fill="#6a6a6a" font-size="17">Counting objects: 47, done.
+            <animate attributeName="opacity" values="0;0;1;1;1;0" dur="5s" keyTimes="0;0.2;0.25;0.9;0.95;1" repeatCount="indefinite"/>
+          </text>
+          <text x="70" y="110" fill="#6a6a6a" font-size="17">Compressing objects: 100% (35/35)
+            <animate attributeName="opacity" values="0;0;1;1;1;0" dur="5s" keyTimes="0;0.35;0.4;0.9;0.95;1" repeatCount="indefinite"/>
+          </text>
+          <text x="70" y="138" fill="#d97757" font-weight="700">✓ deployed → live in 30s
+            <animate attributeName="opacity" values="0;0;1;1;1;0" dur="5s" keyTimes="0;0.5;0.55;0.9;0.95;1" repeatCount="indefinite"/>
+          </text>
+          <line x1="510" y1="90" x2="600" y2="90" stroke="#d97757" stroke-width="2"/>
+          <polygon points="600,90 590,86 590,94" fill="#d97757"/>
+          <g>
+            <animateTransform attributeName="transform" type="scale" values="0.6;1;1;0.6" keyTimes="0;0.65;0.95;1" dur="5s" additive="sum" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;0;1;1;0" dur="5s" keyTimes="0;0.6;0.7;0.95;1" repeatCount="indefinite"/>
+            <rect x="620" y="20" width="140" height="140" rx="10" fill="#fff" stroke="#e8e6dc"/>
+            <g fill="#141413">
+              <rect x="640" y="38" width="22" height="22"/>
+              <rect x="718" y="38" width="22" height="22"/>
+              <rect x="640" y="118" width="22" height="22"/>
+              <rect x="675" y="55" width="10" height="10"/>
+              <rect x="700" y="70" width="10" height="10"/>
+              <rect x="660" y="80" width="20" height="10"/>
+              <rect x="705" y="95" width="10" height="20"/>
+              <rect x="675" y="118" width="15" height="10"/>
+            </g>
+            <text x="690" y="172" text-anchor="middle" fill="#6a6a6a" font-size="16">scan → live URL</text>
+          </g>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 24 · ~5 phút. <b>▶ LIVE DEMO:</b> push thật, share live link qua QR. Gotcha: `git config http.postBuffer 524288000` nếu deck nhiều ảnh; `.nojekyll` ở root.</div>
+</section>
+<!-- audience-word-count: 17 -->
+
+<!-- ============ BLOCK 7 — Steady state (S25) ============ -->
+
+<section class="slide" id="s25-steady-state" data-title="30 phút vì assets compound">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <h1>30 phút deck thứ N vì <span class="hl">assets compound</span>.<br/><span class="dim">KHÔNG vì skill nhanh.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 220" role="img" aria-label="time cost curve annotated">
+        <g font-family="JetBrains Mono,monospace" font-size="14" fill="#141413">
+          <line x1="60" y1="180" x2="860" y2="180" stroke="#6a6a6a"/>
+          <line x1="60" y1="20" x2="60" y2="180" stroke="#6a6a6a"/>
+          <text x="450" y="208" text-anchor="middle" fill="#6a6a6a" font-size="12">deck #1 → #2 → #3 → … → #N</text>
+          <text x="35" y="100" text-anchor="middle" fill="#6a6a6a" font-size="12" transform="rotate(-90 35 100)">thời gian / deck</text>
+          <circle cx="160" cy="40" r="6" fill="#d97757"/>
+          <text x="160" y="28" text-anchor="middle" fill="#d97757" font-weight="700" font-size="19">~3h</text>
+          <text x="160" y="220" text-anchor="middle" fill="#6a6a6a" font-size="12">deck #1</text>
+          <circle cx="340" cy="100" r="6" fill="#d97757"/>
+          <text x="340" y="88" text-anchor="middle" fill="#d97757" font-weight="700" font-size="19">~1h</text>
+          <text x="340" y="220" text-anchor="middle" fill="#6a6a6a" font-size="12">deck #2</text>
+          <circle cx="520" cy="140" r="6" fill="#d97757"/>
+          <text x="520" y="128" text-anchor="middle" fill="#d97757" font-weight="700" font-size="19">~45'</text>
+          <text x="520" y="220" text-anchor="middle" fill="#6a6a6a" font-size="12">deck #3</text>
+          <circle cx="800" cy="160" r="8" fill="#d97757"/>
+          <text x="800" y="138" text-anchor="middle" fill="#d97757" font-weight="700" font-size="38" font-family="Fraunces,serif" font-style="italic">30 phút</text>
+          <text x="800" y="220" text-anchor="middle" fill="#6a6a6a" font-size="12">deck #N</text>
+          <path d="M160 40 Q250 90 340 100 T520 140 T800 160" fill="none" stroke="#d97757" stroke-width="2"/>
+          <text x="250" y="125" text-anchor="middle" fill="#6a6a6a" font-size="12">+ audience tái dùng</text>
+          <text x="430" y="160" text-anchor="middle" fill="#6a6a6a" font-size="12">+ reference-deck fork</text>
+          <text x="660" y="178" text-anchor="middle" fill="#6a6a6a" font-size="12">+ image-prompts chuẩn</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 25 · ~5 phút. <b>Gỡ ảo tưởng "có skill là nhanh".</b> Compound = 40-assets/, không phải skill. 1 skill × 20 deck/năm = 40h+ saved. Nhờ assets compound.</div>
+</section>
+<!-- audience-word-count: 16 -->
+
+<!-- ============ BLOCK 8 — Personal + Tease (S26-S27) ============ -->
+
+<section class="slide personal atmosphere" id="s26-personal" data-title="Personal moment">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <div class="smallcap">2-3 phút · personal moment</div>
+    <p class="quietline">"Mình bắt đầu care về slide từ một buổi pitch hỏng, vì khán giả phải đoán ý mình."</p>
+    <div class="image-placeholder" data-img="s26-pitch-hong">
+      <img src="images/s26-pitch-hong.png" alt="" onerror="this.style.display='none'"/>
+      <div class="placeholder-label">[ image: s26-pitch-hong ]</div>
+      <div class="placeholder-prompt">brand-flat-editorial · phòng pitch tối, audience không nhìn lên slide · cream + orange accent</div>
+    </div>
+  </div>
+  <div class="stage-strip">▸ Beat 26 · ~2-3 phút. <b>Câu chuyện thật, ngắn. Tony chọn 1 khoảnh khắc cụ thể.</b> Image-placeholder ready — generate via Codex CLI hoặc drop file vô images/ rồi chạy place-images.py.</div>
+</section>
+<!-- audience-word-count: 22 -->
+
+<section class="slide" id="s27-tease-s2" data-title="S2 = cùng loop, đổi domain">
+  <span class="slide-num"></span>
+  <div class="wrap">
+    <div class="slide-kicker">Soft tease · Buổi 2 · Monday 2/6 · 20:00</div>
+    <h1>Buổi 2 = <span class="hl">cùng loop, đổi domain</span>.<br/><span class="dim">Bạn quyết offer/positioning/pricing, hệ thống lo cơ học.</span></h1>
+    <figure>
+      <svg viewBox="0 0 900 290" role="img" aria-label="two loops side by side">
+        <g font-family="JetBrains Mono,monospace" font-size="14" fill="#141413">
+          <circle cx="220" cy="120" r="85" fill="none" stroke="#d97757" stroke-width="3"/>
+          <text x="220" y="115" text-anchor="middle" fill="#d97757" font-weight="700" font-size="19">S1: deck loop</text>
+          <text x="220" y="138" text-anchor="middle" fill="#6a6a6a" font-size="12">00 → 10 → 20 → 50 → 40 ↺</text>
+          <line x1="320" y1="120" x2="380" y2="120" stroke="#6a6a6a" stroke-width="2" stroke-dasharray="4 4"/>
+          <polygon points="380,120 370,116 370,124" fill="#6a6a6a"/>
+          <text x="350" y="108" text-anchor="middle" fill="#6a6a6a" font-size="12">cùng pattern</text>
+          <circle cx="475" cy="120" r="85" fill="none" stroke="#d97757" stroke-width="2" stroke-dasharray="6 4">
+            <animate attributeName="stroke-dashoffset" values="0;20" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <text x="475" y="115" text-anchor="middle" fill="#d97757" font-weight="700" font-size="19">S2: bán workshop</text>
+          <text x="475" y="138" text-anchor="middle" fill="#6a6a6a" font-size="12">offer · positioning · pricing</text>
+          <text x="450" y="268" text-anchor="middle" fill="#141413" font-size="19" font-weight="500" font-style="italic" font-family="Fraunces,serif">Judgment trước · mechanical sau · compound qua assets</text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <div class="stage-strip">▸ Beat 27 · ~2 phút. <b>Hand-off không phải "skill khác". Là "cùng pattern".</b> Monday 2/6, 20:00. Landing đó BÁN cohort này. Sang slide cuối.</div>
+</section>
+<!-- audience-word-count: 24 -->
+
+<!-- ============ S28 — Cảm ơn ============ -->
+<section class="slide thanks atmosphere" id="s28-cam-on" data-title="Tham gia Insider">
+  <span class="slide-num"></span>
+  <div class="thanks-bg">
+    <img src="images/s28-cam-on-atmosphere.png" alt="" onerror="this.style.display='none'"/>
+  </div>
+  <div class="wrap">
+    <h1>Tham gia <span class="accent">Insider</span></h1>
+    <div class="sub">Tony's Friends · build cùng nhau</div>
+    <a class="qr" href="https://go.bnqtoan.workers.dev/insider-cong-ty-mot-nguoi" target="_blank" rel="noopener" aria-label="Tham gia Insider — quét QR">
+      <img src="https://go.bnqtoan.workers.dev/qr/insider-cong-ty-mot-nguoi"
+           alt="QR — tham gia Insider"
+           onerror="this.style.display='none';this.parentElement.classList.add('qr-fallback')"/>
+    </a>
+    <div class="qr-cap">quét → go.bnqtoan.workers.dev/insider-cong-ty-mot-nguoi</div>
+    <div class="contact">
+      <div><b>Insider</b>go.bnqtoan.workers.dev/insider-cong-ty-mot-nguoi</div>
+      <div><b>Tony Bùi</b>@bnqtoan · tony@vibery.app</div>
+    </div>
+  </div>
+  <div class="stage-strip">▸ Beat 28 · last slide. CTA: mời mọi người quét QR <b>tham gia Insider</b> (go.bnqtoan.workers.dev/insider-cong-ty-mot-nguoi → track UTM) — cộng đồng build cùng nhau. Hold here cho Q&amp;A, đừng auto-advance.</div>
+</section>
+<!-- audience-word-count: 18 -->
+
+<div class="bar"><i id="bar"></i></div>
+
+<aside class="sidebar" aria-label="Slide index">
+  <h3>Slide index</h3>
+  <ol id="toc"></ol>
+</aside>
+
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  const total=slides.length;
+  slides.forEach((s,i)=>{const n=s.querySelector('.slide-num'); if(n) n.textContent=String(i+1).padStart(2,'0')+' / '+String(total).padStart(2,'0');});
+
+  const toc=document.getElementById('toc');
+  slides.forEach((s,i)=>{
+    const li=document.createElement('li');
+    li.textContent=s.dataset.title||s.id;
+    li.dataset.idx=i;
+    li.addEventListener('click',()=>go(i));
+    toc.appendChild(li);
+  });
+  const tocItems=[...toc.children];
+
+  let lastHashIdx=-1;
+  function idx(){const h=location.hash.slice(1);return slides.findIndex(s=>s.id===h);}
+  function setHash(i){
+    if(i===lastHashIdx) return;
+    const id=slides[i].id;
+    if(location.hash.slice(1)!==id){
+      history.pushState({i},'','#'+id);
+    }
+    lastHashIdx=i;
+    document.title=(slides[i].dataset.title||id)+' · S1 v2 · slide studio';
+    tocItems.forEach((li,j)=>li.classList.toggle('active',j===i));
+  }
+  function go(i){
+    i=Math.max(0,Math.min(total-1,i));
+    slides[i].scrollIntoView({behavior:'smooth',block:'start'});
+    setHash(i);
+    updateBar(i);
+  }
+  function current(){let best=0,bd=1e9;slides.forEach((s,i)=>{const d=Math.abs(s.getBoundingClientRect().top);if(d<bd){bd=d;best=i;}});return best;}
+  function updateBar(i){const b=document.getElementById('bar');if(b)b.style.width=((i)/(total-1)*100)+'%';}
+
+  if(location.hash){const i=idx();if(i>=0)setTimeout(()=>{slides[i].scrollIntoView();setHash(i);updateBar(i);},0);}
+  else{setHash(0);}
+
+  let scrollT;
+  window.addEventListener('scroll',()=>{
+    clearTimeout(scrollT);
+    scrollT=setTimeout(()=>{const i=current();setHash(i);updateBar(i);},120);
+  },{passive:true});
+
+  window.addEventListener('popstate',()=>{const i=idx();if(i>=0){slides[i].scrollIntoView();updateBar(i);tocItems.forEach((li,j)=>li.classList.toggle('active',j===i));lastHashIdx=i;}});
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'||e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(current()+1);}
+    else if(e.key==='ArrowUp'||e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(current()-1);}
+    else if(e.key==='Escape'||e.key.toLowerCase()==='g'){document.body.classList.toggle('grid-mode');}
+    else if(e.key.toLowerCase()==='s'){document.body.classList.toggle('show-sidebar');}
+    else if(e.key.toLowerCase()==='n'){document.body.classList.toggle('show-stage');}
+    else if(e.key.toLowerCase()==='f'){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}
+    else if(e.key.toLowerCase()==='d'){
+      document.body.classList.toggle('dark');
+      try{sessionStorage.setItem('theme',document.body.classList.contains('dark')?'dark':'light');}catch(_){ }
+    }
+  });
+  // restore theme within session
+  try{if(sessionStorage.getItem('theme')==='dark')document.body.classList.add('dark');}catch(_){ }
+  slides.forEach((s,i)=>s.addEventListener('click',()=>{if(document.body.classList.contains('grid-mode')){document.body.classList.remove('grid-mode');go(i);}}));
+
+  // SVG reveal on enter — IntersectionObserver, dependency-free
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('revealed'); });
+    }, { threshold: 0.4 });
+    slides.forEach(s => { if(s.querySelector('svg')) io.observe(s); });
+  } else {
+    // no IO: reveal everything so SVGs never stay hidden
+    slides.forEach(s => s.classList.add('revealed'));
+  }
+  // first slide should not blank-fade in
+  if(slides[0]) slides[0].classList.add('revealed');
+})();
+</script>
 </body>
 </html>
