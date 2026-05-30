@@ -117,7 +117,6 @@
 </style>
 </head>
 <body>
-<div style="background:#141413;color:#faf9f5;padding:.7rem 1rem;text-align:center;font-family:system-ui,sans-serif;font-size:.95rem">📊 <a href="deck/slides.html" style="color:#d97757;font-weight:700;text-decoration:none">Xem deck mẫu — Buổi 1 →</a> &nbsp;·&nbsp; bấm S = speaker notes · Esc = grid</div>
 
 <header>
   <div class="inner">
@@ -237,7 +236,7 @@
   <div class="wrap">
     <div class="section-title-row">
       <span class="num">03</span>
-      <h2>6 SOPs · từ ý tưởng tới slide</h2>
+      <h2>7 SOPs · từ ý tưởng tới slide</h2>
     </div>
 
     <div class="sop">
@@ -269,15 +268,25 @@
       <div class="lead-line">Đây là chỗ HTML xuất hiện. Nhưng trước đó có một luật rất quan trọng.</div>
       <div class="body"><p>Create SOP fork một <code>reference-deck</code> có sẵn, rồi đi theo lối trình bày của nó. Không ngồi tả gu bằng văn xuôi, vì tả kiểu đó thường ra mỗi slide một màu tính cách. Bạn duyệt outline trước, rồi skill mới dựng.</p>
         <p>Mỗi slide đi qua schema 5 field: title tối đa 14 chữ, subtitle tối đa 18 chữ, slide-text tối đa 25 chữ, visual, stage-note. Kế hoạch ảnh có 4 nhánh: SVG, Stock, Codex, Placeholder. Cổng cứng là không build HTML trước khi outline được duyệt.</p>
-        <p>Step 2 thêm cổng chọn style theo style-decision-matrix. Skill đọc audience + brainstorm, đề xuất top 2 fork target có lý do, đợi bạn chốt. Không có default ngầm. Mỗi deck có comment <code>&lt;!-- fork: ... · rationale: ... --&gt;</code> để truy vết.</p></div>
+        <p>Step 2 thêm cổng chọn style theo style-decision-matrix. Skill đọc audience + brainstorm, đề xuất 2 đường: fork 1 seed có sẵn, hoặc bake gu mới từ ảnh/brand (xem SOP 03.5). Không có default ngầm. Mỗi deck có comment <code>&lt;!-- fork: ... · rationale: ... --&gt;</code> để truy vết.</p></div>
       <div class="lock-line">Đừng tả gu. Fork 1 deck đã có gu.</div>
     </div>
 
     <div class="sop">
+      <div class="tag">SOP 03.5 · new-style</div>
+      <h3>New-style · gu mới không drift</h3>
+      <div class="lead-line">Gallery không phải menu đóng. Đưa 1 tấm ảnh tham khảo, skill bake ra gu mới.</div>
+      <div class="body"><p>Khi không có gu nào trong gallery hợp — hoặc bạn có sẵn ảnh đẹp, 1 câu mô tả, hay brand của mình — skill trích DNA: palette, cặp font, độ thoáng, và đúng 1 signature move (cái nhìn-là-nhận-ra). Tất cả đổ vào một <code>token contract</code> cố định.</p>
+        <p>Vì chrome và layout bị khoá, chỉ giá trị token đổi, nên gu mới <b>không bao giờ làm hỏng</b> presenter mechanics. Bake xong, verify bằng mắt, rồi gu đó vào gallery thành seed fork được như mọi gu khác. Đa dạng vô hạn, drift bằng không.</p></div>
+      <div class="output-line">→ Nguồn: ảnh tham khảo · prompt · brand. Output: 1 reference deck mới + token block.</div>
+    </div>
+
+    <div class="sop">
       <div class="tag">SOP 04 · review</div>
-      <h3>Review · 2 lớp check</h3>
-      <div class="lead-line">Trước khi deploy, deck đi qua 2 lớp kiểm để lỗi rẻ được bắt sớm.</div>
-      <div class="body"><p>Lớp 1 là cơ học: <code>slide-check.sh</code> chạy 17 mục kiểm, gồm cấm gạch ngang dài, tỉ lệ kicker, số chữ cho người xem, chữ tràn khung, file thiếu, asset lệch, speaker-meta lọt vô audience layer, và audit trail của fork choice.</p>
+      <h3>Review · 3 lớp check</h3>
+      <div class="lead-line">Trước khi deploy, deck đi qua 3 lớp kiểm để lỗi rẻ được bắt sớm.</div>
+      <div class="body"><p>Lớp 0 là cấu trúc: <code>studio-check.sh</code> gác chống drift — research không lọt ra ngoài deck, mỗi deck đủ audience/brainstorm/outline, không có folder rác. Đây là tầng giữ cho cả studio không sập về mớ lộn xộn.</p>
+        <p>Lớp 1 là cơ học: <code>slide-check.sh</code> chạy 17 mục kiểm, gồm cấm gạch ngang dài, tỉ lệ kicker, số chữ cho người xem, chữ tràn khung, file thiếu, speaker-meta lọt vô audience layer, và audit trail của fork choice.</p>
         <p>Lớp 2 là chất lượng theo <code>slide-method.md</code>, với 13 mục chấm. Nó không hỏi "đẹp chưa" chung chung, mà hỏi title có hành động không, visual có làm việc không, câu chuyện có kéo người xem đi không. Kết luận chỉ có SHIP, FIX-FIRST, hoặc REWORK.</p></div>
     </div>
 
@@ -304,7 +313,7 @@
       <span class="num">3.5</span>
       <h2>Nguyên lý chạy ngầm</h2>
     </div>
-    <p class="lead">3 reference doc ngầm sau lưng 6 SOP. Bạn không cần đọc để dùng skill, nhưng đọc rồi sẽ thấy vì sao mỗi cổng quyết định nó như vậy.</p>
+    <p class="lead">4 reference doc ngầm sau lưng các SOP. Bạn không cần đọc để dùng skill, nhưng đọc rồi sẽ thấy vì sao mỗi cổng quyết định nó như vậy.</p>
 
     <div class="paths" style="grid-template-columns:1fr;gap:1rem">
       <div class="path-card">
@@ -323,6 +332,12 @@
         <div class="path-tag">references/scrollytelling-pattern.md</div>
         <h4>4 gear animation, không stack</h4>
         <p>Skill ship 4 cơ chế động: (1) IntersectionObserver reveal khi slide vô view, (2) SVG SMIL cho self-running loop, (3) Interactive SVG cho click-to-explore, (4) Scrollytelling sticky stage cho audience tự pace. Mỗi content chỉ nên dùng 1 gear. Stack nhiều gear ra slide rối. Khi brainstorm có signal "step by step / long read / construct" thì fork scrollytelling reference deck thay vì slide thường.</p>
+      </div>
+
+      <div class="path-card">
+        <div class="path-tag">reference-deck/_TOKENS.md</div>
+        <h4>Token contract · engine để gu nở vô hạn</h4>
+        <p>Một "gu" không phải file HTML mới — nó là một bộ giá trị cho danh sách <code>--token</code> cố định (màu 60-30-10, cặp font, độ thoáng) cộng đúng 1 signature move. Engine (chrome + layout) đọc token và bị khoá; gu chỉ đổi giá trị. Nhờ vậy attendee bake gu mới từ ảnh/brand mà presenter mechanics không bao giờ drift. Đây là cách phá trần "chỉ vài style" mà vẫn nhất quán.</p>
       </div>
     </div>
   </div>
@@ -361,11 +376,12 @@
   <div class="wrap">
     <div class="tagline">Landing page này được dựng bằng chính <span class="accent">skill</span> này.</div>
     <div class="links">
-      <a href="https://github.com/bnqtoan/cong-ty-mot-nguoi/blob/main/skill/SKILL.md" target="_blank">SKILL.md trong repo →</a>
-      <a href="https://github.com/bnqtoan/cong-ty-mot-nguoi/blob/main/skill/references/slide-method.md" target="_blank">slide-method.md →</a>
-      <a href="https://github.com/bnqtoan/cong-ty-mot-nguoi/blob/main/skill/SKILL.md" target="_blank">inbox/_index.md (demo events) →</a>
+      <a href="deck/slides.html">Xem deck mẫu — Buổi 1 →</a>
+      <a href="../skill/SKILL.md">SKILL.md →</a>
+      <a href="../skill/references/slide-method.md">slide-method.md →</a>
+      <a href="https://go.bnqtoan.workers.dev/insider-cong-ty-mot-nguoi" target="_blank" rel="noopener">Tham gia Insider →</a>
     </div>
-    <div class="closing">Đi build cái deck của bạn.</div>
+    <div class="closing">Đi build cái deck của bạn — rồi vô <span class="accent">Insider</span> build cùng anh em.</div>
   </div>
 </footer>
 
