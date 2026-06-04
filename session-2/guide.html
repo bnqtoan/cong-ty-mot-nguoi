@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Workshop Studio · cách dùng đi với deck Buổi 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500;1,9..144,700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#141413;
+    --cream:#faf9f5;
+    --light-gray:#e8e6dc;
+    --mid:#6a6a6a;
+    --accent:#d97757;
+    --accent-soft:#f3e2d8;
+    --surface:#ffffff;
+    --sans:'Be Vietnam Pro',system-ui,sans-serif;
+    --serif:'Fraunces',Georgia,serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--cream);color:var(--ink);font-family:var(--sans);font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  header{position:sticky;top:0;background:rgba(250,249,245,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--light-gray);z-index:50}
+  header .inner{max-width:1100px;margin:0 auto;padding:1rem 6vw;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.78rem;color:var(--mid);letter-spacing:.1em;text-transform:uppercase}
+  header .brand{color:var(--accent);font-weight:700}
+  header nav{display:flex;gap:1.4rem}
+  header nav a{color:var(--mid);text-decoration:none;transition:color .2s}
+  header nav a:hover{color:var(--accent)}
+
+  section{padding:8vh 6vw;border-bottom:1px solid var(--light-gray)}
+  .wrap{max-width:980px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:1.2rem}
+
+  h1.hero-headline{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(2.6rem,6vw,4.8rem);line-height:1.06;letter-spacing:-.02em;color:var(--ink);max-width:22ch;margin-bottom:1.6rem}
+  h1.hero-headline .accent{color:var(--accent);font-style:italic}
+  .hero-subhead{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.15rem,1.8vw,1.5rem);color:var(--mid);max-width:48ch;line-height:1.45;margin-bottom:2.4rem}
+  .scroll-hint{font-family:var(--mono);font-size:.85rem;color:var(--mid);letter-spacing:.1em;display:inline-flex;align-items:center;gap:.6rem}
+  .scroll-hint::after{content:"↓";font-size:1.1rem;animation:bounce 1.6s ease-in-out infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+  h2{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.9rem,3.6vw,2.8rem);line-height:1.12;color:var(--ink);max-width:24ch;margin-bottom:1.6rem}
+  h2 .accent{color:var(--accent)}
+  h3{font-family:var(--sans);font-weight:800;font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.3;color:var(--ink);margin-bottom:.6rem;letter-spacing:-.01em}
+
+  .lead{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.15rem,1.7vw,1.4rem);color:var(--mid);max-width:50ch;margin-bottom:2rem;line-height:1.45}
+
+  p{max-width:62ch;margin-bottom:1.1rem;font-size:clamp(1rem,1.15vw,1.1rem);color:var(--ink)}
+  p.muted{color:var(--mid)}
+
+  .section-title-row{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap;margin-bottom:.4rem}
+  .section-title-row .num{font-family:var(--mono);font-size:.9rem;color:var(--accent);letter-spacing:.18em}
+
+  /* step list (workflow) */
+  .steps{counter-reset:step;margin-top:1.8rem;display:grid;gap:1rem}
+  .step{background:var(--surface);border:1px solid var(--light-gray);border-left:3px solid var(--accent);border-radius:12px;padding:1.4rem 1.6rem;display:grid;grid-template-columns:auto 1fr;gap:1.2rem;align-items:start}
+  .step .step-num{counter-increment:step;font-family:var(--mono);font-weight:700;color:var(--accent);font-size:1.4rem;line-height:1}
+  .step .step-num::before{content:counter(step)}
+  .step h3{margin-bottom:.3rem;font-size:1.15rem}
+  .step .who{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.14em;color:var(--mid);margin-bottom:.5rem}
+  .step p{max-width:none;margin-bottom:0;font-size:1rem}
+  .step code{font-size:.85em}
+
+  /* mapping table (promise -> studio) */
+  .map-table{margin-top:1.8rem;border:1px solid var(--light-gray);border-radius:12px;overflow:hidden;background:var(--surface)}
+  .map-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--light-gray)}
+  .map-row:last-child{border-bottom:none}
+  .map-row > div{padding:1rem 1.3rem}
+  .map-row .stage{font-family:var(--serif);font-style:italic;color:var(--mid);border-right:1px solid var(--light-gray);line-height:1.4}
+  .map-row .studio{font-size:.98rem;line-height:1.45}
+  .map-row .studio b{color:var(--accent)}
+  .map-head{background:var(--accent-soft)}
+  .map-head .stage,.map-head .studio{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-style:normal}
+
+  /* skill cards */
+  .skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin-top:1.8rem}
+  .skill-card{background:var(--surface);border:1px solid var(--light-gray);border-top:3px solid var(--accent);border-radius:12px;padding:1.5rem 1.6rem}
+  .skill-card .skill-name{font-family:var(--mono);font-weight:700;color:var(--accent);font-size:1rem;margin-bottom:.6rem}
+  .skill-card p{max-width:none;font-size:.95rem;margin-bottom:.8rem}
+  .skill-card .say{font-family:var(--serif);font-style:italic;color:var(--mid);font-size:.92rem;line-height:1.4}
+
+  pre{background:var(--ink);color:var(--cream);padding:1.4rem 1.6rem;border-radius:12px;overflow-x:auto;font-family:var(--mono);font-size:.92rem;line-height:1.6;margin:1.6rem 0}
+  pre .cm{color:var(--accent);font-weight:700}
+  code{font-family:var(--mono);font-size:.9em;background:var(--accent-soft);color:var(--ink);padding:.1em .35em;border-radius:3px}
+
+  .paths{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:1.8rem}
+  .path-card{background:var(--surface);border:1px solid var(--light-gray);border-top:3px solid var(--accent);border-radius:12px;padding:1.6rem 1.8rem}
+  .path-card .path-tag{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
+  .path-card h4{font-family:var(--sans);font-weight:700;font-size:1.15rem;margin-bottom:.7rem;color:var(--ink)}
+  .path-card p{font-size:.98rem;margin-bottom:0;max-width:none}
+
+  .callout{background:var(--accent-soft);border:2px solid var(--accent);border-radius:12px;padding:1.4rem 1.6rem;margin:1.8rem 0}
+  .callout .ct-tag{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.16em;color:var(--accent);margin-bottom:.5rem}
+  .callout p{max-width:none;margin-bottom:0;font-size:1rem}
+
+  footer{background:var(--ink);color:var(--cream);padding:6vh 6vw}
+  footer .wrap{max-width:980px;margin:0 auto}
+  footer .tagline{font-family:var(--serif);font-style:italic;font-size:clamp(1.2rem,1.8vw,1.5rem);max-width:34ch;margin-bottom:2.4rem;line-height:1.4}
+  footer .tagline .accent{color:var(--accent)}
+  footer .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.4rem;margin-bottom:2.4rem;padding-bottom:2rem;border-bottom:1px solid rgba(255,255,255,.1)}
+  footer .links a{color:var(--cream);text-decoration:none;font-family:var(--mono);font-size:.88rem;letter-spacing:.04em;display:block;padding:.6rem 0;border-bottom:1px solid transparent;transition:border-color .2s,color .2s}
+  footer .links a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+  footer .closing{font-family:var(--serif);font-style:italic;color:var(--mid);font-size:1rem}
+
+  @media (max-width:760px){
+    .paths{grid-template-columns:1fr}
+    .map-row{grid-template-columns:1fr}
+    .map-row .stage{border-right:none;border-bottom:1px solid var(--light-gray)}
+    .step{grid-template-columns:1fr}
+    section{padding:6vh 5vw}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .scroll-hint::after{animation:none}
+    *{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <span class="brand">CÔNG TY MỘT NGƯỜI · BUỔI 2</span>
+    <nav>
+      <a href="index.html">Deck</a>
+      <a href="#workflow">Quy trình</a>
+      <a href="#skills">Skills</a>
+      <a href="#start">Bắt đầu</a>
+    </nav>
+  </div>
+</header>
+
+<section id="hero">
+  <div class="wrap">
+    <div class="eyebrow">Workshop Studio · hướng dẫn dùng</div>
+    <h1 class="hero-headline">Buổi học để lại một <span class="accent">cái nhà</span>, không phải vài cái file rời.</h1>
+    <p class="hero-subhead">Deck Buổi 2 hứa: vận hành workshop chỉ với một người — từ bán cái gì tới giao hàng tự động. Cái nhà chạy được lời hứa đó là thư mục <code>workshop-studio</code>. Trang này chỉ bạn cách mở nó ra dùng.</p>
+    <span class="scroll-hint">Kéo xuống</span>
+  </div>
+</section>
+
+<section id="what">
+  <div class="wrap">
+    <div class="section-title-row"><span class="num">01</span></div>
+    <h2>Studio này là <span class="accent">gì</span></h2>
+    <p class="lead">Một OS công ty một người: từ một ý tưởng → bán được → giao hàng tự động.</p>
+    <p>Buổi 1 (slide-studio) lo một việc: research → slide. Buổi 2 thêm hai nửa còn lại của việc kinh doanh — <b>bán</b> (offer/positioning/pricing + landing + checkout) và <b>vận hành</b> (giao hàng sau khi khách trả tiền). Slide giờ chỉ là một năng lực trong cả hệ thống.</p>
+    <p class="muted">Bạn không cần nhớ folder nào chứa gì. Mở Claude Code ngay trong <code>workshop-studio/</code>, AI đọc <code>CLAUDE.md</code> trước rồi tự biết đường đi. Việc của bạn là <b>phán đoán</b> (bán cho ai, offer gì, giá nào); AI lo research, draft, layout, copy, fulfillment.</p>
+    <div class="callout">
+      <div class="ct-tag">4 nguyên tắc chạy ngầm</div>
+      <p><b>1. Không cần nhớ</b> — cấu trúc + skill giữ kiến thức, không phải đầu bạn.&nbsp; <b>2. Bạn quyết, AI làm</b> phần còn lại.&nbsp; <b>3. Có retro</b> — mỗi sản phẩm bán xong để lại dấu vết.&nbsp; <b>4. AI tự học</b> — retro nạp tài sản tái dùng vào <code>40-assets/</code>, nên sản phẩm sau nhanh + tốt hơn sản phẩm trước.</p>
+    </div>
+  </div>
+</section>
+
+<section id="promise">
+  <div class="wrap">
+    <div class="section-title-row"><span class="num">02</span></div>
+    <h2>Lời hứa trên sân khấu → nằm ở <span class="accent">đâu</span></h2>
+    <p class="lead">Mỗi câu deck nói tối đó đều có một chỗ thật trong studio.</p>
+    <div class="map-table">
+      <div class="map-row map-head">
+        <div class="stage">Trên sân khấu mình nói…</div>
+        <div class="studio">Trong studio nó là…</div>
+      </div>
+      <div class="map-row">
+        <div class="stage">"Offer là lời hứa đưa người ta từ A tới B" · "positioning là chọn cái mình KHÔNG bán" · "một giá một cửa"</div>
+        <div class="studio">skill <b>brand</b> → <code>brand.md</code> (offer · positioning · ladder giá)</div>
+      </div>
+      <div class="map-row">
+        <div class="stage">"Audience là file dùng lại, đừng để nó nằm trong đầu"</div>
+        <div class="studio"><b>brand</b> ghi <code>00-foundation/audience/</code> — một audience xài cho nhiều sản phẩm</div>
+      </div>
+      <div class="map-row">
+        <div class="stage">"Landing là hành lang thẳng một mục tiêu" · "bạn không tả style, bạn fork một trang đã đẹp"</div>
+        <div class="studio">skill <b>ship</b> → <code>landing.md</code> + <code>landing.html</code> (tự đề xuất style + ảnh + chuyển động, bạn chỉ chọn)</div>
+      </div>
+      <div class="map-row">
+        <div class="stage">"Fulfillment: xác nhận thanh toán + mọi bước giao sau" · "Discord là link tự authorize, không add lén"</div>
+        <div class="studio"><b>ship</b> → <code>fulfillment.md</code> (runbook chạy sau <code>order.paid</code>, có consent, làm lại được)</div>
+      </div>
+      <div class="map-row">
+        <div class="stage">"SellKit là backend cho bán và giao" · "hai nửa nối nhau ở checkout"</div>
+        <div class="studio">skill <b>sellkit-landing</b> → nối nút mua thật, ra order thật</div>
+      </div>
+      <div class="map-row">
+        <div class="stage">"Mình chỉ online và nói, phần còn lại đã chạy"</div>
+        <div class="studio">cả chuỗi để lại file — lần mở lớp sau chỉ <b>copy + đổi ngày</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="workflow">
+  <div class="wrap">
+    <div class="section-title-row"><span class="num">03</span></div>
+    <h2>Quy trình <span class="accent">6 bước</span> — từ ý tưởng tới bán + giao</h2>
+    <p class="lead">Bạn chỉ chạm bước quyết định. AI lo phần còn lại.</p>
+    <div class="steps">
+      <div class="step"><span class="step-num"></span><div><div class="who">Bạn · ~5 phút</div><h3>Ý tưởng</h3><p>Drop brief vào <code>inbox/{ten-san-pham}/</code> (hoặc nói thẳng): bán gì, cho ai, giá nghĩ trong đầu.</p></div></div>
+      <div class="step"><span class="step-num"></span><div><div class="who">skill brand</div><h3>Brand</h3><p>Phỏng vấn tối thiểu → <code>audience/{tên}.md</code> (nền, tái dùng) + <code>brand.md</code> (offer/positioning/pricing). Đây là phần quyết định — bạn duyệt.</p></div></div>
+      <div class="step"><span class="step-num"></span><div><div class="who">skill ship</div><h3>Landing</h3><p>Đọc <code>brand.md</code> → fork một reference landing đã đẹp rồi đổ nội dung vô. Markdown trước, HTML sau khi duyệt. Bạn không đụng CSS.</p></div></div>
+      <div class="step"><span class="step-num"></span><div><div class="who">skill sellkit-landing</div><h3>Checkout</h3><p>Nối SellKit checkout thật vào landing. Thường chỉ cần snippet Embed trong console. Verify ra order thật.</p></div></div>
+      <div class="step"><span class="step-num"></span><div><div class="who">skill ship</div><h3>Fulfillment</h3><p><code>fulfillment.md</code>: cái gì tự chạy sau <code>order.paid</code> — email + lịch + group (consent) + nhắc + recap. Ngoại lệ (đổi suất/hoàn tiền) có audit.</p></div></div>
+      <div class="step"><span class="step-num"></span><div><div class="who">skill slide · nếu cần</div><h3>Deck</h3><p>Cần deck giới thiệu/bán → <code>30-projects/{dự án}/deck/</code>: research → outline → slides.html. Năng lực mang từ Buổi 1.</p></div></div>
+    </div>
+    <div class="callout">
+      <div class="ct-tag">Một chỗ bạn nối tay</div>
+      <p>Đúng như deck nói "hai nửa nối nhau ở checkout": sau khi <b>ship</b> dựng xong trang, bạn nói thêm một câu <i>"giờ nối nút mua thật đi"</i> để chạy <b>sellkit-landing</b>. Đây là cái joint giữa hai nửa — cố ý để bạn thấy, không giấu.</p>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="section-title-row"><span class="num">04</span></div>
+    <h2>5 năng lực — cứ nói việc bằng <span class="accent">tiếng người</span></h2>
+    <p class="lead">Mỗi skill tự chạy đúng quy trình của nó khi được kích hoạt. Bạn không cần nhắc các bước.</p>
+    <div class="skills">
+      <div class="skill-card"><div class="skill-name">brand</div><p>offer + positioning + pricing + audience → <code>brand.md</code>. Giữ danh tính + uy tín "người bán" của từng sản phẩm (của bạn hoặc của khách).</p><div class="say">"bán X cho ai, định vị sao, giá nào", "offer của mình yếu"</div></div>
+      <div class="skill-card"><div class="skill-name">ship</div><p>landing (copy → trang đẹp) + fulfillment runbook. Tự đề xuất 3 style cho bạn chọn, tự soi pre-flight.</p><div class="say">"dựng landing", "set giao hàng tự động", "sau khi khách trả tiền thì sao"</div></div>
+      <div class="skill-card"><div class="skill-name">sellkit-landing</div><p>nối SellKit checkout thật vào landing, verify ra order thật.</p><div class="say">"gắn nút mua/đăng ký", "nhận thanh toán trên trang này"</div></div>
+      <div class="skill-card"><div class="skill-name">slide</div><p>research → slide deck. Năng lực mang từ Buổi 1.</p><div class="say">"làm deck", "slide giới thiệu"</div></div>
+      <div class="skill-card"><div class="skill-name">me</div><p>chân dung CHỦ studio (bạn). Chạy 1 lần, dùng lại. Chỉ cho việc bán chính bạn / studio của bạn.</p><div class="say">"làm chân dung mình", "pitch về bản thân"</div></div>
+    </div>
+    <div class="callout">
+      <div class="ct-tag">Đừng lẫn me với brand</div>
+      <p><b>me</b> = CHỦ studio (bạn — người vận hành, ổn định, không đổi theo khách). <b>brand</b> = sản phẩm đang bán + danh tính người bán của nó (per-product, của bạn hoặc của khách). Bán đồ của khách → làm <b>brand</b> cho khách, KHÔNG đụng <b>me</b>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <div class="section-title-row"><span class="num">05</span></div>
+    <h2>Cách <span class="accent">bắt đầu</span> — 2 đường</h2>
+    <p class="lead">Giải nén studio, mở Claude Code trong thư mục đó, nói một câu.</p>
+    <div class="paths">
+      <div class="path-card">
+        <div class="path-tag">Đường A · có inbox sẵn</div>
+        <h4>"Có sản phẩm mới, đọc inbox"</h4>
+        <p>AI list các sub-folder trong <code>inbox/</code>, bạn pick 1 → AI confirm context 3 dòng → chạy chuỗi brand → ship → sellkit-landing (+ slide nếu cần deck).</p>
+      </div>
+      <div class="path-card">
+        <div class="path-tag">Đường B · drop thẳng</div>
+        <h4>"Mình bán X cho Y, giá tầm Z"</h4>
+        <p>Skill chạy như đường A, nguyên liệu lấy từ câu bạn nói + vài câu hỏi tối thiểu (chỉ hỏi cái không tự suy ra được).</p>
+      </div>
+    </div>
+    <pre><span class="cm"># 1. giải nén studio (trong Drive resources)</span>
+unzip workshop-studio-buoi-2.zip
+
+<span class="cm"># 2. mở Claude Code ngay trong thư mục studio</span>
+cd workshop-studio
+claude
+
+<span class="cm"># 3. nói một câu — phần còn lại studio lo</span>
+<span class="cm"># &gt;</span> Mình bán khoá luyện IELTS speaking cho người đi làm, giá tầm 3 triệu.</pre>
+    <p class="muted">Mở slide (deck Buổi 2) song song với trang này để đối chiếu: mỗi slide là một lời hứa, mỗi lời hứa có một chỗ thật trong studio ở bảng trên.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="tagline">Bạn chỉ online và nói. <span class="accent">Phần còn lại đã chạy.</span></div>
+    <div class="links">
+      <a href="index.html">Xem deck Buổi 2 →</a>
+      <a href="../session-1/index.html">Deck Buổi 1 (Slide) →</a>
+      <a href="https://go.bnqtoan.workers.dev/insider-cong-ty-mot-nguoi" target="_blank" rel="noopener">Tham gia Insider →</a>
+    </div>
+    <div class="closing">Đi build sản phẩm của bạn — rồi vô <span class="accent">Insider</span> build cùng anh em.</div>
+  </div>
+</footer>
+
+</body>
+</html>
