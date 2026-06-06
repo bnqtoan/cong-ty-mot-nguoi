@@ -1,0 +1,1713 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<!-- fork: ../session-2/deck/slides.html · rationale: S3 same series, gallery-grade editorial elevation of the S2 house engine (CSS+chrome verbatim, body=35 S3 slides) -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Vault nhớ được và làm được · Buổi 3/3 · 5/6/2026</title>
+<meta name="description" content="Slide deck buổi 3/3 Công ty một người — studio lớn thành vault: capture, vault biết cãi, tự build skill, một câu ra sản phẩm, vault tự sửa." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+/* ===== tokens — using oklch so accents stay perceptually balanced ===== */
+:root{
+  --dark: oklch(15% 0.005 70);          /* #141413 */
+  --light: oklch(97% 0.012 85);         /* cream */
+  --mid:   oklch(56% 0.008 80);         /* darkened from #b0aea5 → better contrast */
+  --mid-soft: oklch(72% 0.008 80);      /* old --mid for dark-slide labels */
+  --light-gray: oklch(90% 0.012 85);
+  --orange:      oklch(67% 0.14 45);
+  --orange-deep: oklch(58% 0.14 42);
+  --orange-soft: oklch(67% 0.14 45 / 0.08);
+  --blue: oklch(66% 0.08 245);
+  --green: oklch(60% 0.07 130);
+  --red:   oklch(62% 0.10 25);
+
+  --font-head:"Be Vietnam Pro",system-ui,sans-serif;
+  --font-body:"Lora","Be Vietnam Pro",Georgia,serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --radius:14px;
+
+  color-scheme: light;
+}
+*{ box-sizing:border-box }
+html,body{ margin:0; padding:0; background:var(--light); color:var(--dark) }
+body{
+  font-family:var(--font-body); line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* modern text rendering */
+h1, h2, h3, .balance { text-wrap: balance; }
+p, .lede { text-wrap: pretty; }
+
+/* ===== DECK — scroll snap + scroll-driven entrance (no JS observer flicker) ===== */
+.deck{
+  scroll-snap-type: y mandatory;
+  overflow-y: auto;
+  height: 100vh;
+  scroll-behavior: smooth;
+  scrollbar-color: var(--orange) transparent;
+  scrollbar-width: thin;
+}
+.slide{
+  scroll-snap-align: start;
+  scroll-snap-stop: always;       /* don't fly past on fast scroll — stabilizer */
+  min-height: 100vh;
+  padding: max(64px, env(safe-area-inset-top, 0px) + 40px) 5vw 64px;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative;
+  border-bottom: 1px solid var(--light-gray);
+  view-timeline-name: --slide;
+  view-timeline-axis: block;
+}
+
+/* ===== Awwwards-style reveal: staggered + blur, scroll-driven, GPU, no JS thrash =====
+   Each element clears blur + rises into place in sequence (kicker → title → lede → visual).
+   Uses animation-timeline:view() where supported (sequenced by per-element animation-range);
+   IntersectionObserver fallback (.in-view) for Safari/older — sequenced by transition-delay. */
+
+/* the elements we reveal, in order */
+.slide .slide-kicker,
+.slide > .wrap > h1,
+.slide .col-text h1,
+.slide > .wrap > .lede,
+.slide .col-text .lede,
+.slide .col-visual,
+.slide .visual-card,
+.slide .agenda-map,
+.slide .flow-row,
+.slide .cmp2,
+.slide .pullquote {
+  will-change: opacity, transform, filter;
+}
+
+/* --- Modern path: scroll-driven, each element staggered via animation-range --- */
+@supports (animation-timeline: view()) {
+  .slide .slide-kicker { animation: rv linear both; animation-timeline: view(); animation-range: entry 2% cover 18%; }
+  .slide > .wrap > h1,
+  .slide .col-text h1  { animation: rv linear both; animation-timeline: view(); animation-range: entry 6% cover 26%; }
+  .slide > .wrap > .lede,
+  .slide .col-text .lede { animation: rv linear both; animation-timeline: view(); animation-range: entry 11% cover 32%; }
+  .slide .col-visual,
+  .slide .visual-card,
+  .slide .agenda-map,
+  .slide .flow-row,
+  .slide .cmp2,
+  .slide .pullquote { animation: rv-img linear both; animation-timeline: view(); animation-range: entry 14% cover 40%; }
+  /* the wrap itself no longer animates as a block — children do */
+  .slide > .wrap { animation: none; }
+}
+@keyframes rv {
+  from { opacity: 0; transform: translateY(26px); filter: blur(10px); }
+  60%  { filter: blur(0); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes rv-img {
+  from { opacity: 0; transform: translateY(34px) scale(0.97); filter: blur(16px); }
+  55%  { filter: blur(0); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+
+/* --- Fallback path (no scroll-driven anim, e.g. Safari): IntersectionObserver toggles .in-view --- */
+@supports not (animation-timeline: view()) {
+  .slide .slide-kicker,
+  .slide .col-text h1, .slide > .wrap > h1,
+  .slide .col-text .lede, .slide > .wrap > .lede,
+  .slide .col-visual, .slide .visual-card, .slide .agenda-map,
+  .slide .flow-row, .slide .cmp2, .slide .pullquote {
+    opacity: 0; transform: translateY(28px); filter: blur(12px);
+    transition: opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1), filter .7s ease;
+  }
+  .slide.in-view .slide-kicker { opacity:1; transform:none; filter:blur(0); transition-delay:.05s }
+  .slide.in-view .col-text h1, .slide.in-view > .wrap > h1 { opacity:1; transform:none; filter:blur(0); transition-delay:.16s }
+  .slide.in-view .col-text .lede, .slide.in-view > .wrap > .lede { opacity:1; transform:none; filter:blur(0); transition-delay:.28s }
+  .slide.in-view .col-visual, .slide.in-view .visual-card, .slide.in-view .agenda-map,
+  .slide.in-view .flow-row, .slide.in-view .cmp2, .slide.in-view .pullquote { opacity:1; transform:none; filter:blur(0); transition-delay:.4s }
+}
+
+/* --- Respect reduced motion: show everything, no animation/blur --- */
+@media (prefers-reduced-motion: reduce) {
+  .slide *, .slide > .wrap, .slide > .wrap > * {
+    animation: none !important; transition: none !important;
+    opacity: 1 !important; transform: none !important; filter: none !important;
+  }
+}
+
+.slide.dark{
+  background: var(--dark); color: var(--light);
+  border-bottom-color: rgba(255,255,255,.08);
+  background-image:
+    radial-gradient(900px 600px at 82% 12%, oklch(67% 0.14 45 / 0.22), transparent 60%),
+    radial-gradient(700px 500px at 8% 92%, oklch(66% 0.08 245 / 0.14), transparent 60%);
+}
+.slide .wrap { max-width: 1180px; margin: 0 auto; width: 100%; }
+/* SPLIT layout — the reusable answer for "h1 + lede + one visual" slides.
+   Text column left (kicker/h1/lede), visual column right that FILLS the height.
+   Replaces the 1-column stack where the image fell below the fold + left dead margins. */
+.slide.split .wrap{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(32px,5vw,72px); align-items:center; max-width:1240px }
+.slide.split .col-text{ min-width:0 }
+.slide.split .col-visual{ min-width:0; display:flex; align-items:center; justify-content:center }
+.slide.split .col-visual .slide-figure{ margin:0; width:100% }
+.slide.split .col-visual img{ max-height:74vh; width:100%; object-fit:contain }
+.slide.split h1{ max-width:14ch }
+.slide.split .lede{ max-width:34ch }
+@media (max-width:860px){ .slide.split .wrap{ grid-template-columns:1fr; gap:24px } .slide.split .col-visual img{ max-height:42vh } }
+
+.slide-num{
+  position:absolute; top: max(20px, env(safe-area-inset-top, 0px) + 4px); left: 5vw;
+  font-family: var(--font-mono); font-size: 12.5px; font-weight: 500;
+  color: var(--dark); opacity: .45; letter-spacing: .08em;
+}
+.slide.dark .slide-num,
+.slide.bg-image .slide-num{ color: var(--light); opacity:.78; text-shadow:0 1px 3px rgba(0,0,0,.5) }
+
+.slide-kicker{
+  font-family: var(--font-head); font-size: 12px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 16px;
+}
+.slide h1{
+  font-family: var(--font-head); font-weight: 700;
+  font-size: clamp(1.6rem, 3.6vw, 2.9rem);   /* dialed down: VN headlines are long; 5.4vw overflowed */
+  letter-spacing: -.025em; line-height: 1.12; margin: 0 0 16px;
+  max-width: 20ch;                            /* force a sane measure so long VN titles wrap, never bleed */
+  text-wrap: balance; overflow-wrap: break-word;
+}
+.slide.dark h1{ max-width: 18ch }
+/* hero/cover + section dividers get a bigger, more deliberate title */
+.slide.cover h1, .slide.section h1{ font-size: clamp(2.2rem, 5vw, 4rem); max-width: 16ch }
+.slide h2{
+  font-family: var(--font-head); font-weight: 600;
+  font-size: clamp(1.3rem, 2.4vw, 1.9rem);
+  letter-spacing: -.02em; line-height: 1.2; margin: 24px 0 12px;
+}
+.slide .lede{
+  font-family: var(--font-body); font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  max-width: 880px; opacity: .92; margin: 0 0 18px;
+}
+.slide.dark .lede{ color: var(--light); opacity: .9 }
+
+.u-orange{
+  text-decoration: underline;
+  text-decoration-color: var(--orange);
+  text-decoration-thickness: 6px;
+  text-underline-offset: 4px;
+  text-decoration-skip-ink: none;
+}
+.grad-word{
+  background: linear-gradient(100deg, var(--orange) 0%, oklch(75% 0.13 50) 55%, oklch(85% 0.08 60) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+
+/* ===== hero ===== */
+.hero-stage{ display:flex; flex-direction:column; gap:24px; align-items:flex-start }
+.hero-stage .eyebrow{
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: .15em;
+  color: var(--orange); text-transform: uppercase;
+}
+.hero-stage h1{ font-size: clamp(2.4rem, 6.6vw, 5.2rem); line-height: 1.02; margin: 0 }
+.hero-stage .meta{
+  display:flex; gap:22px; flex-wrap:wrap;
+  font-family: var(--font-head); font-size: 14px; color: var(--mid-soft); margin-top: 4px;
+}
+
+/* ===== counters ===== */
+.stat-row{ display:grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 8px }
+.stat{
+  background: #fff;
+  border: 1px solid var(--light-gray);
+  border-radius: var(--radius);
+  padding: 22px 22px;
+  border-top: 3px solid var(--orange);
+  container-type: inline-size;
+}
+.slide.dark .stat{
+  background: rgba(255,255,255,.04);
+  border-color: rgba(255,255,255,.1);
+  border-top-color: var(--orange);
+}
+.stat .n{
+  font-family: var(--font-head); font-weight: 800;
+  font-size: clamp(2rem, 4.8vw, 3.4rem); letter-spacing: -.03em;
+  color: var(--orange-deep); line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.slide.dark .stat .n{ color: var(--orange) }
+.stat .l{
+  font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .12em;
+  text-transform: uppercase; color: oklch(45% 0.008 80);   /* darker than --mid → readable on cream */
+  margin-top: 8px;
+}
+.slide.dark .stat .l{ color: var(--mid-soft) }
+.stat .d{
+  font-family: var(--font-body); font-size: 14.5px;
+  margin-top: 6px; line-height: 1.5; color: var(--dark);
+}
+.slide.dark .stat .d{ color: var(--light); opacity: .82 }
+@media (max-width: 760px){ .stat-row{ grid-template-columns: 1fr } }
+
+/* ===== takeaway ===== */
+.takeaway{
+  margin-top: 22px; padding: 16px 22px;
+  background: var(--orange-soft); border-left: 3px solid var(--orange);
+  border-radius: 6px; font-family: var(--font-body); font-size: 15.5px; line-height: 1.6;
+}
+
+/* ===== 3-pack cards ===== */
+.pack3{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 14px }
+.pack{
+  background: #fff; border: 1px solid var(--light-gray); border-radius: var(--radius);
+  padding: 22px 22px; border-top: 3px solid var(--orange);
+  display: flex; flex-direction: column; gap: 8px; min-height: 240px;
+}
+.pack .p-tag{ font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--orange-deep) }
+.pack .p-title{ font-family: var(--font-head); font-weight: 700; font-size: 1.25rem; letter-spacing: -.01em }
+.pack .p-desc{ font-family: var(--font-body); font-size: 14.5px; line-height: 1.55; opacity: .9 }
+.pack .p-when{ font-family: var(--font-mono); font-size: 11px; color: oklch(45% 0.008 80); margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--light-gray) }
+@media (max-width: 880px){ .pack3{ grid-template-columns: 1fr } }
+
+/* ===== rules grid (the 6 luật) — DARK SLIDE — explicit dark-mode styling ===== */
+.rules{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 14px }
+.rules.three{ grid-template-columns: repeat(3, 1fr) }  /* 3 items → 3 even columns, no 2-1 orphan */
+.rule{
+  background: oklch(20% 0.005 70);                  /* slightly lifted from dark bg */
+  border: 1px solid oklch(28% 0.005 70);
+  border-radius: var(--radius);
+  padding: 18px 20px; display: flex; gap: 14px; align-items: flex-start;
+  color: var(--light);
+  transition: border-color .2s, transform .2s;
+}
+.rule:hover{ border-color: var(--orange); transform: translateY(-2px); }
+.rule .r-n{
+  font-family: var(--font-mono); font-weight: 700; font-size: 14px;
+  color: var(--orange); flex-shrink: 0; min-width: 28px; padding-top: 2px; letter-spacing: .05em;
+}
+.rule .r-t{ font-family: var(--font-head); font-weight: 600; font-size: 1.05rem; line-height: 1.35; color: var(--light); }
+.rule .r-s{ font-family: var(--font-body); font-size: 14px; line-height: 1.55; color: var(--light); opacity: .72; margin-top: 4px }
+
+/* light-slide version of rules (for "what this proves" slide) */
+.rules.light .rule{
+  background: #fff; border-color: var(--light-gray); color: var(--dark);
+}
+.rules.light .rule .r-t{ color: var(--dark) }
+.rules.light .rule .r-s{ color: var(--dark); opacity: .75 }
+.rules.light .rule code{
+  font-family: var(--font-mono); font-size: .88em;
+  background: var(--orange-soft); padding: 1px 6px; border-radius: 4px; color: var(--orange-deep);
+}
+@media (max-width: 760px){ .rules{ grid-template-columns: 1fr } }
+
+/* ===== CTA ===== */
+.cta-row{ display: flex; gap: 14px; flex-wrap: wrap; margin-top: 16px; font-family: var(--font-mono); font-size: 14px }
+.cta-row a{ color: var(--orange); text-decoration: none; border-bottom: 1.5px solid currentColor; padding-bottom: 1px }
+.cta-row .dot{ opacity: .4 }
+.slide.dark .cta-row{ color: var(--mid-soft) }
+
+/* ===== KEYBOARD HINT ===== */
+.kbd-hint{
+  position: fixed; right: 14px; bottom: 14px; z-index: 30;
+  font-family: var(--font-mono); font-size: 11px;
+  background: oklch(15% 0.005 70 / 0.85); color: var(--light);
+  padding: 8px 12px; border-radius: 8px; backdrop-filter: blur(6px);
+  letter-spacing: .04em; line-height: 1.6; pointer-events: none;
+  opacity: .9; transition: opacity .3s;
+}
+.kbd-hint kbd{
+  font-family: var(--font-mono); font-size: 10.5px;
+  background: rgba(255,255,255,.14); padding: 1px 6px; border-radius: 4px;
+  border: 1px solid rgba(255,255,255,.2); margin: 0 2px;
+}
+body.hide-hint .kbd-hint{ opacity: 0 }
+@media (max-width: 760px){ .kbd-hint{ display: none } }
+
+/* ===== GRID MODE via <dialog> (top-layer + ::backdrop + @starting-style) ===== */
+dialog.grid-dialog{
+  margin: 0; padding: 0; border: none;
+  width: 100vw; height: 100vh; max-width: none; max-height: none;
+  background: linear-gradient(180deg, oklch(15% 0.005 70) 0%, oklch(10% 0.005 70) 100%);
+  color: var(--light);
+  overflow: auto;
+  /* entry animation via @starting-style */
+  opacity: 1; transform: none;
+  transition: opacity .25s, transform .25s, overlay .25s allow-discrete, display .25s allow-discrete;
+}
+@starting-style {
+  dialog.grid-dialog[open]{ opacity: 0; transform: scale(0.96); }
+}
+dialog.grid-dialog::backdrop{
+  background: oklch(10% 0.005 70 / 0.6);
+  backdrop-filter: blur(8px);
+  transition: background .25s, backdrop-filter .25s, display .25s allow-discrete, overlay .25s allow-discrete;
+}
+@starting-style {
+  dialog.grid-dialog[open]::backdrop{ background: oklch(10% 0.005 70 / 0); backdrop-filter: blur(0); }
+}
+.grid-dialog .gd-header{
+  position: sticky; top: 0; z-index: 2;
+  background: oklch(10% 0.005 70 / 0.85); backdrop-filter: blur(10px);
+  padding: 18px 28px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.grid-dialog .gd-title{
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--orange);
+}
+.grid-dialog .gd-close{
+  font-family: var(--font-mono); font-size: 12px;
+  background: rgba(255,255,255,.06); color: var(--light);
+  border: 1px solid rgba(255,255,255,.14); border-radius: 6px;
+  padding: 6px 12px; cursor: pointer;
+}
+.grid-dialog .gd-close:hover{ background: var(--orange); border-color: var(--orange) }
+
+.grid-dialog .gd-grid{
+  display: grid; gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  padding: 28px;
+}
+/* ===== Title-card thumbnails — Keynote-style navigator ===== */
+.thumb{
+  aspect-ratio: 16 / 10;
+  background: var(--light); color: var(--dark);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  overflow: hidden; cursor: pointer; position: relative;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+  padding: 18px 18px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+  text-align: left; font: inherit;
+}
+.thumb.dark{
+  background: var(--dark); color: var(--light);
+  background-image:
+    radial-gradient(280px 180px at 85% 8%, oklch(67% 0.14 45 / 0.18), transparent 60%);
+}
+.thumb:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 14px 36px oklch(67% 0.14 45 / 0.32);
+  border-color: var(--orange);
+  z-index: 5;
+}
+.thumb:focus-visible{ outline: 2px solid var(--orange); outline-offset: 3px }
+
+.thumb .t-num{
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .14em; color: var(--orange);
+}
+.thumb .t-title{
+  font-family: var(--font-head); font-weight: 700;
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  letter-spacing: -.01em; line-height: 1.2;
+  color: inherit;
+  /* clamp to 2 lines */
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.thumb .t-sub{
+  font-family: var(--font-body); font-size: 12.5px; line-height: 1.45;
+  opacity: .75;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.thumb .t-foot{
+  margin-top: auto;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+}
+.thumb .t-tag{
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 999px;
+  background: var(--orange-soft); color: var(--orange-deep);
+  border: 1px solid oklch(67% 0.14 45 / 0.25);
+}
+.thumb.dark .t-tag{
+  background: oklch(67% 0.14 45 / 0.18);
+  color: var(--orange); border-color: oklch(67% 0.14 45 / 0.4);
+}
+.thumb .t-icon{
+  font-family: var(--font-mono); font-size: 16px; opacity: .55;
+}
+/* tag color variants */
+.thumb .t-tag.tag-interactive{ background: oklch(60% 0.07 130 / 0.14); color: oklch(40% 0.07 130); border-color: oklch(60% 0.07 130 / 0.4) }
+.thumb.dark .t-tag.tag-interactive{ color: oklch(72% 0.08 130) }
+.thumb .t-tag.tag-data{ background: oklch(66% 0.08 245 / 0.14); color: oklch(40% 0.08 245); border-color: oklch(66% 0.08 245 / 0.4) }
+.thumb.dark .t-tag.tag-data{ color: oklch(72% 0.08 245) }
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  position: fixed; top: 0; left: -240px; width: 220px; height: 100vh; z-index: 40;
+  background: var(--dark); color: var(--light);
+  border-right: 1px solid rgba(255,255,255,.08);
+  overflow-y: auto; padding: 16px 12px;
+  transition: left .3s cubic-bezier(.2,.7,.2,1);
+  display: flex; flex-direction: column; gap: 6px;
+}
+body.sidebar-mode .sidebar{ left: 0 }
+body.sidebar-mode .deck{ padding-left: 0; transition: padding .3s; }
+.sidebar-title{
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--orange); padding: 4px 6px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 4px;
+}
+.sb-item{
+  display: flex; gap: 10px; padding: 8px 8px; border-radius: 6px;
+  cursor: pointer; transition: background .15s, border-color .15s;
+  align-items: flex-start; border: 1px solid transparent;
+}
+.sb-item:hover{ background: rgba(255,255,255,.06) }
+.sb-item.active{ background: oklch(67% 0.14 45 / 0.14); border-color: oklch(67% 0.14 45 / 0.4) }
+.sb-item .sb-n{
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--orange);
+  flex-shrink: 0; padding-top: 2px; min-width: 22px; letter-spacing: .05em;
+}
+.sb-item .sb-t{
+  font-family: var(--font-head); font-size: 12.5px; line-height: 1.35; color: var(--light);
+}
+
+/* mobile nav arrows */
+.nav-arrows{
+  position: fixed; right: 14px; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 8px; z-index: 25;
+}
+.nav-arrows button{
+  width: 42px; height: 42px; border-radius: 50%;
+  background: oklch(15% 0.005 70 / 0.85); color: var(--light);
+  border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(6px);
+  font-size: 18px; cursor: pointer; transition: background .15s;
+  font-family: var(--font-mono);
+}
+.nav-arrows button:hover{ background: var(--orange) }
+@media (min-width: 900px){ .nav-arrows{ display: none } }
+
+/* progress bar */
+.progress{
+  position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 50;
+  pointer-events: none;
+}
+/* scroll-driven progress — no JS */
+@supports (animation-timeline: scroll()) {
+  .progress::after{
+    content: ""; display: block; height: 100%; width: 100%;
+    background: var(--orange); transform-origin: left;
+    animation: prog linear;
+    animation-timeline: scroll(nearest);
+  }
+}
+@keyframes prog { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+/* fallback */
+@supports not (animation-timeline: scroll()) {
+  .progress > #progress-bar{ height: 100%; width: 0; background: var(--orange); transition: width .2s }
+}
+
+/* hero pulse */
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+.pulse{ display: inline-block; animation: pulse 2.4s ease-in-out infinite }
+@media (prefers-reduced-motion: reduce) { .pulse { animation: none } }
+
+/* ===== S2 diagrams ===== */
+.content-grid{ display:grid; grid-template-columns: minmax(0, .92fr) minmax(360px, 1fr); gap:36px; align-items:center; margin-top:18px }
+.content-grid.wide{ grid-template-columns: 1fr 1.15fr }
+/* no white card box — the diagram lives directly on the cream slide (white-box was the lazy tell) */
+.visual-card{ background:transparent; border:0; border-radius:0; padding:0; box-shadow:none }
+.slide.dark .visual-card{ background:transparent; border:0; box-shadow:none }
+.slide-figure{ margin:22px 0 0; background:transparent; border:0; border-radius:0; padding:0; box-shadow:none }
+/* images are cream-bg line art → multiply blends the cream into the slide's cream so only the linework shows (no white card, no box) */
+.slide-figure img{ display:block; width:100%; height:auto; max-height:58vh; object-fit:contain; mix-blend-mode:multiply }
+.slide.dark .slide-figure img{ mix-blend-mode:normal; border-radius:10px } /* on dark slides multiply fails; keep image as-is */
+.img-bleed{ max-width:980px; margin-inline:auto }
+/* interactive: fulfillment fan-out */
+.fp-edge{ opacity:.12; transition:opacity .35s ease; stroke-dasharray:240; stroke-dashoffset:240 }
+.fp-edge.lit{ opacity:1; stroke:var(--orange); stroke-dashoffset:0; transition:stroke-dashoffset .5s ease, opacity .35s ease }
+.fp-nodes text{ opacity:.25; transition:opacity .4s ease, fill .4s ease }
+.fp-nodes text.lit{ opacity:1; fill:var(--orange); font-weight:700 }
+#fp-btn.fired{ animation:fp-pulse .5s ease }
+@keyframes fp-pulse{ 0%{transform:scale(1)} 40%{transform:scale(1.12)} 100%{transform:scale(1)} ; transform-origin:450px 210px }
+#fp-btn{ transform-box:fill-box; transform-origin:center }
+/* interactive: pricing ladder */
+.pl-wrap{ display:flex; gap:14px; margin-top:24px; align-items:flex-end; justify-content:center }
+.pl-tier{ flex:1; max-width:220px; border:2px solid var(--light-gray); border-radius:var(--radius); padding:18px 16px; cursor:pointer; transition:all .3s ease; background:var(--light); text-align:center }
+.pl-tier .pl-name{ font-family:var(--font-head); font-weight:700; font-size:1.1rem }
+.pl-tier .pl-price{ font-family:var(--font-mono); font-size:1.5rem; margin:8px 0; color:var(--dark) }
+.pl-tier .pl-desc{ font-size:.9rem; color:var(--mid); line-height:1.4 }
+.pl-tier.picked{ border-color:var(--orange); background:var(--orange-soft); transform:translateY(-8px); box-shadow:0 10px 30px oklch(67% 0.14 45 / 0.18) }
+.pl-tier.target::after{ content:"đa số chọn đây"; display:block; margin-top:10px; font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; color:var(--orange); text-transform:uppercase }
+.pl-readout{ margin-top:18px; text-align:center; font-family:var(--font-body); min-height:28px; color:var(--mid) }
+.pl-readout b{ color:var(--dark) }
+/* diagrams are SUPPORT, not the hero — cap their width so SVG text never rivals h1 */
+.diagram{ width:100%; max-width:620px; margin-inline:auto; min-height:220px; display:flex; align-items:center; justify-content:center; gap:18px; position:relative }
+.diagram svg{ width:100%; height:auto; display:block; overflow:visible }
+.label{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+  fill:oklch(45% 0.008 80); color:oklch(45% 0.008 80);
+}
+/* text that sits INSIDE a node/card and must be READ (not a faint axis label) — dark, bigger, no uppercase */
+.node-label{ font-family:var(--font-head); font-weight:600; font-size:18px; fill:var(--dark); color:var(--dark) }
+/* override inline font-size on SVG titles → a controlled secondary tier (was 34, rivalled h1) */
+.diagram-title{ font-family:var(--font-head); font-weight:700; letter-spacing:-.02em; fill:var(--dark); color:var(--dark); font-size:22px !important }
+.slide.dark .diagram-title{ fill:var(--light); color:var(--light) }
+.ink{ stroke:var(--dark); fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round }
+.soft{ fill:var(--orange-soft); stroke:oklch(67% 0.14 45 / .35) }
+.paper{ fill:oklch(94% 0.012 85); stroke:oklch(88% 0.012 85) }  /* cream-tint, not stark white (white-box tell) */
+.accent-fill{ fill:var(--orange) }
+.accent-stroke{ stroke:var(--orange) }
+.blue-fill{ fill:var(--blue) }
+.green-fill{ fill:var(--green) }
+.red-fill{ fill:var(--red) }
+.muted-fill{ fill:var(--light-gray) }
+/* halves — two connected panels (A —checkout→ B), each filled with icon+label+detail (no dead space) */
+.halves{ display:grid; grid-template-columns:1fr auto 1fr; align-items:stretch; gap:0; margin-top:36px }
+.half{ background:oklch(94% 0.012 85); border:1px solid oklch(88% 0.012 85); border-radius:18px; padding:34px 32px; display:flex; flex-direction:column; gap:12px }
+.half-icon{ width:52px; height:52px; color:var(--orange); }
+.half-icon svg{ width:100%; height:100% }
+.half-label{ font-family:var(--font-mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--orange-deep) }
+.half-q{ font-family:var(--font-head); font-weight:800; font-size:clamp(1.5rem,2.6vw,2.1rem); line-height:1.1; letter-spacing:-.02em; color:var(--dark) }
+.half-note{ font-family:var(--font-body); font-size:1rem; color:var(--mid); margin-top:auto }
+.half-link{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 20px; gap:8px }
+.half-link-line{ flex:1; width:2px; min-height:26px; background:linear-gradient(var(--orange), transparent) }
+.half-link-line:last-child{ background:linear-gradient(transparent, var(--orange)) }
+.half-link-chip{ font-family:var(--font-mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:#fff; background:var(--orange); padding:8px 14px; border-radius:999px; white-space:nowrap }
+/* subtle cream background texture for otherwise-plain content slides — leverages visual without overlay (image is light enough for dark text) */
+.slide.cream-bg{ background-size:cover; background-position:center }
+@media (max-width:860px){ .halves{ grid-template-columns:1fr } .half-link{ flex-direction:row; padding:14px 0 } .half-link-line{ width:auto; height:2px; min-height:0; flex:1 } }
+.cmp2{ display:grid; grid-template-columns:1fr auto 1fr; gap:18px; align-items:stretch; margin-top:20px }
+.cmp-panel{
+  background:oklch(94% 0.012 85); border:1px solid oklch(88% 0.012 85); border-radius:var(--radius); padding:32px 26px;
+  min-height:200px; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; text-align:left;
+  position:relative; overflow:hidden;
+}
+.cmp-panel::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--orange); opacity:.5 }
+.slide.dark .cmp-panel{ background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.12) }
+.cmp-label{ font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--orange-deep); margin-bottom:10px }
+/* card title = SECONDARY tier, clearly smaller than h1 (was 2.4rem = rivalled h1 → flat hierarchy) */
+.cmp-title{ font-family:var(--font-head); font-weight:700; font-size:clamp(1.15rem,1.9vw,1.6rem); line-height:1.15; letter-spacing:-.02em }
+.cmp-desc{ font-size:1rem; opacity:.76; margin-top:10px }
+/* connector word — a quiet link, NOT the brightest thing on the slide (it was out-shouting h1) */
+.cmp-arrow{ align-self:center; font-family:var(--font-mono); font-weight:500; font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--mid) }
+.ladder3{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:end; margin-top:22px }
+.step{
+  background:oklch(94% 0.012 85); border:1px solid oklch(88% 0.012 85); border-top:3px solid var(--orange); border-radius:var(--radius);
+  padding:20px; min-height:160px; display:flex; flex-direction:column; justify-content:flex-end;
+}
+.step:nth-child(2){ min-height:210px }
+.step:nth-child(3){ min-height:260px }
+.step .num{ font-family:var(--font-mono); color:var(--orange-deep); font-weight:700; letter-spacing:.12em; font-size:12px }
+.step .name{ font-family:var(--font-head); font-weight:800; font-size:1.45rem; margin-top:8px; letter-spacing:-.02em }
+.step .desc{ font-size:14.5px; margin-top:6px; opacity:.78 }
+/* Full Background Image (slide-method §4 emotion): ảnh khái niệm phủ full + overlay tối 40-60% + chữ trắng.
+   Dùng cho cover + section dividers → slide nổi bật, điện ảnh, không còn "light image trên dark boring". */
+.slide.bg-image{ background-size:cover; background-position:center; color:var(--light); border-bottom-color:rgba(255,255,255,.08) }
+.slide.bg-image::before{
+  content:""; position:absolute; inset:0; z-index:0;
+  background:linear-gradient(90deg, oklch(15% 0.01 60 / 0.82) 0%, oklch(15% 0.01 60 / 0.62) 45%, oklch(15% 0.01 60 / 0.30) 100%);
+}
+.slide.bg-image .wrap{ position:relative; z-index:1 }
+.slide.bg-image .slide-kicker{ color:var(--orange) }
+.slide.bg-image h1{ color:var(--light); text-shadow:0 2px 24px oklch(15% 0.01 60 / 0.5) }
+.slide.bg-image .lede{ color:var(--light); opacity:.92 }
+/* pullquote — elegant typographic emphasis, NOT a heavy black box (that was the lazy-block tell).
+   A thin orange rule + large light-weight type reads as editorial, lets the slide breathe. */
+.pullquote{
+  font-family:var(--font-head); font-weight:500; font-size:clamp(1.5rem,3.2vw,2.5rem);
+  line-height:1.18; letter-spacing:-.02em; color:var(--dark);
+  margin:28px 0 0; padding-left:24px; border-left:3px solid var(--orange); max-width:24ch;
+}
+.pullquote .pq-punch{ font-weight:800; color:var(--orange-deep); }
+.slide.dark .pullquote{ color:var(--light) }
+.slide.dark .pullquote .pq-punch{ color:var(--orange) }
+/* legacy quote-card kept for the closing big-statement, but lighter than before */
+.quote-card{
+  font-family:var(--font-head); font-size:clamp(1.6rem,3.4vw,2.7rem);
+  font-weight:700; line-height:1.14; letter-spacing:-.025em; margin-top:24px;
+  padding-left:24px; border-left:3px solid var(--orange); color:var(--dark); max-width:22ch;
+}
+.slide.dark .quote-card{ color:var(--light) }
+.agenda-map{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-top:20px }
+.agenda-group{ font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--orange); margin:18px 0 4px }
+.agenda-item{
+  display:grid; grid-template-columns:34px 1fr; gap:10px; align-items:center; padding:11px 13px;
+  background:#fff; border:1px solid var(--light-gray); border-radius:10px; opacity:.88;
+}
+.slide.dark .agenda-item, .slide.bg-image .agenda-item{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.16); color:var(--light); backdrop-filter:blur(2px) }
+.agenda-item.done{ opacity:.45 }
+.agenda-item.active{ opacity:1; border-color:var(--orange); box-shadow:0 0 0 3px var(--orange-soft) }
+.agenda-n{ font-family:var(--font-mono); color:var(--orange); font-weight:800 }
+.agenda-t{ font-family:var(--font-head); font-weight:700; line-height:1.2 }
+.code-chip{
+  display:block; max-width:100%; box-sizing:border-box;
+  white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word;
+  font-family:var(--font-mono); font-size:clamp(1.05rem,2vw,1.3rem); line-height:1.5;
+  background:#fff; border:1px solid var(--light-gray); border-radius:8px; padding:10px 14px; color:var(--orange-deep);
+}
+/* playbook explainer (slide-26b) */
+.benefit-list{ list-style:none; margin:18px 0 0; padding:0; display:grid; gap:12px }
+.benefit-list li{ position:relative; padding-left:22px; font-size:1.02rem; line-height:1.5; color:var(--mid) }
+.benefit-list li::before{ content:""; position:absolute; left:0; top:.62em; width:9px; height:9px; border-radius:50%; background:var(--orange) }
+.benefit-list strong{ color:var(--dark) }
+.benefit-list code{ font-family:var(--font-mono); font-size:.86em; background:#fff; border:1px solid var(--light-gray); border-radius:5px; padding:1px 6px; color:var(--orange-deep) }
+.playbook-card{ background:#fff; border:1px solid var(--light-gray); border-radius:14px; padding:22px 24px; box-shadow:0 18px 44px -28px rgba(20,20,19,.45); width:100% }
+.playbook-card .eyebrow{ color:var(--orange-deep); margin-bottom:14px }
+.playbook-steps{ margin:0; padding-left:1.4em; display:grid; gap:9px; counter-reset:none }
+.playbook-steps li{ font-family:var(--font-head); font-weight:600; font-size:1.02rem; line-height:1.35; color:oklch(35% 0.008 80) }
+.playbook-steps li strong{ color:var(--orange-deep) }
+.playbook-steps li::marker{ color:var(--orange); font-weight:700; font-family:var(--font-mono) }
+/* ===== method explainers (CODE / PARA / Zettelkasten) ===== */
+.method-label{ font-family:var(--font-mono); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--orange-deep); margin-bottom:6px }
+/* PARA 4-bucket row */
+.para-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:22px }
+.para-box{ background:#fff; border:1px solid var(--light-gray); border-radius:12px; padding:16px 14px; text-align:left }
+.para-box .pb-k{ font-family:var(--font-head); font-weight:800; font-size:1.12rem; color:var(--dark); letter-spacing:-.01em }
+.para-box .pb-d{ font-size:.92rem; color:var(--mid); margin-top:6px; line-height:1.35 }
+.para-box.hot{ border-color:var(--orange); background:var(--orange-soft) }
+.para-box.hot .pb-k{ color:var(--orange-deep) }
+/* CODE pipeline — reuse flow chips but mark the payoff */
+.flow-chip.payoff{ background:var(--orange); color:#fff; border-color:var(--orange); box-shadow:0 8px 22px -10px oklch(67% 0.14 45 / .6) }
+/* Zettelkasten note-graph */
+.zk-row{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:24px }
+.zk-note{ background:#fff; border:1px solid var(--light-gray); border-radius:10px; padding:12px 16px; font-family:var(--font-head); font-weight:700; min-width:96px; text-align:center }
+.zk-note .zk-id{ display:block; font-family:var(--font-mono); font-size:11px; color:var(--mid); font-weight:500; margin-top:3px }
+.zk-link{ font-family:var(--font-mono); font-size:12px; letter-spacing:.06em; color:var(--orange); white-space:nowrap }
+/* pros / cons chips (each method slide) */
+.pc-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:22px }
+.pc{ border-radius:10px; padding:13px 15px; font-size:.98rem; line-height:1.4 }
+.pc .pc-k{ font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; display:block; margin-bottom:5px }
+.pc.pro{ background:oklch(95% 0.03 150); border:1px solid oklch(86% 0.05 150) }
+.pc.pro .pc-k{ color:oklch(45% 0.09 150) }
+.pc.con{ background:oklch(96% 0.03 40); border:1px solid oklch(88% 0.05 40) }
+.pc.con .pc-k{ color:var(--orange-deep) }
+/* ===== symptom → method guide ===== */
+.symptom-list{ display:grid; gap:12px; margin-top:22px }
+.symptom-row{ display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:14px; background:#fff; border:1px solid var(--light-gray); border-radius:12px; padding:14px 18px }
+.symptom-row .sx-pain{ font-size:1.05rem; color:var(--dark) }
+.symptom-row .sx-arrow{ font-family:var(--font-mono); color:var(--orange); font-weight:700 }
+.symptom-row .sx-fix{ font-family:var(--font-head); font-weight:800; color:var(--orange-deep); white-space:nowrap }
+/* ===== interactive framework explorer (slide 7b) ===== */
+.fw-tabs{ display:flex; gap:10px; margin-top:8px; flex-wrap:wrap }
+.fw-tab{ font-family:var(--font-head); font-weight:700; font-size:clamp(1rem,1.7vw,1.25rem); background:#fff; border:1px solid var(--light-gray); border-radius:999px; padding:10px 22px; cursor:pointer; color:var(--mid); transition:all .25s ease }
+.fw-tab .fw-tab-sub{ display:block; font-family:var(--font-mono); font-weight:400; font-size:.66rem; letter-spacing:.04em; color:var(--mid); margin-top:2px }
+.fw-tab[aria-selected="true"]{ background:var(--orange); color:#fff; border-color:var(--orange); box-shadow:0 10px 26px -12px oklch(67% 0.14 45 / .6) }
+.fw-tab[aria-selected="true"] .fw-tab-sub{ color:rgba(255,255,255,.85) }
+.fw-stage{ margin-top:26px; min-height:170px; display:flex; flex-direction:column; justify-content:center }
+.fw-panel{ display:none; animation:fw-in .45s cubic-bezier(.2,.7,.2,1) both }
+.fw-panel[data-active="true"]{ display:block }
+@keyframes fw-in{ from{ opacity:0; transform:translateY(14px); filter:blur(6px) } to{ opacity:1; transform:none; filter:blur(0) } }
+.fw-fix{ margin-top:22px; font-family:var(--font-head); font-weight:700; font-size:clamp(1.02rem,1.7vw,1.3rem); color:var(--dark) }
+.fw-fix b{ color:var(--orange-deep) }
+.fw-fix .fw-fix-k{ font-family:var(--font-mono); font-size:.7em; letter-spacing:.1em; text-transform:uppercase; color:var(--orange-deep); margin-right:10px }
+@media (prefers-reduced-motion: reduce){ .fw-panel{ animation:none } }
+/* ===== principles-you-already-know (slide 7) ===== */
+.principle-row{ display:grid; gap:14px; margin-top:22px }
+.principle{ display:grid; grid-template-columns:auto 1fr; align-items:center; gap:18px; background:#fff; border:1px solid var(--light-gray); border-radius:12px; padding:16px 20px }
+.principle .pr-name{ font-family:var(--font-mono); font-size:.92rem; letter-spacing:.06em; color:var(--orange-deep); font-weight:600; white-space:nowrap }
+.principle .pr-say{ font-family:var(--font-head); font-weight:700; font-size:clamp(1.05rem,1.7vw,1.35rem); color:var(--dark); line-height:1.25 }
+/* ===== librarian → operator reveal (slide 10) ===== */
+.reveal2{ display:grid; grid-template-columns:1fr auto 1fr; gap:0; align-items:stretch; margin-top:22px }
+.reveal-card{ border:1px solid var(--light-gray); border-radius:16px; padding:26px 26px; background:#fff; display:flex; flex-direction:column; gap:6px }
+.reveal-card.operator{ background:var(--orange-soft); border-color:var(--orange) }
+.reveal-card .rc-role{ font-family:var(--font-mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--mid) }
+.reveal-card.operator .rc-role{ color:var(--orange-deep) }
+.reveal-card .rc-h{ font-family:var(--font-head); font-weight:800; font-size:clamp(1.3rem,2.2vw,1.9rem); line-height:1.1; letter-spacing:-.02em; color:var(--dark) }
+.reveal-card .rc-box{ font-size:.96rem; color:var(--mid); margin-top:10px; line-height:1.45 }
+.reveal-card .rc-out{ margin-top:auto; padding-top:14px; font-family:var(--font-head); font-weight:700; color:var(--dark) }
+.reveal-card.operator .rc-out{ color:var(--orange-deep) }
+.reveal-mid{ align-self:center; padding:0 18px; font-family:var(--font-mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--orange); font-weight:700 }
+.box-add{ display:inline-block; font-family:var(--font-mono); font-size:.82em; background:#fff; border:1px solid var(--orange); color:var(--orange-deep); border-radius:5px; padding:1px 7px; margin:2px 0 }
+/* ===== capture-to-note flow (slide 17) ===== */
+.cap-flow{ display:grid; gap:12px; margin-top:6px }
+.cap-you{ display:flex; align-items:center; gap:14px; background:#fff; border:1px solid var(--light-gray); border-radius:12px; padding:14px 18px }
+.cap-you .cap-k{ font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--mid); white-space:nowrap }
+.cap-you .cap-say{ font-family:var(--font-head); font-weight:700; font-size:clamp(1.02rem,1.7vw,1.3rem); color:var(--dark) }
+.cap-arrow{ font-family:var(--font-mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--orange); font-weight:700; padding-left:6px }
+.cap-vault{ display:grid; gap:8px; background:var(--orange-soft); border:1px solid var(--orange); border-radius:12px; padding:16px 18px }
+.cap-step{ font-size:1rem; color:var(--dark); line-height:1.4 }
+.cap-step b{ color:var(--orange-deep); margin-right:6px }
+.cap-out{ font-family:var(--font-head); font-weight:700; font-size:1.02rem; color:var(--dark); padding-left:6px }
+.cap-out code, .cap-hood code{ font-family:var(--font-mono); font-size:.86em; background:#fff; border:1px solid var(--light-gray); border-radius:5px; padding:1px 6px; color:var(--orange-deep) }
+.cap-hood{ margin-top:14px; font-size:.85rem; color:var(--mid); font-style:italic }
+/* ===== 4-way comparison table ===== */
+.cmp-table{ width:100%; border-collapse:separate; border-spacing:0; margin-top:20px; font-size:clamp(.86rem,1.4vw,1rem);
+  background:#fff; border:1px solid var(--light-gray); border-radius:14px; padding:8px 18px; box-shadow:0 18px 44px -28px rgba(20,20,19,.45) }
+.cmp-table th, .cmp-table td{ padding:12px 14px; text-align:left; border-bottom:1px solid var(--light-gray); vertical-align:middle }
+.cmp-table thead th{ font-family:var(--font-mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--mid); border-bottom:2px solid var(--light-gray) }
+.cmp-table thead th.ours{ color:#fff; background:var(--orange); border-radius:8px 8px 0 0 }
+.cmp-table tbody th{ font-family:var(--font-head); font-weight:700; color:var(--dark); white-space:nowrap }
+.cmp-table td.ours{ background:var(--orange-soft); font-weight:600; color:var(--orange-deep) }
+.cmp-table tbody tr:last-child td, .cmp-table tbody tr:last-child th{ border-bottom:0 }
+.flow-row{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:24px }
+.flow-chip{
+  font-family:var(--font-head); font-weight:700; background:#fff; border:1px solid var(--light-gray);
+  border-radius:18px; padding:12px 18px; text-align:center; line-height:1.2;
+}
+.flow-chip small{ display:block; font-family:var(--font-body); font-weight:400; font-size:.74rem; color:var(--mid); margin-top:3px }
+.flow-chip.payoff small{ color:rgba(255,255,255,.85) }
+.flow-chip.hot{ background:var(--orange); color:#fff; border-color:var(--orange) }
+.flow-arrow{ font-family:var(--font-head); color:var(--orange); font-size:24px; font-weight:800 }
+.bubbles{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:22px }
+.bubble{
+  background:#fff; border:1px solid var(--light-gray); border-radius:999px; padding:26px 20px;
+  font-family:var(--font-head); font-weight:700; text-align:center; color:oklch(45% 0.008 80);
+}
+.mini-list{ display:grid; gap:10px; margin-top:20px; font-family:var(--font-head); font-weight:700 }
+.mini-list div{ background:oklch(94% 0.012 85); border:1px solid oklch(88% 0.012 85); border-radius:10px; padding:14px 16px }
+.mini-list .dim{ opacity:.45 }
+.mini-list .hot{ border-color:var(--orange); background:var(--orange-soft); color:var(--orange-deep) }
+.stage-strip{
+  display:none; margin-top:18px; padding:12px 14px; border-radius:8px;
+  background:oklch(15% 0.005 70 / .05); font-family:var(--font-mono); font-size:12px; color:oklch(45% 0.008 80);
+}
+body.notes-mode .stage-strip{ display:block }
+body.dark-ui .deck{ background:var(--dark) }
+body.dark-ui .slide:not(.dark){ background:oklch(20% 0.005 70); color:var(--light); border-bottom-color:rgba(255,255,255,.08) }
+body.dark-ui .slide:not(.dark) .visual-card,
+body.dark-ui .slide:not(.dark) .cmp-panel,
+body.dark-ui .slide:not(.dark) .step,
+body.dark-ui .slide:not(.dark) .bubble,
+body.dark-ui .slide:not(.dark) .mini-list div,
+body.dark-ui .slide:not(.dark) .agenda-item{ background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.12); color:var(--light) }
+body.dark-ui .slide:not(.dark) .slide-num{ color:var(--mid-soft) }
+@media (max-width: 880px){
+  .content-grid,.content-grid.wide,.cmp2,.ladder3,.bubbles,.agenda-map{ grid-template-columns:1fr }
+  .cmp-arrow{ transform:rotate(90deg) }
+}
+
+/* mobile tweaks */
+@media (max-width: 760px){
+  .slide{ padding: max(56px, env(safe-area-inset-top, 0px) + 32px) 6vw 56px }
+  .pack{ min-height: 0 }
+  .visual-card{ padding:16px }
+}
+
+@media print{
+  html,body{ background:#fff; color:#000 }
+  .deck{ height:auto; overflow:visible; scroll-snap-type:none }
+  .slide{
+    min-height:100vh; page-break-after:always; break-after:page;
+    border-bottom:none; animation:none !important;
+  }
+  .slide > .wrap{ animation:none !important }
+  .progress,.sidebar,.nav-arrows,.kbd-hint,.grid-dialog{ display:none !important }
+}
+</style>
+</head>
+<body>
+
+<div class="progress"><div id="progress-bar"></div></div>
+
+<aside class="sidebar" id="sidebar" aria-label="Slide navigation">
+  <div class="sidebar-title">Slides</div>
+</aside>
+
+<div class="nav-arrows">
+  <button onclick="navPrev()" aria-label="Previous slide" type="button">↑</button>
+  <button onclick="navNext()" aria-label="Next slide" type="button">↓</button>
+</div>
+
+<div class="kbd-hint" id="kbd-hint">
+  <kbd>Esc</kbd>/<kbd>G</kbd> grid · <kbd>S</kbd> sidebar · <kbd>N</kbd> notes · <kbd>F</kbd> full · <kbd>↑↓</kbd> nav
+</div>
+
+<dialog class="grid-dialog" id="grid-dialog" aria-label="All slides overview">
+  <div class="gd-header">
+    <div class="gd-title">All slides · click to enter</div>
+    <button class="gd-close" type="button" onclick="closeGrid()">Esc — Close</button>
+  </div>
+  <div class="gd-grid" id="gd-grid"></div>
+</dialog>
+
+<main class="deck" id="deck">
+<section class="slide cover bg-image" id="slide-1" data-title="Tối nay: studio thành vault" data-group="Mở đầu" style="background-image:url('assets/bg-cover.png')">
+  <div class="wrap">
+    <div class="slide-kicker">BUỔI 3/3 · CÔNG TY MỘT NGƯỜI</div>
+    <h1>Tối nay: studio của bạn lớn thành một vault — nhớ được và làm được.</h1>
+    <p class="lede">Hai buổi trước bạn làm ra một thứ, rồi bán được một thứ. Tối nay mình làm cho cái đó tự nhớ và tự chạy phần việc lặp đi lặp lại.</p>
+  </div>
+  <div class="stage-strip">Buổi 1 bạn dựng được một studio làm ra deck. Buổi 2 bạn bán được nó bằng nút trả tiền thật. Tối nay mình không đổi món mới — mình làm cho chính cái studio đó lớn lên thành một cái vault: nó nhớ bạn là ai, và nó làm được việc cho bạn.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-2" data-title="Gặp Hằng" data-group="Gặp Hằng" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">GẶP HẰNG</div>
+      <h1>Đây là Hằng. Tối nay tụi mình học bằng câu chuyện của Hằng.</h1>
+      <p class="lede">Hằng làm marketing 8 năm cho mấy công ty công nghệ và bán lẻ. Vừa nghỉ việc, ra làm riêng — một mình. Giờ Hằng nhận tư vấn và dạy lại nghề cho mấy bạn mới vào marketing.</p>
+    </div>
+    <div class="col-visual">
+      <figure class="slide-figure"><img src="assets/hang-hero.png" alt="Hằng — marketer vừa ra làm riêng, ngồi làm việc bên ly trà sáng" style="border-radius:10px;box-shadow:0 22px 60px -30px rgba(20,20,19,.55)"/></figure>
+    </div>
+  </div>
+  <div class="stage-strip">Mình không nói lý thuyết suông. Mình kể chuyện một người. Hằng có thật về mặt tình huống — tám năm trong nghề, giờ một mình ra làm riêng, vừa nhận tư vấn vừa mở lớp dạy lại nghề. Cả tối nay mình sẽ đi theo Hằng.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-3" data-title="Hằng muốn mở workshop đều đặn" data-group="Gặp Hằng" style="background-image:url('assets/bg-cream-2.png')">
+  <div class="wrap">
+    <div class="slide-kicker">HẰNG MUỐN GÌ</div>
+    <h1>Hằng muốn mở workshop đều đặn — mà không kiệt sức làm lại từ đầu mỗi lần.</h1>
+    <p class="lede">Mỗi lần mở một đợt mới, Hằng lại ngồi nghĩ lại từ đầu: đặt tên, viết mô tả, dựng trang đăng ký, viết bài mời. Làm hoài một việc, mệt hoài.</p>
+  </div>
+  <div class="stage-strip">Đây là điều Hằng muốn, nói cho gọn: mở lớp đều đặn mà không phải gồng. Vấn đề là mỗi đợt mới, Hằng làm lại gần như từ con số không. Cái đó không bền — và đó chính là cái tối nay mình sửa.</div>
+</section>
+
+<section class="slide bg-image" id="slide-4" data-title="Đổi Hằng thành bạn" data-group="Gặp Hằng" style="background-image:url('assets/hang-swap.png')">
+  <div class="wrap">
+    <div class="slide-kicker">NHỚ ĐIỀU NÀY</div>
+    <h1>Hằng chỉ là một ví dụ. Lát nữa mình sẽ cho bạn thấy: đổi Hằng thành BẠN, cả cái vault tự đổi theo.</h1>
+    <p class="lede">Cái máy không gắn chặt với Hằng. Cùng một cái vault, mình thả thông tin của bạn vào, là nó dựng lại cho đúng nghề của bạn. Cuối buổi mình sẽ làm thật điều này trước mặt bạn.</p>
+  </div>
+  <div class="stage-strip">Cái này quan trọng, bạn ghim lại giùm mình: Hằng chỉ là một cái ví dụ để dễ kể. Điều mình muốn bạn thấy là cái máy bên dưới — nó không thuộc về riêng Hằng. Cuối buổi mình sẽ copy nguyên cái vault này, thả thông tin của BẠN vào, và nó tự dựng lại cho nghề của bạn. Nhớ cái lời hứa này, cuối buổi mình trả.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-5" data-title="Một mình gánh nhiều vai" data-group="Gặp Hằng" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">MỘT MÌNH NGHĨA LÀ</div>
+      <h1>Một mình nghĩa là Hằng vừa là marketing, vừa là sale, vừa là người dựng trang, vừa là người nhớ mọi thứ.</h1>
+      <p class="lede">Công ty lớn có nhiều phòng ban chia việc. Công ty một người thì một cái đầu gánh hết — nên cái gì lặp lại mà không có hệ thống, là đuối.</p>
+    </div>
+    <div class="col-visual">
+      <figure class="slide-figure"><img src="assets/hang-p5-manyhats.png" alt="Hằng một mình gánh nhiều vai" style="border-radius:10px;box-shadow:0 18px 50px -28px rgba(20,20,19,.5)"/></figure>
+    </div>
+  </div>
+  <div class="stage-strip">Khi mình nói "một mình", nó nặng hơn nghe. Hằng là người chạy nội dung, cũng là người chốt sale, cũng là người dựng trang đăng ký, cũng là người duy nhất nhớ hết mọi thứ trong đầu. Công ty lớn chia việc cho nhiều phòng ban. Công ty một người thì một cái đầu ôm hết. Nên việc gì lặp đi lặp lại mà không có hệ thống đỡ, là kiệt sức.</div>
+</section>
+
+<section class="slide bg-image" id="slide-6" data-title="Bốn chỗ kẹt" data-group="Đang kẹt" style="background-image:url('assets/hang-overwhelm.png')">
+  <div class="wrap">
+    <div class="slide-kicker">BỐN CHỖ KẸT</div>
+    <h1>Hằng kẹt ở bốn chỗ. Bạn coi thử có thấy mình trong đó không.</h1>
+    <p class="lede">Không phải Hằng lười. Hằng làm nhiều là khác. Vấn đề nằm chỗ khác — mình đi qua từng cái.</p>
+  </div>
+  <div class="stage-strip">Trước khi nói cách sửa, mình kể bốn chỗ Hằng đang kẹt. Vừa nghe vừa soi lại mình nha — mình đoán bạn dính ít nhất hai cái. Và nhớ: đây không phải chuyện lười.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-7" data-title="Lưu vào nhưng không ra việc" data-group="Đang kẹt" style="background-image:url('assets/bg-cream-3.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">CHỖ KẸT 1</div>
+      <h1>Ghi chú, link hay, ý tưởng — lưu hết mà để đó, không quay lại thành việc.</h1>
+      <p class="lede">Hằng hay coi mấy talk, podcast về marketing, thấy hay là lưu link lại định "đọc sau". Rồi để đó. Cả kho lưu trữ mà không cái nào quay ra thành bài đăng, thành buổi học, thành tiền.</p>
+    </div>
+    <div class="col-visual">
+      <figure class="slide-figure"><img src="assets/hang-p1-saved.png" alt="Hằng nhìn bức tường đầy link đã lưu mà không dùng" style="border-radius:10px;box-shadow:0 18px 50px -28px rgba(20,20,19,.5)"/></figure>
+    </div>
+  </div>
+  <div class="stage-strip">Chỗ kẹt thứ nhất, ai cũng dính: mình lưu rất nhiều mà không cái nào quay lại thành việc. Hằng coi talk hay, lưu link, định đọc sau, rồi quên. Kho càng đầy càng nặng đầu, mà chẳng ra được cái gì giao cho khách. Ghi chú chết vì nó chỉ có một chiều: chiều đi vào.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-8" data-title="AI không nhớ Hằng" data-group="Đang kẹt" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">CHỖ KẸT 2</div>
+      <h1>Mỗi lần nhờ AI, Hằng phải kể lại từ đầu mình là ai, bán cái gì.</h1>
+      <p class="lede">Mở AI lên, gõ một câu, là phải dán lại: "mình tên Hằng, làm marketing, dạy người mới, giọng mình thế này…". Lần nào cũng kể lại. AI không nhớ Hằng là ai.</p>
+    </div>
+    <div class="col-visual">
+      <figure class="slide-figure"><img src="assets/hang-p2-reexplain.png" alt="Hằng phải kể lại mình là ai mỗi lần mở AI" style="border-radius:10px;box-shadow:0 18px 50px -28px rgba(20,20,19,.5)"/></figure>
+    </div>
+  </div>
+  <div class="stage-strip">Chỗ kẹt thứ hai: AI không nhớ bạn. Mỗi lần nhờ nó làm gì, bạn phải kể lại từ đầu mình là ai, bán gì, giọng mình ra sao. Một lần thì không sao. Làm hoài mỗi ngày thì mệt — và kết quả nó ra cứ chung chung, vì nó đâu có biết bạn.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-9" data-title="Viết quá tay khi bán hàng" data-group="Đang kẹt" style="background-image:url('assets/bg-cream-2.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">CHỖ KẸT 3</div>
+      <h1>Lúc hăng, Hằng dễ viết quá tay — kiểu "cam kết tăng lương" — rồi tự bắn vào chân.</h1>
+      <p class="lede">Khi viết bài bán hàng, đang phấn khích, dễ phóng đại: hứa điều chưa làm được, ghi con số chưa có thật. Nghe mạnh lúc đó, nhưng là tự gài bẫy mình.</p>
+    </div>
+    <div class="col-visual">
+      <figure class="slide-figure"><img src="assets/hang-p3-overclaim.png" alt="Hằng bị cám dỗ viết quá tay khi bán hàng" style="border-radius:10px;box-shadow:0 18px 50px -28px rgba(20,20,19,.5)"/></figure>
+    </div>
+  </div>
+  <div class="stage-strip">Chỗ kẹt thứ ba tế nhị hơn. Lúc viết bài bán hàng, đang hăng, mình dễ viết quá tay — hứa "cam kết tăng lương", ghi "200+ học viên" trong khi lớp đầu tiên còn chưa khai giảng. Nghe mạnh thiệt, nhưng đó là tự bắn vào chân: khách tin rồi không đúng là mất uy tín. Một mình thì không có ai cản mình lại.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-10" data-title="Mỗi đợt lại làm từ đầu" data-group="Đang kẹt" style="background-image:url('assets/bg-cream-3.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">CHỖ KẸT 4</div>
+      <h1>Mỗi lần mở một đợt mới, Hằng làm lại gần như từ đầu.</h1>
+      <p class="lede">Đợt trước đặt tên gì, mô tả ra sao, trang đăng ký thế nào — nằm rải rác, không gom thành một quy trình. Nên đợt sau lại dựng lại từ con số không.</p>
+    </div>
+    <div class="col-visual">
+      <figure class="slide-figure"><img src="assets/hang-p4-redo.png" alt="Hằng phải làm lại từ đầu mỗi đợt workshop" style="border-radius:10px;box-shadow:0 18px 50px -28px rgba(20,20,19,.5)"/></figure>
+    </div>
+  </div>
+  <div class="stage-strip">Chỗ kẹt thứ tư là cái Hằng ghét nhất: mỗi đợt workshop mới, cô làm lại gần như từ đầu. Việc đợt trước không gom thành quy trình để xài lại, nên đợt sau dựng lại từ số không. Đó là chỗ tốn sức nhất mà lẽ ra khỏi tốn.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-11" data-title="Thiếu hệ thống khép vòng" data-group="Đang kẹt" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="slide-kicker">VẤN ĐỀ THẬT</div>
+    <h1>Bốn cái này không phải vì thiếu chăm. Là vì thiếu một cái HỆ THỐNG khép vòng.</h1>
+    <p class="lede">Hằng làm rất nhiều. Cái thiếu là một chỗ để mọi thứ chảy thành vòng: ghi vào → thành note → thành sản phẩm → bán → học lại → tốt lên. Thiếu cái vòng đó, càng làm càng đuối.</p>
+  </div>
+  <div class="stage-strip">Gom lại: bốn chỗ kẹt không phải tại Hằng lười — cô làm nhiều là khác. Cái cô thiếu là một hệ thống khép vòng: đồ ghi vào thì chảy ra thành sản phẩm, bán xong thì học lại để lần sau tốt hơn. Thiếu cái vòng đó, mọi nỗ lực rớt ra ngoài. Phần còn lại của buổi là mình dựng cái vòng đó.</div>
+</section>
+<section class="slide section bg-image" id="slide-12" data-title="Ba cách đã có" data-group="Nền tảng" style="background-image:url('assets/bg-part4-build-skill.png')">
+  <div class="wrap">
+    <div class="slide-kicker">GIẢI PHÁP · PHẦN 1</div>
+    <h1>Tin vui: bạn đã biết cách sắp xếp đúng rồi. Người ta đặt tên cho nó hết rồi.</h1>
+    <p class="lede">Có ba cách sắp xếp ghi chú đã được kiểm chứng nhiều năm. Mình điểm nhanh, vì cái đáng tiền tối nay không phải ba cái này — mà là chỗ cả ba cùng hụt.</p>
+  </div>
+  <div class="stage-strip">Trước khi tới cái mới, mình trấn an bạn một câu: bạn không dốt chuyện sắp xếp. Người thông minh đã nghĩ ra ba cách đúng từ lâu. Mình đi nhanh qua ba cái, rồi chỉ cho bạn chỗ cả ba cùng có một lỗ.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-13" data-title="CODE PARA Zettelkasten" data-group="Nền tảng" style="background-image:url('assets/bg-cream-2.png')">
+  <div class="wrap">
+    <div class="slide-kicker">BA CÁCH ĐÃ CÓ</div>
+    <h1>CODE, PARA, Zettelkasten — ba cách sắp xếp, ba ý đơn giản.</h1>
+    <p class="lede">CODE: đẩy ghi chú đi tới tận sản phẩm. PARA: xếp đồ theo việc mình sắp làm. Zettelkasten: mỗi ý một note nhỏ, rồi nối các note lại thành mạng lưới. Chỉ vậy thôi.</p>
+  </div>
+  <div class="stage-strip">Ba cái tên nghe kêu nhưng ý rất đơn giản. CODE là đẩy ghi chú đi tới tận output, đừng để nó nằm im. PARA là xếp đồ theo việc sắp làm chứ không theo chủ đề. Zettelkasten là mỗi ý ghi một note nhỏ rồi nối chúng lại. Bạn Google năm phút là hiểu — nên mình không dạy lại.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-14" data-title="Bấm thử: ba cách, ba hình dạng" data-group="Nền tảng" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="slide-kicker">BẤM THỬ</div>
+    <h1>Bấm thử: ba cách, ba hình dạng thật khác nhau.</h1>
+    <p class="lede">Không phải ba cái tên na ná. Mỗi cái là một hình dạng riêng, sửa một bệnh riêng. Bấm từng tab để thấy. (Phím 1 · 2 · 3 để chuyển nhanh.)</p>
+    <div class="fw-tabs" role="tablist" id="fw-tabs">
+      <button class="fw-tab" role="tab" aria-selected="true" data-fw="code">CODE<span class="fw-tab-sub">Tiago Forte</span></button>
+      <button class="fw-tab" role="tab" aria-selected="false" data-fw="para">PARA<span class="fw-tab-sub">Tiago Forte</span></button>
+      <button class="fw-tab" role="tab" aria-selected="false" data-fw="zettel">Zettelkasten<span class="fw-tab-sub">Niklas Luhmann</span></button>
+    </div>
+    <div id="fw-stage">
+      <div class="fw-panel" data-fw="code" data-active="true">
+        <div style="display:flex;align-items:center;gap:18px;margin:18px 0 16px;color:#141413">
+          <div style="border:2px solid #141413;background:#faf9f5;padding:18px 20px;min-width:120px;text-align:center">Ghi chú</div>
+          <div style="color:#d97757;font-size:34px;line-height:1">→</div>
+          <div style="border:2px solid #141413;background:#faf9f5;padding:18px 20px;min-width:120px;text-align:center">Chắt</div>
+          <div style="color:#d97757;font-size:34px;line-height:1">→</div>
+          <div style="border:2px solid #141413;background:#faf9f5;padding:18px 20px;min-width:120px;text-align:center">Sản phẩm</div>
+        </div>
+        <p>Sửa bệnh: ghi chú nằm im, không bao giờ thành cái giao cho khách. CODE đẩy ghi chú đi tới tận sản phẩm.</p>
+      </div>
+      <div class="fw-panel" data-fw="para" data-active="false">
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(130px,1fr));gap:12px;margin:18px 0 16px;color:#141413">
+          <div style="border:2px solid #141413;background:#faf9f5;padding:18px;text-align:center">Dự án</div>
+          <div style="border:2px solid #141413;background:#faf9f5;padding:18px;text-align:center">Lĩnh vực</div>
+          <div style="border:2px solid #141413;background:#faf9f5;padding:18px;text-align:center">Tài nguyên</div>
+          <div style="border:2px solid #141413;background:#faf9f5;padding:18px;text-align:center">Lưu trữ</div>
+        </div>
+        <p>Sửa bệnh: đồ để lộn xộn, tới lúc cần không biết tìm ở đâu. PARA xếp đồ theo việc mình sắp làm.</p>
+      </div>
+      <div class="fw-panel" data-fw="zettel" data-active="false">
+        <div style="position:relative;height:190px;margin:16px 0;color:#141413">
+          <div style="position:absolute;left:50px;top:48px;width:18px;height:18px;border-radius:50%;background:#d97757"></div>
+          <div style="position:absolute;left:190px;top:28px;width:18px;height:18px;border-radius:50%;background:#141413"></div>
+          <div style="position:absolute;left:315px;top:76px;width:18px;height:18px;border-radius:50%;background:#d97757"></div>
+          <div style="position:absolute;left:130px;top:138px;width:18px;height:18px;border-radius:50%;background:#141413"></div>
+          <div style="position:absolute;left:270px;top:146px;width:18px;height:18px;border-radius:50%;background:#b0aea5"></div>
+          <div style="position:absolute;left:68px;top:57px;width:124px;border-top:2px solid #b0aea5;transform:rotate(-8deg);transform-origin:left center"></div>
+          <div style="position:absolute;left:207px;top:40px;width:122px;border-top:2px solid #b0aea5;transform:rotate(22deg);transform-origin:left center"></div>
+          <div style="position:absolute;left:64px;top:64px;width:108px;border-top:2px solid #b0aea5;transform:rotate(47deg);transform-origin:left center"></div>
+          <div style="position:absolute;left:148px;top:147px;width:124px;border-top:2px solid #b0aea5;transform:rotate(4deg);transform-origin:left center"></div>
+          <div style="position:absolute;left:280px;top:93px;width:60px;border-top:2px solid #b0aea5;transform:rotate(112deg);transform-origin:left center"></div>
+        </div>
+        <p>Sửa bệnh: ý tưởng rời rạc, không nối lại được để bật ra ý mới. Zettelkasten: một ý một note, nối link lại với nhau.</p>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Bấm thử ba tab cho khán giả thấy ba hình thật khác nhau, không phải ba cái tên giông giống. CODE là đường ống chảy tới output. PARA là bốn cái thùng xếp theo việc. Zettelkasten là mạng lưới note nối nhau. Ba bệnh khác nhau, ba hình khác nhau. Bấm phím 1, 2, 3 để chuyển nhanh khi đang nói.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-15" data-title="Cả ba cùng hụt" data-group="Nền tảng" style="background-image:url('assets/bg-cream-3.png')">
+  <div class="wrap">
+    <div class="slide-kicker">CHỖ CẢ BA CÙNG HỤT</div>
+    <h1>Cả ba đều đúng. Mà cả ba cùng một lỗ: chúng chờ BẠN tự kỷ luật.</h1>
+    <p class="lede">Cả ba giả định bạn đủ kiên trì để làm hoài: chắt note đều đặn, dời folder mỗi khi xong việc, nối link mọi lúc. Mà không ai làm nổi mãi. Nên kho của ai rồi cũng thành bãi rác — bất kể chọn cách nào.</p>
+  </div>
+  <div class="stage-strip">Đây là chỗ không sách nào nói thẳng: ba cách đều giả định bạn đủ kỷ luật làm hoài. Mà người thật thì không. Không ai chắt note đều mỗi ngày, không ai dời folder khi xong project, không ai nối link mọi lúc. Nên "bộ não thứ hai" của ai rồi cũng thành bãi rác, dù chọn cách nào. Lỗi không nằm ở ý tưởng — nằm ở chỗ nó là việc tay, mà việc tay thì người ta bỏ.</div>
+</section>
+
+<section class="slide section bg-image" id="slide-16" data-title="Vault nhìn ở hai tầng" data-group="Vault hai tầng" style="background-image:url('assets/bg-part2-studio-grows.png')">
+  <div class="wrap">
+    <div class="slide-kicker">GIẢI PHÁP · PHẦN 2</div>
+    <h1>Vậy lời giải là gì? Một cái vault — nhìn ở hai tầng.</h1>
+    <p class="lede">Tầng 1 là cái thân: nó được sắp xếp thế nào, và dữ liệu chảy ra sao. Tầng 2 là cái đầu: Claude đọc cái thân đó rồi làm việc. Mình đi từng tầng.</p>
+  </div>
+  <div class="stage-strip">Giờ tới cái mới. Câu trả lời cho cả bốn chỗ kẹt là một cái vault. Nhưng mình giải thích nó ở hai tầng, vì nếu chỉ nhìn folder thì bạn hiểu sai. Tầng một là cái thân — cấu trúc và dòng chảy. Tầng hai là cái đầu — Claude điều khiển cái thân đó. Đi từng tầng cho rõ.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-17" data-title="Bốn phần của vault" data-group="Vault hai tầng" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="slide-kicker">TẦNG 1 · CẤU TRÚC</div>
+    <h1>Vault gồm bốn phần: bạn là ai, việc làm theo bước, sản phẩm, và bài học rút ra.</h1>
+    <p class="lede">Bạn là ai — bán gì, giọng văn ra sao, có bằng chứng gì. Việc làm theo bước — những việc làm đi làm lại, ghi rõ từng bước. Sản phẩm — đồ bán và tài sản dùng lại được. Bài học — rút kinh nghiệm sau mỗi lần làm. Bốn phần, đủ cho một công ty một người.</p>
+  </div>
+  <div class="stage-strip">Tầng một, cấu trúc. Vault chỉ có bốn phần thôi cho dễ nhớ. Phần một, bạn là ai: bán gì, giọng ra sao, có bằng chứng gì. Phần hai, việc làm theo bước: việc nào làm hoài thì ghi rõ từng bước. Phần ba, sản phẩm: đồ bán và đồ dùng lại được. Phần bốn, bài học: làm xong thì rút kinh nghiệm. Bốn phần đó là đủ cho một người làm một mình.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-18" data-title="Bản đồ thư mục" data-group="Vault hai tầng" style="background-image:url('assets/bg-cream-2.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">TẦNG 1 · BẢN ĐỒ</div>
+      <h1>Trên máy, bốn phần đó là mấy thư mục có đánh số.</h1>
+      <p class="lede">Đánh số để Claude (và bạn) biết cái nào quan trọng trước. Bạn không cần nhớ tên — chỉ cần biết mỗi thư mục ứng với một phần.</p>
+    </div>
+    <div class="col-visual">
+      <div style="display:grid;gap:10px;color:#141413">
+        <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:center;border:2px solid #141413;border-left:8px solid #d97757;background:#faf9f5;padding:12px 14px"><div>00-foundation</div><div>Bạn là ai</div></div>
+        <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:center;border:2px solid #141413;border-left:8px solid #d97757;background:#faf9f5;padding:12px 14px"><div>10-playbooks</div><div>Việc làm theo bước</div></div>
+        <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:center;border:2px solid #141413;border-left:8px solid #d97757;background:#faf9f5;padding:12px 14px"><div>20-products + 40-artifacts</div><div>Sản phẩm + tài sản dùng lại</div></div>
+        <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:center;border:2px solid #141413;border-left:8px solid #d97757;background:#faf9f5;padding:12px 14px"><div>50-reviews</div><div>Bài học rút ra</div></div>
+        <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:center;border:2px solid #141413;background:#faf9f5;padding:12px 14px"><div>60-people</div><div>Khách (ai đã mua)</div></div>
+        <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:center;border:2px solid #141413;background:#faf9f5;padding:12px 14px"><div>90-inbox</div><div>Hộp nhận (đồ mới ghi vào)</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Trên máy, bốn phần đó hiện ra là mấy thư mục có đánh số đầu. Đánh số để biết cái nào đứng trước: nền tảng số 00, playbook số 10, sản phẩm 20 và 40, rút kinh nghiệm 50. Thêm hai cái phụ: 60 là khách đã mua, 90 là hộp nhận đồ mới ghi vào. Bạn khỏi học thuộc — chỉ cần hiểu mỗi thư mục là một phần.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-19" data-title="Dữ liệu chảy thành vòng" data-group="Vault hai tầng" style="background-image:url('assets/bg-cream-3.png')">
+  <div class="wrap">
+    <div class="slide-kicker">TẦNG 1 · DÒNG CHẢY</div>
+    <h1>Điều quan trọng nhất: dữ liệu CHẢY thành một vòng, không nằm im trong tủ.</h1>
+    <p class="lede">Một cái link bạn lưu vào hộp nhận, chắt lại thành note, nối vào phần "bạn là ai", lớn thành sản phẩm, mở một đợt bán; khách mua thì ghi vào phần khách; xong rồi rút kinh nghiệm để lần sau làm tốt hơn. Hết một vòng.</p>
+  </div>
+  <div class="stage-strip">Đây là ý quan trọng nhất của cả tầng một, nghe kỹ giùm mình. Folder không phải cái tủ đứng yên. Dữ liệu chảy thành một vòng. Một cái link rớt vào hộp nhận, mình chắt nó thành một note, nối note đó vào phần "mình là ai", nó lớn dần thành một sản phẩm, mình mở một đợt bán; khách mua thì tên họ vào phần khách; bán xong mình rút kinh nghiệm, ghi lại để đợt sau sắc hơn. Đó là một vòng kín — đó là cái Hằng đang thiếu.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-20" data-title="Vòng khép kín" data-group="Vault hai tầng" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">TẦNG 1 · VÒNG KHÉP KÍN</div>
+      <h1>Vẽ ra thì nó là một vòng tròn, không phải một hàng thẳng.</h1>
+      <p class="lede">Mỗi mũi tên là một bước có thật. Quan trọng là cái mũi tên cuối quay ngược về đầu: bài học vòng này làm vòng sau tốt hơn.</p>
+    </div>
+    <div class="col-visual">
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;color:#141413">
+        <div style="border:2px solid #141413;background:#faf9f5;padding:14px;text-align:center">Hộp nhận</div>
+        <div style="color:#d97757;font-size:28px">→</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:14px;text-align:center">Note</div>
+        <div style="color:#d97757;font-size:28px;text-align:center">↓</div>
+        <div></div>
+        <div style="color:#d97757;font-size:28px;text-align:center">↓</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:14px;text-align:center">Khách mua</div>
+        <div style="color:#d97757;font-size:28px">←</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:14px;text-align:center">Đợt bán</div>
+        <div style="color:#d97757;font-size:28px;text-align:center">↑</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:14px;text-align:center">Sản phẩm</div>
+        <div style="color:#d97757;font-size:28px;text-align:center">↑</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:14px;text-align:center">Bài học</div>
+        <div style="color:#d97757;font-size:28px;text-align:center">↻</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:14px;text-align:center">Bạn là ai</div>
+      </div>
+      <div style="margin-top:12px;color:#d97757;text-align:center">Bài học ↻ quay về làm việc tốt hơn lần sau</div>
+    </div>
+  </div>
+  <div class="stage-strip">Vẽ ra cho dễ thấy: nó là một vòng, không phải một hàng thẳng rồi hết. Đồ vào hộp nhận, thành note, nối vào hồ sơ bạn là ai, lớn thành sản phẩm, mở đợt bán, khách mua, rồi rút kinh nghiệm — và cái rút kinh nghiệm đó quay ngược về làm cho playbook lần sau tốt hơn. Cái mũi tên quay về đó chính là chỗ hệ thống tự khá lên.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-21" data-title="Claude là bộ não" data-group="Vault hai tầng" style="background-image:url('assets/bg-cream-2.png')">
+  <div class="wrap">
+    <div class="slide-kicker">TẦNG 2 · BỘ NÃO</div>
+    <h1>Nhưng thư mục chỉ là giấy tờ nằm im. Claude mới là cái đầu đọc nó rồi LÀM.</h1>
+    <p class="lede">Tầng 1 dù gọn cách mấy, tự nó không làm gì. Phải có một cái đầu đọc được cấu trúc đó rồi biến nó thành việc. Cái đầu đó là Claude.</p>
+  </div>
+  <div class="stage-strip">Tới tầng hai. Mình nói thẳng: bốn cái folder đẹp cách mấy, tự nó vẫn là giấy tờ nằm im. Nó không tự viết email, không tự dựng landing. Phải có một cái đầu đọc cấu trúc đó rồi làm. Cái đầu đó là Claude. Tầng một là cơ thể, tầng hai là bộ não.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-22" data-title="Claude cầm công cụ" data-group="Vault hai tầng" style="background-image:url('assets/bg-cream-3.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">TẦNG 2 · CÔNG CỤ</div>
+      <h1>Claude không làm một mình — nó cầm theo mấy công cụ, mỗi cái một việc.</h1>
+      <p class="lede">Một dòng cho mỗi cái, để bạn biết khi nào gọi cái nào.</p>
+    </div>
+    <div class="col-visual">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;color:#141413">
+        <div style="grid-column:1 / 3;border:2px solid #141413;background:#d97757;color:#141413;padding:18px;text-align:center">Claude (bộ não)</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:12px"><div>Figma</div><div style="color:#b0aea5">để thiết kế hình ảnh, giao diện.</div></div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:12px"><div>NotebookLM</div><div style="color:#b0aea5">để nghiên cứu mà có trích nguồn rõ ràng.</div></div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:12px"><div>cmux</div><div style="color:#b0aea5">để chạy nhiều việc cùng lúc, song song.</div></div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:12px"><div>qmd</div><div style="color:#b0aea5">để tìm trong vault của bạn tức thì.</div></div>
+        <div style="grid-column:1 / 3;border:2px solid #141413;background:#faf9f5;padding:12px"><div>Codex</div><div style="color:#b0aea5">để dựng mấy thứ nặng, nhiều bước.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Claude không làm tay không. Nó cầm theo mấy công cụ, mỗi cái một việc rõ ràng. Figma để thiết kế. NotebookLM để nghiên cứu có trích nguồn đàng hoàng. cmux để chạy nhiều việc song song. qmd để tìm trong vault của bạn ngay lập tức. Codex để dựng mấy thứ nặng nhiều bước. Bạn không cần thuộc hết — chỉ cần biết bộ não có sẵn mấy cánh tay này.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-23" data-title="Cơ thể và bộ não" data-group="Vault hai tầng" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="slide-kicker">TẦNG 2 · CHỐT LẠI</div>
+    <h1>Tầng 1 là cơ thể. Tầng 2 là bộ não. Thiếu não, vault chỉ là folder. Có não, nó tự làm việc.</h1>
+    <p class="lede">Đây là chỗ khác nhau giữa "một đống thư mục gọn gàng" và "một cái vault biết làm việc cho bạn". Cùng một cấu trúc, khác nhau ở chỗ có cái đầu điều khiển hay không.</p>
+  </div>
+  <div class="stage-strip">Chốt tầng hai bằng một câu cho bạn nhớ: tầng một là cơ thể, tầng hai là bộ não. Thiếu bộ não thì vault chỉ là mớ folder gọn gàng — đẹp mà vô dụng. Có bộ não thì chính mớ folder đó tự đứng dậy làm việc cho bạn. Khác biệt nằm ở cái đầu, không nằm ở folder.</div>
+</section>
+<section class="slide section bg-image" id="slide-24" data-title="Lái thử vault" data-group="Lái thử" style="background-image:url('assets/bg-part1-open.png')">
+  <div class="wrap">
+    <div class="slide-kicker">GIẢI PHÁP · PHẦN 3</div>
+    <h1>Giờ mình lái thử trên chính vault của Hằng — coi điều gì xảy ra.</h1>
+    <p class="lede">Bốn bậc, từ dễ tới mạnh. Mỗi bậc mình nói trước nó làm gì, rồi chuyển qua màn hình lái thật, rồi quay lại coi nó ra cái gì.</p>
+  </div>
+  <div class="stage-strip">Đây không phải "demo cho đẹp". Mình lái thật trên vault của Hằng để bạn thấy điều gì xảy ra. Bốn bậc, mỗi bậc mạnh hơn bậc trước. Cách mình làm: nói trước nó sẽ làm gì, chuyển qua Claude Desktop lái sống, rồi quay lại slide coi kết quả. Bắt đầu từ cái dễ nhất.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-25" data-title="Ghi lại setup" data-group="Lái thử" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">BẬC 1 · GHI LẠI (SETUP)</div>
+      <h1>Bậc 1 — mình gõ "lưu cái talk này", coi nó ghi kiểu gì.</h1>
+      <p class="lede">Bình thường lưu một cái link là nó nằm chết. Ở đây mình muốn coi: nó có chắt thành note nối được vào lưới không, và nó có tự đối chiếu với cái Hằng đang dạy không.</p>
+    </div>
+    <div class="col-visual">
+      <div style="background:#faf9f5;border:3px solid #141413;color:#141413;padding:30px;max-width:560px;">
+        <div style="font-family:monospace;font-size:30px;line-height:1.35;">« lưu cái talk này vào vault giùm mình »</div>
+        <div style="border-top:2px solid #b0aea5;margin-top:24px;padding-top:14px;color:#b0aea5;font-size:18px;">coi nó làm gì với cái link</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Bậc một, dễ nhất: ghi lại. Mình sẽ gõ "lưu cái talk này vào vault". Cái hay không phải ở chỗ nó lưu — Notion cũng lưu được. Cái hay là coi nó có chắt cái talk thành một note nối được vào lưới, và có tự nói "talk này khác cái chị đang dạy ở chỗ này" hay không. Tức là nó vừa nhớ, vừa biết soi.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-26" data-title="Lái thử bậc 1" data-group="Lái thử" style="background-image:url('assets/bg-cream-3.png')">
+  <div class="wrap">
+    <div class="slide-kicker">BẬC 1 · LÁI THẬT</div>
+    <h1>Mình mở Claude Desktop, coi nó lưu một cái link thành việc.</h1>
+    <p class="lede">Cùng nhìn màn hình nha — bạn sẽ thấy nó đọc vault, hiểu Hằng đang dạy gì, rồi tạo note và tự đối chiếu.</p>
+  </div>
+  <div class="stage-strip">[Tony: mở Claude Desktop, tab Code. Gõ câu lưu talk. Để mọi người coi nó đọc vault, hiểu Hằng đang dạy gì, rồi tạo note và tự đối chiếu. Đừng đọc slide nữa, nhìn màn hình.]</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-27" data-title="Kết quả ghi lại" data-group="Lái thử" style="background-image:url('assets/bg-cream-2.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">BẬC 1 · KẾT QUẢ</div>
+      <h1>Nó không chỉ lưu — nó nối note vào lưới, và nói luôn "talk này khác cái chị đang dạy".</h1>
+      <p class="lede">Một thao tác ghi lại bình thường, mà ra hai thứ: một note nối được vào hồ sơ của Hằng, và một câu so sánh với cái Hằng đang dạy. Nó nhớ, và nó soi.</p>
+    </div>
+    <div class="col-visual">
+      <div style="display:flex;align-items:center;gap:18px;color:#141413;">
+        <div style="background:#faf9f5;border:3px solid #141413;padding:24px;width:190px;">
+          <div style="font-size:24px;">Note talk</div>
+          <div style="height:2px;background:#b0aea5;margin:18px 0;"></div>
+          <div style="color:#b0aea5;font-size:18px;">ý chính đã chắt lại</div>
+        </div>
+        <div style="font-size:42px;color:#141413;">→</div>
+        <div style="background:#faf9f5;border:3px solid #141413;padding:24px;width:150px;text-align:center;font-size:26px;">Hằng</div>
+        <div style="font-size:42px;color:#141413;">→</div>
+        <div style="background:#d97757;border:3px solid #141413;color:#141413;padding:22px;width:220px;font-size:22px;">khác cái chị đang dạy ở: …</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Kết quả bậc một: nó vượt qua "lưu cho có". Nó chắt talk thành note, nối vào lưới của Hằng, và tự nhận ra "cái talk này khác cái chị đang dạy ở điểm này". Mới bậc dễ nhất mà nó đã vừa nhớ vừa soi. Giữ cái cảm giác đó, bậc sau mạnh hơn.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-28" data-title="Vault biết cãi" data-group="Lái thử" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">BẬC 2 · VAULT BIẾT CÃI (SETUP)</div>
+      <h1>Bậc 2 — mình cố tình bảo nó viết "200+ marketer, cam kết tăng lương" cho mạnh.</h1>
+      <p class="lede">Đây là chỗ kẹt số 3 hồi nãy. Mình thử ép nó phóng đại. Coi nó nghe lời, hay nó cãi lại vì nó nhớ số thật của Hằng.</p>
+    </div>
+    <div class="col-visual">
+      <div style="background:#faf9f5;border:3px solid #141413;color:#141413;padding:30px;max-width:620px;">
+        <div style="font-family:monospace;font-size:28px;line-height:1.35;">« ghi cho mình câu bán mạnh: "200+ marketer tin dùng, cam kết tăng lương" »</div>
+        <div style="border-top:2px solid #b0aea5;margin-top:24px;padding-top:14px;color:#b0aea5;font-size:18px;">coi nó có chịu bịa không</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Bậc hai là khoảnh khắc à-há của cả buổi, để ý nha. Mình quay lại chỗ kẹt số ba — viết quá tay. Mình cố tình ép nó: "ghi câu bán thật mạnh, 200+ marketer, cam kết tăng lương". Một cái AI bình thường sẽ viết liền vì mình kêu. Coi cái này có chịu bịa không.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-29" data-title="Lái thử bậc 2" data-group="Lái thử" style="background-image:url('assets/bg-cream-3.png')">
+  <div class="wrap">
+    <div class="slide-kicker">BẬC 2 · LÁI THẬT</div>
+    <h1>Giờ mình thử ép nó nói quá lên — coi nó phản ứng sao.</h1>
+    <p class="lede">Nhìn kỹ màn hình: bạn sẽ thấy vault từ chối viết câu phóng đại, rồi đề xuất một câu nói thật mà vẫn mạnh.</p>
+  </div>
+  <div class="stage-strip">[Tony: Claude Desktop. Gõ câu ép nó phóng đại. Mọi người coi kỹ phản ứng của nó — chỗ này là điểm nhấn.]</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-30" data-title="Không chịu bịa" data-group="Lái thử" style="background-image:url('assets/bg-cream-2.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">BẬC 2 · KẾT QUẢ</div>
+      <h1>Nó TỪ CHỐI bịa. Vì nó nhớ số thật: mới 4/6 mentee, lớp đầu chưa có ai khen.</h1>
+      <p class="lede">Vault nhớ Hằng mới kèm 6 bạn, 4 bạn lên được vị trí cao hơn, và workshop là lần mở đầu nên chưa có lời khen nào. Nên nó không cho ghi "200+". Nó đề xuất một câu thật mà vẫn mạnh: "4 trong 6 bạn mình kèm đã lên vị trí cao hơn trong một năm."</p>
+    </div>
+    <div class="col-visual">
+      <div style="display:flex;align-items:center;gap:18px;color:#141413;">
+        <div style="background:#faf9f5;border:3px solid #141413;padding:26px;width:260px;position:relative;font-size:26px;">
+          <div>200+ cam kết tăng lương</div>
+          <div style="position:absolute;left:16px;right:16px;top:50%;height:5px;background:#d97757;"></div>
+        </div>
+        <div style="font-size:46px;">→</div>
+        <div style="background:#d97757;border:3px solid #141413;padding:26px;width:330px;font-size:26px;">
+          <div>✓ 4/6 bạn mình kèm đã lên vị trí cao hơn trong một năm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Đây, khoảnh khắc à-há: nó không chịu bịa. Vì vault nhớ số thật của Hằng — cô mới kèm sáu bạn, bốn bạn lên chức, còn workshop thì là lần mở đầu nên chưa có ai khen. Nó từ chối ghi "200+ cam kết tăng lương", rồi tự đề xuất một câu vừa thật vừa mạnh: "bốn trên sáu bạn mình kèm đã lên vị trí cao hơn trong một năm". Một cái AI bình thường nịnh bạn. Cái vault này cãi bạn để cứu uy tín bạn. Đó là khác biệt.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-31" data-title="Một câu ra sản phẩm" data-group="Lái thử" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">BẬC 3 · MỘT CÂU RA SẢN PHẨM (SETUP)</div>
+      <h1>Bậc 3 — mình gõ một câu "mở đợt workshop tháng sau", coi nó dựng được tới đâu.</h1>
+      <p class="lede">Nó đã biết Hằng là ai, bán gì, giọng ra sao. Nên mình đoán nó chỉ cần hỏi thêm hai thứ: giá bao nhiêu và ngày nào. Rồi nó tự dựng trang bán + gói chào + nút trả tiền thật.</p>
+    </div>
+    <div class="col-visual">
+      <div style="background:#faf9f5;border:3px solid #141413;color:#141413;padding:30px;max-width:590px;">
+        <div style="font-family:monospace;font-size:29px;line-height:1.35;">« mở giúp mình một đợt workshop cho tháng sau »</div>
+        <div style="border-top:2px solid #b0aea5;margin-top:24px;padding-top:18px;font-size:24px;line-height:1.55;">
+          <div>→ landing</div>
+          <div>→ gói chào (offer)</div>
+          <div>→ nút trả tiền thật</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Bậc ba cho thấy sức của việc nó nhớ bạn. Mình chỉ gõ "mở đợt workshop tháng sau". Vì nó đã biết Hằng là ai, bán gì, giọng thế nào, nên nó không hỏi lại mười câu — nó chỉ cần hai thứ nó chưa biết: giá và ngày. Rồi từ đó dựng luôn trang đăng ký, gói chào, và nút trả tiền thật.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-32" data-title="Lái thử bậc 3" data-group="Lái thử" style="background-image:url('assets/bg-cream-3.png')">
+  <div class="wrap">
+    <div class="slide-kicker">BẬC 3 · LÁI THẬT</div>
+    <h1>Một câu "mở đợt workshop" — coi nó dựng trang bán được.</h1>
+    <p class="lede">Nó sẽ chỉ hỏi mình giá với ngày, rồi tự dựng trang đăng ký và gắn nút trả tiền thật ngay tại đây.</p>
+  </div>
+  <div class="stage-strip">[Tony: Claude Desktop. Gõ câu mở đợt. Khi nó hỏi giá với ngày thì mình nhập. Mọi người coi nó dựng trang và gắn nút trả tiền thật ngay tại đây.]</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-33" data-title="Trang bán thật" data-group="Lái thử" style="background-image:url('assets/bg-cream-2.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">BẬC 3 · KẾT QUẢ</div>
+      <h1>Một câu, hai thông tin — ra một trang bán có nút trả tiền chạy thật.</h1>
+      <p class="lede">Không phải bản nháp để bạn sửa cả buổi. Là một trang đăng ký đúng giọng Hằng, đúng giá, đúng ngày, có nút trả tiền thật. Việc mở một đợt mới — cái Hằng từng phải làm lại từ đầu — giờ gói trong một câu.</p>
+    </div>
+    <div class="col-visual">
+      <div style="background:#faf9f5;border:3px solid #141413;color:#141413;width:430px;padding:26px;">
+        <div style="font-size:28px;line-height:1.25;">Workshop viết offer cho marketer</div>
+        <div style="height:2px;background:#b0aea5;margin:20px 0;"></div>
+        <div style="font-size:22px;margin-bottom:12px;">Giá: 1.500.000đ</div>
+        <div style="font-size:22px;margin-bottom:22px;">Ngày: tháng sau</div>
+        <div style="background:#d97757;border:3px solid #141413;padding:16px 22px;font-size:24px;text-align:center;">Trả tiền</div>
+        <div style="color:#b0aea5;font-size:18px;margin-top:12px;text-align:center;">thật</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Kết quả bậc ba: từ một câu và hai thông tin, ra một trang bán thật, đúng giọng Hằng, có nút trả tiền chạy được. Nhớ chỗ kẹt số bốn không — mỗi đợt mới làm lại từ đầu? Đây là lời giải cho nó. Cái việc tốn sức nhất giờ nằm gọn trong một câu.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-34" data-title="Cả dây chuyền" data-group="Lái thử" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">BẬC 4 · CẢ DÂY CHUYỀN (SETUP · QUAY SẴN)</div>
+      <h1>Bậc 4 — "ra một buổi chia sẻ miễn phí để kéo người vào workshop." Cả dây chuyền chạy một lượt.</h1>
+      <p class="lede">Một câu, nó chạy cả chuỗi: nghiên cứu chủ đề → làm slide → dựng landing → viết bài đăng mạng xã hội. Rồi điều mình thích nhất: xong nó tự chấm điểm lại để lần sau làm sắc hơn.</p>
+    </div>
+    <div class="col-visual">
+      <div style="color:#141413;">
+        <div style="display:flex;align-items:center;gap:12px;font-size:22px;">
+          <div style="background:#faf9f5;border:3px solid #141413;padding:18px;">Nghiên cứu</div>
+          <div>→</div>
+          <div style="background:#faf9f5;border:3px solid #141413;padding:18px;">Slide</div>
+          <div>→</div>
+          <div style="background:#faf9f5;border:3px solid #141413;padding:18px;">Landing</div>
+          <div>→</div>
+          <div style="background:#faf9f5;border:3px solid #141413;padding:18px;">Bài social</div>
+          <div>→</div>
+          <div style="background:#d97757;border:3px solid #141413;padding:18px;">Tự chấm điểm</div>
+        </div>
+        <div style="font-size:42px;color:#d97757;text-align:center;margin-top:20px;">↻</div>
+        <div style="color:#b0aea5;font-size:18px;text-align:right;margin-top:18px;">đoạn này quay sẵn</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Bậc bốn là bậc lớn nhất, và đoạn này mình quay sẵn vì nó chạy hơi lâu để đứng đợi live. Mình gõ một câu: "ra một buổi chia sẻ miễn phí để kéo người vào workshop". Nó chạy cả dây chuyền: nghiên cứu chủ đề, làm slide, dựng landing, viết bài đăng. Và cái mình mê nhất ở cuối: nó tự chấm điểm lại việc vừa làm, ghi vào retro, để lần sau sắc hơn. Đó là cái vòng khép kín hồi nãy, chạy thật.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-35" data-title="Tự rút kinh nghiệm" data-group="Lái thử" style="background-image:url('assets/bg-cream-2.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">BẬC 4 · KẾT QUẢ</div>
+      <h1>Cả một chiến dịch nhỏ ra trong một lượt — và nó tự rút kinh nghiệm để lần sau tốt hơn.</h1>
+      <p class="lede">Đây là lúc bốn phần của vault chạy cùng nhau: phần "bạn là ai" cho giọng, phần "việc làm theo bước" cho các bước, phần "sản phẩm" cho cái giao ra, phần "bài học" để lần sau khá hơn. Cái mũi tên bài học quay về chính là chỗ hệ thống tự khá lên mà bạn không phải làm gì thêm.</p>
+    </div>
+    <div class="col-visual">
+      <div style="position:relative;width:620px;height:410px;color:#141413;">
+        <div style="position:absolute;left:205px;top:145px;background:#d97757;border:3px solid #141413;padding:26px;width:170px;text-align:center;font-size:26px;">Sản phẩm chung</div>
+        <div style="position:absolute;left:10px;top:20px;background:#faf9f5;border:3px solid #141413;padding:20px;width:150px;text-align:center;font-size:22px;">Bạn là ai</div>
+        <div style="position:absolute;right:10px;top:20px;background:#faf9f5;border:3px solid #141413;padding:20px;width:170px;text-align:center;font-size:22px;">Việc làm theo bước</div>
+        <div style="position:absolute;left:10px;bottom:25px;background:#faf9f5;border:3px solid #141413;padding:20px;width:150px;text-align:center;font-size:22px;">Sản phẩm</div>
+        <div style="position:absolute;right:10px;bottom:25px;background:#faf9f5;border:3px solid #141413;padding:20px;width:150px;text-align:center;font-size:22px;">Bài học</div>
+        <div style="position:absolute;left:150px;top:74px;font-size:38px;">→</div>
+        <div style="position:absolute;right:175px;top:74px;font-size:38px;">←</div>
+        <div style="position:absolute;left:150px;bottom:84px;font-size:38px;">→</div>
+        <div style="position:absolute;right:175px;bottom:84px;font-size:38px;">←</div>
+        <div style="position:absolute;right:72px;top:142px;color:#d97757;font-size:50px;">↻</div>
+        <div style="position:absolute;right:92px;top:118px;color:#b0aea5;font-size:16px;">về việc làm</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Kết quả bậc bốn: từ một câu ra cả một chiến dịch nhỏ — nghiên cứu, slide, landing, bài đăng — và quan trọng nhất, nó tự chấm điểm rồi ghi bài học vào retro. Lần sau bạn mở chiến dịch tương tự, nó đã khôn hơn. Đây là lúc cả bốn phần của vault chạy cùng lúc. Đây là cái vòng khép kín, sống thật trước mặt bạn.</div>
+</section>
+<section class="slide section bg-image" id="slide-36" data-title="Tự xây vault" data-group="Tự xây" style="background-image:url('assets/bg-part4-build-skill.png')">
+  <div class="wrap">
+    <div class="slide-kicker">TỰ XÂY</div>
+    <h1>Tới đây bạn không chỉ DÙNG được vault — bạn xây được vault của riêng mình.</h1>
+    <p class="lede">Mình vừa cho bạn thấy vault của Hằng làm được gì. Giờ mình chỉ cho bạn cái khung để tự dựng một cái cho nghề của bạn.</p>
+  </div>
+  <div class="stage-strip">Phần cuối cùng, và là phần làm bạn khác mọi người: bạn không chỉ xài vault có sẵn, bạn xây được vault của riêng mình. Mình đưa bạn cái khung. Vì không ai hiểu nghề của bạn bằng bạn.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-37" data-title="Ba tầng để xây" data-group="Tự xây" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">BA TẦNG ĐỂ XÂY</div>
+      <h1>Xây vault có ba tầng: tại sao, cách làm, và tự động hoá cách làm.</h1>
+      <p class="lede">Framework — tại sao: sáu năng lực bạn cần, và hai chế độ làm việc. Playbook — cách làm: ghi rõ các bước cho một việc. Skill — tự động hoá: biến cái playbook đó thành một lệnh chạy được.</p>
+    </div>
+    <div class="col-visual">
+      <div style="display:flex;flex-direction:column;gap:14px;align-items:stretch;color:#141413;">
+        <div style="border:2px solid #141413;background:#faf9f5;padding:22px 24px;font-weight:800;">Framework — tại sao<br><span style="color:#b0aea5;font-weight:700;">6 năng lực · 2 chế độ</span></div>
+        <div style="color:#d97757;text-align:center;font-size:34px;font-weight:900;line-height:1;">↓</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:22px 24px;font-weight:800;">Playbook — cách làm<br><span style="color:#b0aea5;font-weight:700;">các bước</span></div>
+        <div style="color:#d97757;text-align:center;font-size:34px;font-weight:900;line-height:1;">↓</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:22px 24px;font-weight:800;">Skill — tự động hoá<br><span style="color:#b0aea5;font-weight:700;">một lệnh</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Xây vault có ba tầng, đi từ trên xuống. Trên cùng là Framework — cái tại sao: bạn cần sáu năng lực, làm việc ở hai chế độ. Giữa là Playbook — cách làm: một việc thì ghi rõ các bước. Dưới cùng là Skill — tự động hoá: biến cái playbook đó thành một lệnh để gõ một câu là chạy. Hiểu, ghi, rồi tự động hoá.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-38" data-title="Đổi Hằng thành bạn" data-group="Tự xây" style="background-image:url('assets/bg-cream-2.png')">
+  <div class="wrap">
+    <div class="slide-kicker">TRẢ LẠI LỜI HỨA</div>
+    <h1>Nhớ Hằng chứ? Giờ coi nè — mình đổi Hằng thành BẠN.</h1>
+    <p class="lede">Đầu buổi mình hứa: cái máy không gắn chặt với Hằng. Giờ mình copy nguyên cái vault, thả vào một tấm thẻ thông tin của BẠN, và nó tự dựng lại hồ sơ "bạn là ai", nhóm khách, và sản phẩm — cho đúng nghề của bạn.</p>
+  </div>
+  <div class="stage-strip">Đây là lúc mình trả lời lời hứa đầu buổi, và là lúc mạnh nhất của cả tối. Nhớ mình nói Hằng chỉ là ví dụ không? Giờ coi nè. Mình copy nguyên cái vault này, thả vào một tấm thẻ thông tin của bạn — bạn là ai, bán gì — và nó tự dựng lại me, audience, product cho nghề của bạn. Cùng một cái máy, đổi ngữ cảnh thôi. Không phải vault của Hằng nữa. Là vault của BẠN.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-39" data-title="Đổi Hằng thành bạn — lái thật" data-group="Tự xây" style="background-image:url('assets/bg-cream-3.png')">
+  <div class="wrap">
+    <div class="slide-kicker">ĐỔI HẰNG → BẠN · LÁI THẬT</div>
+    <h1>Thả thẻ của một nghề khác vào — coi cả vault tự dựng lại.</h1>
+    <p class="lede">Mình copy vault, thả một thẻ ngữ cảnh mới vào. Bạn sẽ thấy hồ sơ "bạn là ai", nhóm khách và sản phẩm dựng lại cho một nghề hoàn toàn khác — cùng một cái máy.</p>
+  </div>
+  <div class="stage-strip">[Tony: Claude Desktop. Copy vault, thả tấm thẻ ngữ cảnh mới vào. Mọi người coi nó dựng lại hồ sơ cho một nghề hoàn toàn khác — cùng một cái máy. Đây là bằng chứng nó là hệ thống, không phải đồ may riêng cho Hằng.]</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-40" data-title="Từ mình sang khách" data-group="Tự xây" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">BÁN ĐỒ MÌNH → LÀM CHO KHÁCH</div>
+      <h1>Khi bạn lớn từ bán đồ của mình lên làm cho khách — vault không xây lại, nó mọc thêm một nhánh.</h1>
+      <p class="lede">Cái gì đổi: từ một giọng thành nhiều giọng (mỗi khách một thư mục riêng), thêm luật không để lẫn khách này sang khách kia, và bộ phận "cãi" sẽ cãi theo đúng cái đã chốt với từng khách.</p>
+    </div>
+    <div class="col-visual">
+      <div style="display:grid;grid-template-columns:1fr 44px 1fr;gap:14px;align-items:center;color:#141413;">
+        <div style="border:2px solid #141413;background:#faf9f5;padding:20px;">
+          <div style="font-weight:900;margin-bottom:12px;">Bán đồ mình</div>
+          <div style="border:2px solid #b0aea5;background:#faf9f5;padding:18px;font-weight:800;">một giọng</div>
+        </div>
+        <div style="color:#d97757;font-size:34px;font-weight:900;text-align:center;">→</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:20px;">
+          <div style="font-weight:900;margin-bottom:12px;">Làm cho khách</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="border:2px solid #b0aea5;background:#faf9f5;padding:14px;font-weight:800;">clients/Khách A<br><span style="color:#b0aea5;">một giọng</span></div>
+            <div style="border:2px solid #b0aea5;background:#faf9f5;padding:14px;font-weight:800;">clients/Khách B<br><span style="color:#b0aea5;">một giọng</span></div>
+          </div>
+        </div>
+        <div style="grid-column:1 / 4;border-top:3px solid #d97757;padding-top:12px;text-align:center;font-weight:900;color:#d97757;">không rò khách này sang khách kia</div>
+      </div>
+    </div>
+  </div>
+  <div class="stage-strip">Một bước lớn nữa, để bạn thấy nó bền tới đâu. Hôm nay Hằng bán đồ của chính mình. Mai mốt có công ty cũ mời cô về đào tạo nội bộ — giờ cô làm CHO khách. Cái gì đổi? Một giọng thành nhiều giọng, mỗi khách một thư mục riêng. Thêm luật không để thông tin khách này rò sang khách kia. Bộ phận cãi thì cãi theo đúng cái đã chốt với từng khách. Điều hay là: vault không phải xây lại — nó chỉ mọc thêm một nhánh. Đó chính là bằng chứng nó là một hệ thống, không phải một file.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-41" data-title="Dấu hiệu hệ thống" data-group="Tự xây" style="background-image:url('assets/bg-cream-2.png')">
+  <div class="wrap">
+    <div class="slide-kicker">VÌ SAO QUAN TRỌNG</div>
+    <h1>Vault mọc thêm nhánh chứ không xây lại — đó là dấu hiệu của một hệ thống thật.</h1>
+    <p class="lede">Một file thì tới lúc đổi việc là bỏ đi làm lại. Một hệ thống thì khi bạn lớn lên, nó lớn theo. Đó là khác biệt giữa "ghi chú" và "vault".</p>
+  </div>
+  <div class="stage-strip">Chốt phần tự xây bằng một câu: cái gì xây lại mỗi lần đổi việc thì là file, vứt đi rồi làm lại. Cái gì lớn theo bạn, mọc thêm nhánh khi bạn đổi nghề, thì là hệ thống. Bạn đang xây cái thứ hai. Đó là lý do nó đáng công.</div>
+</section>
+
+<section class="slide cream-bg" id="slide-42" data-title="Tự động hoá thật" data-group="Kết" style="background-image:url('assets/bg-cream-3.png')">
+  <div class="wrap">
+    <div class="slide-kicker">KẾT · 1</div>
+    <h1>Giờ bạn tự tin hơn rồi. Và bạn tự động hoá được — bằng playbook và retro thật, không phải hứa hẹn.</h1>
+    <p class="lede">Mình không bán giấc mơ "một câu chạy cả công ty". Mình bán cái thật: nó làm phần việc lặp đi lặp lại, bạn giữ phần phán đoán. Và mỗi lần làm, retro ghi lại để lần sau tốt hơn.</p>
+  </div>
+  <div class="stage-strip">Gần xong rồi, mình nói thẳng để không bán quá tay. Cái này tụi mình test thật, có người chấm độc lập. Nó không "chạy cả công ty bằng một câu" — đừng tin ai bán bạn giấc mơ đó. Cái nó làm thật là: gánh phần việc lặp đi lặp lại, còn bạn giữ phần phán đoán và lái nó tới xong. Và vì có retro, mỗi lần làm nó khá hơn một chút. Đó là tự động hoá thật.</div>
+</section>
+
+<section class="slide split cream-bg" id="slide-43" data-title="Ba buổi một hệ thống" data-group="Kết" style="background-image:url('assets/bg-cream-1.png')">
+  <div class="wrap">
+    <div class="col-text">
+      <div class="slide-kicker">KẾT · 2</div>
+      <h1>Ba buổi gộp lại là hình dạng của một hệ thống.</h1>
+      <p class="lede">Buổi 1: bạn làm ra một thứ. Buổi 2: bạn bán được nó. Buổi 3 — tối nay: bạn để nó tự chạy phần cơ học. Làm ra → bán được → tự chạy. Đó là một vòng đủ.</p>
+    </div>
+    <div class="col-visual">
+      <div style="display:flex;align-items:center;gap:12px;color:#141413;">
+        <div style="border:2px solid #141413;background:#faf9f5;padding:20px 18px;font-weight:900;min-width:126px;text-align:center;">Buổi 1<br><span style="color:#b0aea5;">Làm ra</span></div>
+        <div style="color:#d97757;font-size:30px;font-weight:900;">→</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:20px 18px;font-weight:900;min-width:126px;text-align:center;">Buổi 2<br><span style="color:#b0aea5;">Bán được</span></div>
+        <div style="color:#d97757;font-size:30px;font-weight:900;">→</div>
+        <div style="border:2px solid #141413;background:#faf9f5;padding:20px 18px;font-weight:900;min-width:126px;text-align:center;">Buổi 3<br><span style="color:#b0aea5;">Tự chạy</span></div>
+      </div>
+      <div style="color:#d97757;font-size:48px;font-weight:900;text-align:center;margin-top:22px;">↻</div>
+    </div>
+  </div>
+  <div class="stage-strip">Lùi lại nhìn cả ba buổi. Buổi một bạn làm ra được một thứ. Buổi hai bạn bán được nó bằng nút trả tiền thật. Buổi ba, tối nay, bạn để nó tự chạy phần cơ học và tự rút kinh nghiệm. Làm ra, bán được, tự chạy — ba buổi đó gộp lại là hình dạng đầy đủ của một hệ thống cho công ty một người.</div>
+</section>
+
+<section class="slide section bg-image" id="slide-44" data-title="Về xây vault của bạn" data-group="Kết" style="background-image:url('assets/hang-confident.png')">
+  <div class="wrap">
+    <div class="slide-kicker">KẾT · 3</div>
+    <h1>Không ai hiểu nghề của bạn hơn bạn. Nên không ai xây được vault của bạn tốt hơn bạn.</h1>
+    <p class="lede">Hôm nay bạn có đủ hình dạng rồi — cấu trúc, dòng chảy, bộ não, cách tự xây. Về xây cái của riêng mình.</p>
+  </div>
+  <div class="stage-strip">Câu cuối, mình muốn bạn mang về. Cả tối nay mình lái trên vault của Hằng, nhưng cái thật sự mình trao cho bạn là cái khuôn. Không ai hiểu nghề của bạn hơn bạn — nên không ai xây được vault của bạn tốt hơn bạn. Hôm nay bạn đã có đủ hình dạng: cấu trúc bốn phần, cái vòng khép kín, bộ não điều khiển, và ba tầng để tự xây. Phần còn lại là về nhà, xây cái của chính mình. Cảm ơn mọi người.</div>
+</section>
+</main>
+<script>
+'use strict';
+
+const deck = document.getElementById('deck');
+const slides = [...deck.querySelectorAll('.slide')];
+const sidebar = document.getElementById('sidebar');
+const gridDialog = document.getElementById('grid-dialog');
+const gdGrid = document.getElementById('gd-grid');
+const progressBar = document.getElementById('progress-bar');
+const kbdHint = document.getElementById('kbd-hint');
+
+/* ===== Auto slide numbers ===== */
+slides.forEach((s, i) => {
+  const num = document.createElement('div');
+  num.className = 'slide-num';
+  num.textContent = `${String(i+1).padStart(2,'0')} / ${String(slides.length).padStart(2,'0')}`;
+  s.prepend(num);
+});
+
+/* ===== Sidebar items ===== */
+slides.forEach((s, i) => {
+  const item = document.createElement('button');
+  item.type = 'button';
+  item.className = 'sb-item';
+  item.dataset.idx = i;
+  item.innerHTML = `<span class="sb-n">${String(i+1).padStart(2,'0')}</span><span class="sb-t">${s.dataset.title || 'Slide '+(i+1)}</span>`;
+  item.style.cssText += 'background:transparent;border:1px solid transparent;text-align:left;width:100%;font:inherit;color:inherit';
+  item.addEventListener('click', () => scrollToSlide(i));
+  sidebar.appendChild(item);
+});
+const sbItems = [...sidebar.querySelectorAll('.sb-item')];
+
+/* ===== Title-card thumbnails ===== */
+const THUMB_META = slides.map((s) => ({
+  sub: s.querySelector('.lede')?.textContent?.trim() || '',
+  tag: s.dataset.group || 'Slide',
+  icon: s.classList.contains('dark') ? '●' : '→'
+}));
+
+function buildThumbs(){
+  gdGrid.innerHTML = '';
+  slides.forEach((s, i) => {
+    const meta = THUMB_META[i] || { sub: '', tag: '', icon: '' };
+    const t = document.createElement('button');
+    t.type = 'button';
+    t.className = 'thumb' + (s.classList.contains('dark') ? ' dark' : '');
+    const tagCls = meta.cls ? ` ${meta.cls}` : '';
+    t.innerHTML = `
+      <div class="t-num">${String(i+1).padStart(2,'0')} / ${String(slides.length).padStart(2,'0')}</div>
+      <div class="t-title">${s.dataset.title || 'Slide ' + (i+1)}</div>
+      <div class="t-sub">${meta.sub}</div>
+      <div class="t-foot">
+        <span class="t-tag${tagCls}">${meta.tag}</span>
+        <span class="t-icon" aria-hidden="true">${meta.icon}</span>
+      </div>
+    `;
+    t.addEventListener('click', () => {
+      closeGrid();
+      requestAnimationFrame(() => scrollToSlide(i));
+    });
+    gdGrid.appendChild(t);
+  });
+}
+
+/* ===== Navigation ===== */
+function currentSlide(){
+  // pick the slide closest to viewport top
+  let idx = 0, best = Infinity;
+  slides.forEach((s, i) => {
+    const top = Math.abs(s.getBoundingClientRect().top);
+    if (top < best){ best = top; idx = i; }
+  });
+  return idx;
+}
+function scrollToSlide(i, behavior = 'smooth'){
+  if (!slides[i]) return;
+  slides[i].scrollIntoView({ behavior, block: 'start' });
+  const id = slides[i].id;
+  if (id) history.replaceState(null, '', `#${id}`);
+}
+function navNext(){ const i = currentSlide(); if (i < slides.length - 1) scrollToSlide(i + 1); }
+function navPrev(){ const i = currentSlide(); if (i > 0) scrollToSlide(i - 1); }
+
+/* ===== Active sidebar item — IntersectionObserver, single threshold, no flicker ===== */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting){
+      const idx = slides.indexOf(e.target);
+      sbItems.forEach((it, i) => it.classList.toggle('active', i === idx));
+      const id = e.target.id;
+      if (id && location.hash !== `#${id}`) history.replaceState(null, '', `#${id}`);
+      e.target.classList.add('in-view');   /* awwwards reveal fallback (Safari/no scroll-driven-anim) */
+    }
+  });
+}, { threshold: 0.55 });          // strict single threshold — no jitter
+slides.forEach(s => io.observe(s));
+
+/* ===== Keyboard ===== */
+document.addEventListener('keydown', e => {
+  const inGrid = gridDialog.open;
+  // ignore typing inside inputs
+  if (e.target.matches('input, textarea')) return;
+
+  if (e.key === 'Escape'){
+    if (inGrid){ e.preventDefault(); closeGrid(); }
+    else { e.preventDefault(); openGrid(); }
+  } else if (e.key === 'g' || e.key === 'G'){
+    e.preventDefault();
+    if (inGrid) closeGrid(); else openGrid();
+  } else if (e.key === 's' || e.key === 'S'){
+    document.body.classList.toggle('sidebar-mode');
+  } else if (e.key === 'n' || e.key === 'N'){
+    document.body.classList.toggle('notes-mode');
+  } else if (e.key === 'd' || e.key === 'D'){
+    document.body.classList.toggle('dark-ui');
+  } else if (e.key === 'f' || e.key === 'F'){
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  } else if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' '){
+    if (!inGrid){ e.preventDefault(); navNext(); }
+  } else if (e.key === 'ArrowUp' || e.key === 'PageUp'){
+    if (!inGrid){ e.preventDefault(); navPrev(); }
+  } else if (e.key === 'Home'){ scrollToSlide(0); }
+    else if (e.key === 'End'){ scrollToSlide(slides.length - 1); }
+});
+
+/* ===== Grid via <dialog> + View Transition ===== */
+function openGrid(){
+  buildThumbs();
+  const open = () => gridDialog.showModal();
+  if (document.startViewTransition){
+    document.startViewTransition(open);
+  } else { open(); }
+}
+function closeGrid(){
+  const close = () => gridDialog.close();
+  if (document.startViewTransition){
+    document.startViewTransition(close);
+  } else { close(); }
+}
+
+/* ===== Fade kbd hint ===== */
+let hintTimer = null;
+function poke(){
+  document.body.classList.remove('hide-hint');
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(() => document.body.classList.add('hide-hint'), 4500);
+}
+deck.addEventListener('scroll', poke, { passive: true });
+document.addEventListener('keydown', poke);
+poke();
+
+/* ===== Fallback progress bar (no scroll-timeline support) ===== */
+if (!CSS.supports('animation-timeline: scroll()')){
+  deck.addEventListener('scroll', () => {
+    const max = deck.scrollHeight - deck.clientHeight;
+    progressBar.style.width = (deck.scrollTop / max * 100) + '%';
+  }, { passive: true });
+}
+
+/* ===== Hash deep-link ===== */
+window.addEventListener('load', () => {
+  if (location.hash){
+    const target = document.getElementById(location.hash.slice(1));
+    const idx = slides.indexOf(target);
+    if (idx >= 0) scrollToSlide(idx, 'auto');
+  }
+});
+
+/* ===== Interactive: fulfillment fan-out (slide order.paid) ===== */
+(function(){
+  const btn = document.getElementById('fp-btn');
+  if (!btn) return;
+  let fired = false;
+  function fire(){
+    const edges = [...document.querySelectorAll('.fp-edge')];
+    const nodes = [...document.querySelectorAll('.fp-nodes text')];
+    btn.classList.add('fired');
+    edges.forEach((e,i)=> setTimeout(()=>{
+      e.classList.add('lit');
+      if (nodes[i]) nodes[i].classList.add('lit');
+    }, 180*i + 120));
+    setTimeout(()=> btn.classList.remove('fired'), 600);
+  }
+  function reset(){
+    document.querySelectorAll('.fp-edge.lit, .fp-nodes text.lit').forEach(el=>el.classList.remove('lit'));
+    fired = false;
+  }
+  btn.addEventListener('click', ()=>{ if(fired){ reset(); } else { fire(); fired=true; } });
+})();
+
+/* ===== Interactive: pricing ladder (decoy steer) ===== */
+(function(){
+  const tiers = [...document.querySelectorAll('.pl-tier')];
+  if (!tiers.length) return;
+  const readout = document.getElementById('pl-readout');
+  const msg = {
+    good:  'Bậc rẻ: được học thôi. Nhiều người tiếc, vì thêm chút nữa là có cả hệ thống.',
+    better:'Bậc giữa: thêm 300k so với bậc rẻ mà được xài hệ thống 6 tháng. Đa số dừng ở đây — đó là chỗ mình muốn họ tới.',
+    best:  'Bậc đắt: có mình đi cùng. Ít người chọn, nhưng nó làm bậc giữa nhìn ra hời.'
+  };
+  tiers.forEach(t=> t.addEventListener('click', ()=>{
+    tiers.forEach(x=>x.classList.remove('picked'));
+    t.classList.add('picked');
+    readout.innerHTML = msg[t.dataset.tier] || '';
+  }));
+})();
+
+/* ===== Interactive: framework explorer (CODE / PARA / Zettelkasten) ===== */
+(function(){
+  const tabs = [...document.querySelectorAll('#fw-tabs .fw-tab')];
+  if (!tabs.length) return;
+  const panels = [...document.querySelectorAll('#fw-stage .fw-panel')];
+  const order = ['code','para','zettel'];
+  function show(key){
+    tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.fw === key)));
+    panels.forEach(p => p.setAttribute('data-active', String(p.dataset.fw === key)));
+  }
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.fw)));
+  // 1 / 2 / 3 jump to a framework — only while slide-7b is the one in view
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('input, textarea')) return;
+    const idx = ({'1':0,'2':1,'3':2})[e.key];
+    if (idx === undefined) return;
+    const slide = document.getElementById('slide-7b');
+    if (!slide) return;
+    const r = slide.getBoundingClientRect();
+    const inView = r.top < window.innerHeight*0.5 && r.bottom > window.innerHeight*0.5;
+    if (inView){ e.preventDefault(); show(order[idx]); }
+  });
+})();
+</script>
+</body>
+</html>

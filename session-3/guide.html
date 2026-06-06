@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Studio Buổi 3 · vault đầy đủ — cách dùng my-os & my-agency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500;1,9..144,700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#141413;
+    --cream:#faf9f5;
+    --light-gray:#e8e6dc;
+    --mid:#6a6a6a;
+    --accent:#d97757;
+    --accent-soft:#f3e2d8;
+    --surface:#ffffff;
+    --sans:'Be Vietnam Pro',system-ui,sans-serif;
+    --serif:'Fraunces',Georgia,serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--cream);color:var(--ink);font-family:var(--sans);font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  header{position:sticky;top:0;background:rgba(250,249,245,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--light-gray);z-index:50}
+  header .inner{max-width:1100px;margin:0 auto;padding:1rem 6vw;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.78rem;color:var(--mid);letter-spacing:.1em;text-transform:uppercase}
+  header .brand{color:var(--accent);font-weight:700}
+  header nav{display:flex;gap:1.4rem}
+  header nav a{color:var(--mid);text-decoration:none;transition:color .2s}
+  header nav a:hover{color:var(--accent)}
+
+  section{padding:8vh 6vw;border-bottom:1px solid var(--light-gray)}
+  .wrap{max-width:980px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:1.2rem}
+
+  h1.hero-headline{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(2.6rem,6vw,4.8rem);line-height:1.06;letter-spacing:-.02em;color:var(--ink);max-width:22ch;margin-bottom:1.6rem}
+  h1.hero-headline .accent{color:var(--accent);font-style:italic}
+  .hero-subhead{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.15rem,1.8vw,1.5rem);color:var(--mid);max-width:48ch;line-height:1.45;margin-bottom:2.4rem}
+  .scroll-hint{font-family:var(--mono);font-size:.85rem;color:var(--mid);letter-spacing:.1em;display:inline-flex;align-items:center;gap:.6rem}
+  .scroll-hint::after{content:"↓";font-size:1.1rem;animation:bounce 1.6s ease-in-out infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+  h2{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.9rem,3.6vw,2.8rem);line-height:1.12;color:var(--ink);max-width:24ch;margin-bottom:1.6rem}
+  h2 .accent{color:var(--accent)}
+  h3{font-family:var(--sans);font-weight:800;font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.3;color:var(--ink);margin-bottom:.6rem;letter-spacing:-.01em}
+
+  .lead{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(1.15rem,1.7vw,1.4rem);color:var(--mid);max-width:50ch;margin-bottom:2rem;line-height:1.45}
+
+  p{max-width:62ch;margin-bottom:1.1rem;font-size:clamp(1rem,1.15vw,1.1rem);color:var(--ink)}
+  p.muted{color:var(--mid)}
+
+  .section-title-row{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap;margin-bottom:.4rem}
+  .section-title-row .num{font-family:var(--mono);font-size:.9rem;color:var(--accent);letter-spacing:.18em}
+
+  /* step list (workflow) */
+  .steps{counter-reset:step;margin-top:1.8rem;display:grid;gap:1rem}
+  .step{background:var(--surface);border:1px solid var(--light-gray);border-left:3px solid var(--accent);border-radius:12px;padding:1.4rem 1.6rem;display:grid;grid-template-columns:auto 1fr;gap:1.2rem;align-items:start}
+  .step .step-num{counter-increment:step;font-family:var(--mono);font-weight:700;color:var(--accent);font-size:1.4rem;line-height:1}
+  .step .step-num::before{content:counter(step)}
+  .step h3{margin-bottom:.3rem;font-size:1.15rem}
+  .step .who{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.14em;color:var(--mid);margin-bottom:.5rem}
+  .step p{max-width:none;margin-bottom:0;font-size:1rem}
+  .step code{font-size:.85em}
+
+  /* mapping table (promise -> studio) */
+  .map-table{margin-top:1.8rem;border:1px solid var(--light-gray);border-radius:12px;overflow:hidden;background:var(--surface)}
+  .map-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--light-gray)}
+  .map-row:last-child{border-bottom:none}
+  .map-row > div{padding:1rem 1.3rem}
+  .map-row .stage{font-family:var(--serif);font-style:italic;color:var(--mid);border-right:1px solid var(--light-gray);line-height:1.4}
+  .map-row .studio{font-size:.98rem;line-height:1.45}
+  .map-row .studio b{color:var(--accent)}
+  .map-head{background:var(--accent-soft)}
+  .map-head .stage,.map-head .studio{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-style:normal}
+
+  /* skill cards */
+  .skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin-top:1.8rem}
+  .skill-card{background:var(--surface);border:1px solid var(--light-gray);border-top:3px solid var(--accent);border-radius:12px;padding:1.5rem 1.6rem}
+  .skill-card .skill-name{font-family:var(--mono);font-weight:700;color:var(--accent);font-size:1rem;margin-bottom:.6rem}
+  .skill-card p{max-width:none;font-size:.95rem;margin-bottom:.8rem}
+  .skill-card .say{font-family:var(--serif);font-style:italic;color:var(--mid);font-size:.92rem;line-height:1.4}
+
+  pre{background:var(--ink);color:var(--cream);padding:1.4rem 1.6rem;border-radius:12px;overflow-x:auto;font-family:var(--mono);font-size:.92rem;line-height:1.6;margin:1.6rem 0}
+  pre .cm{color:var(--accent);font-weight:700}
+  code{font-family:var(--mono);font-size:.9em;background:var(--accent-soft);color:var(--ink);padding:.1em .35em;border-radius:3px}
+
+  .paths{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:1.8rem}
+  .path-card{background:var(--surface);border:1px solid var(--light-gray);border-top:3px solid var(--accent);border-radius:12px;padding:1.6rem 1.8rem}
+  .path-card .path-tag{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
+  .path-card h4{font-family:var(--sans);font-weight:700;font-size:1.15rem;margin-bottom:.7rem;color:var(--ink)}
+  .path-card p{font-size:.98rem;margin-bottom:0;max-width:none}
+
+  .callout{background:var(--accent-soft);border:2px solid var(--accent);border-radius:12px;padding:1.4rem 1.6rem;margin:1.8rem 0}
+  .callout .ct-tag{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.16em;color:var(--accent);margin-bottom:.5rem}
+  .callout p{max-width:none;margin-bottom:0;font-size:1rem}
+
+  footer{background:var(--ink);color:var(--cream);padding:6vh 6vw}
+  footer .wrap{max-width:980px;margin:0 auto}
+  footer .tagline{font-family:var(--serif);font-style:italic;font-size:clamp(1.2rem,1.8vw,1.5rem);max-width:34ch;margin-bottom:2.4rem;line-height:1.4}
+  footer .tagline .accent{color:var(--accent)}
+  footer .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.4rem;margin-bottom:2.4rem;padding-bottom:2rem;border-bottom:1px solid rgba(255,255,255,.1)}
+  footer .links a{color:var(--cream);text-decoration:none;font-family:var(--mono);font-size:.88rem;letter-spacing:.04em;display:block;padding:.6rem 0;border-bottom:1px solid transparent;transition:border-color .2s,color .2s}
+  footer .links a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+  footer .closing{font-family:var(--serif);font-style:italic;color:var(--mid);font-size:1rem}
+
+  @media (max-width:760px){
+    .paths{grid-template-columns:1fr}
+    .map-row{grid-template-columns:1fr}
+    .map-row .stage{border-right:none;border-bottom:1px solid var(--light-gray)}
+    .step{grid-template-columns:1fr}
+    section{padding:6vh 5vw}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .scroll-hint::after{animation:none}
+    *{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <span class="brand">CÔNG TY MỘT NGƯỜI · BUỔI 3</span>
+        <nav>
+      <a href="index.html">Deck</a>
+      <a href="#two">Hai vault</a>
+      <a href="#workflow">Quy trình</a>
+      <a href="#skills">Skills</a>
+      <a href="#start">Bắt đầu</a>
+    </nav>
+  </div>
+</header>
+
+
+<section id="hero">
+  <div class="wrap">
+    <div class="eyebrow">Workshop Studio · hướng dẫn dùng · Buổi 3</div>
+    <h1 class="hero-headline">Cuối cùng, studio tốt nghiệp thành <span class="accent">một cái nhà tự lớn</span>.</h1>
+    <p class="hero-subhead">Buổi 1 để lại kỹ năng làm slide. Buổi 2 để lại quy trình bán + giao. Buổi 3 gom hết vào một vault đầy đủ — nói một câu mơ hồ, nó tự đọc nhà, chọn đường, chạy. Và khi thiếu việc gì, nó tự mọc thêm skill.</p>
+    <span class="scroll-hint">Cuộn xuống</span>
+  </div>
+</section>
+
+<section id="what">
+  <div class="wrap">
+    <div class="section-title-row"><span class="num">01</span></div>
+    <h2>Buổi 3 thêm <span class="accent">gì</span></h2>
+    <p class="lead">Buổi 2 bạn còn phải biết gọi tên skill nào. Buổi 3 có một cửa vào duy nhất: bạn nói ý định, vault lo phần còn lại.</p>
+    <div class="skills">
+      <div class="skill-card"><div class="skill-name">studio · nhạc trưởng</div><p>Cửa vào duy nhất. Bạn nói <i>"mình muốn mở một lớp dạy X"</i> — nó đọc vault trước, chọn playbook, gọi đúng chuỗi skill. Bạn không cần nhớ tên skill nào.</p></div>
+      <div class="skill-card"><div class="skill-name">operate · chạy đường mòn</div><p>Việc đã làm một lần thì có <code>10-playbooks/</code> ghi lại đường đi. Lần sau <b>operate</b> chạy theo bản đồ đó — nhanh và sắc hơn.</p></div>
+      <div class="skill-card"><div class="skill-name">skill-creator · tự mọc tay nghề</div><p>Thiếu một việc lặp lại chưa có skill? Vault tự build skill mới cho chính nó. Cái nhà tự lớn theo bạn, không reset.</p></div>
+    </div>
+    <div class="callout">
+      <div class="ct-tag">4 nguyên tắc chạy ngầm (đọc CLAUDE.md là thấy)</div>
+      <p>Vault nhớ được (mọi thứ thành file, không nằm trong đầu) · nói tiếng người (bạn mô tả việc, không gọi lệnh) · bạn chỉ chạm bước quyết định · đóng vòng (mỗi lần xong → retro vào <code>50-reviews/</code> → playbook lớn lên).</p>
+    </div>
+  </div>
+</section>
+
+<section id="two">
+  <div class="wrap">
+    <div class="section-title-row"><span class="num">02</span></div>
+    <h2>Hai cái nhà — chọn cái <span class="accent">đúng đời bạn</span></h2>
+    <p class="lead">Cùng một bộ xương. Khác nhau một trục. Trong Drive có 2 file zip — giải nén cái hợp với bạn (hoặc cả hai để so).</p>
+    <div class="paths">
+      <div class="path-card">
+        <div class="path-tag">my-os-buoi-3.zip</div>
+        <h4>my-os — bạn bán đồ CỦA MÌNH</h4>
+        <p>Mô hình người bán: sản phẩm của bạn, người mua nằm ở <code>60-people/</code>. Mở lớp, bán khoá, bán dịch vụ của chính bạn. Đây là vault gốc — nếu chưa chắc, dùng cái này.</p>
+      </div>
+      <div class="path-card">
+        <div class="path-tag">my-agency-buoi-3.zip</div>
+        <h4>my-agency — bạn làm CHO khách</h4>
+        <p>Thêm một trục: <code>clients/{khách}/</code> — mỗi khách dịch vụ một nhà riêng (giọng của họ + khách của họ + scope đã chốt + ledger quyết định). Có luật cứng <b>cách ly context giữa các khách</b>. Hợp freelance / agency / nhận job.</p>
+      </div>
+    </div>
+    <div class="map-table">
+      <div class="map-row map-head">
+        <div class="stage">clients/{khách}/</div>
+        <div class="studio">60-people/{người}.md</div>
+      </div>
+      <div class="map-row">
+        <div class="stage"><b>Khách dịch vụ</b> — thuê bạn làm cho business của HỌ</div>
+        <div class="studio"><b>Người mua sản phẩm CỦA BẠN</b> — học viên, khách lẻ</div>
+      </div>
+      <div class="map-row">
+        <div class="stage">Một folder: about + audience của họ + offers + ledger</div>
+        <div class="studio">Một file: đã mua gì, ngày, trạng thái</div>
+      </div>
+    </div>
+    <div class="callout">
+      <div class="ct-tag">Một câu để khỏi lẫn</div>
+      <p><code>clients/</code> = bạn làm <b>CHO</b> ai · <code>60-people/</code> = ai mua <b>CỦA</b> bạn. my-agency có cả hai; my-os chỉ có vế sau.</p>
+    </div>
+  </div>
+</section>
+
+<section id="workflow">
+  <div class="wrap">
+    <div class="section-title-row"><span class="num">03</span></div>
+    <h2>Quy trình <span class="accent">6 bước</span> — từ ý tưởng tới bán + giao</h2>
+    <p class="lead">Giống Buổi 2, nhưng giờ <b>studio</b> mở màn: đọc vault, chọn playbook, rồi mới chạy chuỗi. Bạn chỉ nói câu đầu.</p>
+    <div class="steps">
+      <div class="step"><span class="step-num"></span><div><div class="who">skill studio · ~10 giây</div><h3>Studio đọc nhà</h3><p>Bạn nói <i>"mình muốn mở lớp dạy X"</i>. Nhạc trưởng đọc <code>CLAUDE.md</code> + vault, chọn playbook trong <code>10-playbooks/</code>, rồi chạy bản đồ dưới. Mơ hồ cũng được — nó hỏi lại đúng cái cần.</p></div></div>
+      <div class="step"><span class="step-num"></span><div><div class="who">Bạn · ~5 phút</div><h3>Ý tưởng</h3><p>Drop brief vào <code>90-inbox/{ten-san-pham}/</code> (hoặc nói thẳng): bán gì, cho ai, giá nghĩ trong đầu.</p></div></div>
+      <div class="step"><span class="step-num"></span><div><div class="who">skill brand</div><h3>Brand</h3><p>Phỏng vấn tối thiểu → <code>00-foundation/audience/{tên}.md</code> (nền, tái dùng) + <code>20-products/{sp}/brand.md</code> (offer/positioning/pricing). Phần quyết định — bạn duyệt.</p></div></div>
+      <div class="step"><span class="step-num"></span><div><div class="who">skill ship · sellkit-landing</div><h3>Landing + Checkout</h3><p><b>ship</b> fork một landing đã đẹp rồi đổ nội dung vô (bạn không đụng CSS). Rồi <b>sellkit-landing</b> nối nút mua thật — verify ra order thật. Đây là chỗ bạn nối tay.</p></div></div>
+      <div class="step"><span class="step-num"></span><div><div class="who">skill ship</div><h3>Fulfillment</h3><p><code>fulfillment.md</code>: cái gì tự chạy sau <code>order.paid</code> — email + lịch + group (có consent) + nhắc + recap. Ngoại lệ (đổi suất/hoàn tiền) có audit.</p></div></div>
+      <div class="step"><span class="step-num"></span><div><div class="who">skill slide · nếu cần · + RETRO</div><h3>Deck + đóng vòng</h3><p>Cần deck bán → <code>30-projects/{dự án}/deck/</code> (năng lực Buổi 1). Xong xuôi → 1 file <code>50-reviews/</code>: chạy gì, tái dùng gì, sửa gì. Chấm điểm playbook → lần sau nhanh hơn.</p></div></div>
+    </div>
+    <div class="callout">
+      <div class="ct-tag">Làm cho khách (my-agency)</div>
+      <p>Cùng 6 bước, nhưng <b>brand</b> làm cho KHÁCH (không đụng <code>me.md</code> của bạn), job đặt ở <code>30-projects/{khách}-job-N</code> và link về <code>clients/{khách}/</code>. Trước khi build, Counsel đọc <code>clients/{khách}/decisions.md</code> để khỏi làm lại cái đã chốt.</p>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="section-title-row"><span class="num">04</span></div>
+    <h2>Năng lực — cứ nói việc bằng <span class="accent">tiếng người</span></h2>
+    <div class="skills">
+      <div class="skill-card"><div class="skill-name">studio</div><p>Nhạc trưởng — cửa vào. Đọc vault, chọn playbook, gọi đúng chuỗi skill.</p><div class="say">"mình muốn mở lớp dạy X", "có sản phẩm mới"</div></div>
+      <div class="skill-card"><div class="skill-name">operate</div><p>Chạy một playbook đã biết theo bản đồ — nhanh, ít hỏi lại.</p><div class="say">"chạy lại quy trình bán như lần trước"</div></div>
+      <div class="skill-card"><div class="skill-name">brand</div><p>offer + positioning + pricing + audience → <code>brand.md</code>. Của bạn hoặc của khách.</p><div class="say">"bán X cho ai, định vị sao, giá nào"</div></div>
+      <div class="skill-card"><div class="skill-name">ship</div><p>landing (copy → trang đẹp) + fulfillment runbook. Tự đề xuất style, tự soi pre-flight.</p><div class="say">"dựng landing", "sau khi khách trả tiền thì sao"</div></div>
+      <div class="skill-card"><div class="skill-name">sellkit-landing</div><p>nối SellKit checkout thật vào landing, verify ra order thật.</p><div class="say">"gắn nút mua/đăng ký vô trang"</div></div>
+      <div class="skill-card"><div class="skill-name">slide</div><p>research → slide deck. Năng lực mang từ Buổi 1.</p><div class="say">"làm deck giới thiệu lớp"</div></div>
+      <div class="skill-card"><div class="skill-name">me</div><p>chân dung CHỦ studio (bạn). Chạy 1 lần, dùng lại.</p><div class="say">"làm chân dung mình"</div></div>
+      <div class="skill-card"><div class="skill-name">skill-creator</div><p>thiếu một việc lặp lại chưa có skill → vault tự build skill mới.</p><div class="say">"việc này mình làm hoài, tạo skill đi"</div></div>
+    </div>
+    <div class="callout">
+      <div class="ct-tag">Đừng lẫn me với brand</div>
+      <p><b>me</b> = CHỦ studio (bạn — ổn định, không đổi theo khách). <b>brand</b> = sản phẩm đang bán + danh tính người bán của nó (per-product, của bạn hoặc của khách). Làm cho khách → <b>brand</b> cho khách, KHÔNG đụng <b>me</b>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <div class="section-title-row"><span class="num">05</span></div>
+    <h2>Cách <span class="accent">bắt đầu</span></h2>
+    <p class="lead">Trong folder Drive có 2 zip. Giải nén cái hợp với bạn, mở Claude Code trong thư mục đó, nói một câu.</p>
+    <pre><span class="cm"># 1. giải nén studio (chọn 1 — hoặc cả 2 để so)</span>
+unzip my-os-buoi-3.zip        <span class="cm"># bán đồ của mình</span>
+unzip my-agency-buoi-3.zip    <span class="cm"># làm cho khách</span>
+
+<span class="cm"># 2. mở Claude Code ngay trong thư mục vault</span>
+cd my-os
+claude
+
+<span class="cm"># 3. nói một câu — studio (nhạc trưởng) lo phần còn lại</span>
+<span class="cm"># &gt;</span> Mình muốn mở một lớp luyện IELTS speaking cho người đi làm, giá tầm 3 triệu.</pre>
+    <p class="muted">Vào nhà rồi, AI đọc <code>CLAUDE.md</code> (bộ não) trước. Cần bản đồ từng bước thì có <code>WORKFLOW.md</code>. Mở deck Buổi 3 song song với trang này để đối chiếu: mỗi lời hứa trên sân khấu có một chỗ thật trong vault.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="tagline">Một câu tiếng người vô. <span class="accent">Cả một cái nhà tự chạy ra.</span></div>
+    <div class="links">
+      <a href="index.html">Xem deck Buổi 3 →</a>
+      <a href="../session-2/index.html">Deck Buổi 2 (Bán + Giao) →</a>
+      <a href="../session-1/index.html">Deck Buổi 1 (Slide) →</a>
+      <a href="https://go.bnqtoan.workers.dev/insider-cong-ty-mot-nguoi" target="_blank" rel="noopener">Tham gia Insider →</a>
+    </div>
+    <div class="closing">Hết 3 buổi. Giờ tới lượt bạn build — rồi vô <span class="accent">Insider</span> build cùng anh em.</div>
+  </div>
+</footer>
+
+</body>
+</html>
